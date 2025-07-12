@@ -21,14 +21,31 @@ import {
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles, highlighted: true },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
 
-function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
+function NavLink({ href, icon: Icon, label, highlighted = false }: { href: string; icon: React.ElementType; label: string, highlighted?: boolean }) {
   const pathname = usePathname();
   const isActive = pathname === href;
+
+  if (highlighted) {
+    return (
+         <Link
+            href={href}
+            className={cn(
+                "flex flex-col items-center justify-center gap-1 p-2 rounded-full transition-all -translate-y-2.5 h-14 w-14",
+                isActive
+                ? "bg-primary text-primary-foreground shadow-lg"
+                : "bg-background text-primary shadow-md hover:bg-primary/90 hover:text-primary-foreground"
+            )}
+        >
+            <Icon className="h-6 w-6" />
+            <span className="text-xs font-medium text-center">{label}</span>
+        </Link>
+    )
+  }
 
   return (
     <Link
@@ -119,7 +136,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-1 md:h-auto">
+        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-1 md:h-auto items-center">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>
