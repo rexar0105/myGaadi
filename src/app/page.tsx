@@ -81,9 +81,14 @@ export default function DashboardPage() {
   }
 
   const upcomingServices = serviceRecords
-    .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
-    .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime())
-    .slice(0, 3);
+    .filter((s) => {
+        if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) {
+            return false;
+        }
+        const daysLeft = differenceInDays(new Date(s.nextDueDate), new Date());
+        return daysLeft <= 14;
+    })
+    .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
 
   return (
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
@@ -193,14 +198,14 @@ export default function DashboardPage() {
                     <CardTitle className="font-headline flex items-center gap-2 text-xl">
                       <Wrench className="text-primary" /> Service Reminders
                     </CardTitle>
-                    <CardDescription>Your next upcoming services.</CardDescription>
+                    <CardDescription>Your next upcoming services due within 14 days.</CardDescription>
                 </CardHeader>
                 <CardContent>
                    <ul className="space-y-4">
                       {upcomingServices.map((service, index) => {
                         const dueDate = new Date(service.nextDueDate!);
                         const daysLeft = differenceInDays(dueDate, new Date());
-                        const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
+                        const urgency = daysLeft < 7 ? "destructive" : "secondary";
                         
                         return (
                             <li 
@@ -213,8 +218,8 @@ export default function DashboardPage() {
                                   <p className="font-semibold">{service.service}</p>
                                   <p className="text-sm text-muted-foreground">{service.vehicleName}</p>
                                 </div>
-                                <Badge variant={urgency === 'default' ? 'outline' : urgency}>
-                                  {daysLeft} days left
+                                <Badge variant={urgency}>
+                                  {daysLeft <= 0 ? "Due Today" : `${daysLeft} days left`}
                                 </Badge>
                               </div>
                                <p className="text-xs text-muted-foreground mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
