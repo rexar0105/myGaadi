@@ -133,7 +133,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-2 md:h-auto items-center justify-items-center">
+        <div className="flex h-16 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-2 md:h-auto">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>
