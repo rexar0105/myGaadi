@@ -98,7 +98,7 @@ export default function ServicesPage() {
 
 
     return (
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-8 animate-fade-in">
              <div className="flex items-center justify-between mb-8">
                  <h2 className="text-3xl font-bold font-headline text-foreground">
                     Services
@@ -215,7 +215,7 @@ export default function ServicesPage() {
                 </Dialog>
             </div>
             <div className="grid gap-6">
-                <Card>
+                <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
                   <CardHeader>
                     <CardTitle className="font-headline flex items-center gap-2 text-xl">
                       <Wrench className="text-primary" /> Upcoming Services
@@ -230,7 +230,11 @@ export default function ServicesPage() {
                         const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
                         
                         return (
-                            <li key={service.id}>
+                            <li 
+                              key={service.id}
+                              className="animate-fade-in-up"
+                              style={{ animationDelay: `${index * 50 + 200}ms` }}
+                            >
                               <div className="flex justify-between items-center">
                                 <div>
                                   <p className="font-semibold">{service.service}</p>
@@ -249,7 +253,7 @@ export default function ServicesPage() {
                     </ul>
                   </CardContent>
                 </Card>
-                <Card>
+                <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
                     <CardHeader>
                         <CardTitle className="font-headline text-xl">Service History</CardTitle>
                         <CardDescription>All recorded services for your vehicles</CardDescription>
@@ -257,7 +261,11 @@ export default function ServicesPage() {
                     <CardContent>
                          <ul className="space-y-4">
                             {serviceHistory.map((record, index) => (
-                                <li key={record.id}>
+                                <li 
+                                  key={record.id}
+                                  className="animate-fade-in-up"
+                                  style={{ animationDelay: `${index * 50 + 300}ms` }}
+                                >
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <p className="font-semibold">{record.service}</p>

@@ -86,7 +86,7 @@ export function ConditionAssessment() {
   };
 
   return (
-    <Card>
+    <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
       <CardHeader>
         <div className="flex items-center gap-4">
             <div className="flex-shrink-0 bg-primary/10 text-primary p-3 rounded-full">
@@ -160,7 +160,7 @@ export function ConditionAssessment() {
               </Alert>
             )}
             {result && (
-              <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+              <Accordion type="single" collapsible defaultValue="item-1" className="w-full animate-fade-in">
                 <AccordionItem value="item-1">
                   <AccordionTrigger>AI Assessment</AccordionTrigger>
                   <AccordionContent>{result.assessment}</AccordionContent>

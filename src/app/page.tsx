@@ -35,6 +35,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -77,7 +78,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="p-4 md:p-8 flex-1">
+    <main className="p-4 md:p-8 flex-1 animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold font-headline text-foreground">
           Your Vehicles
@@ -180,8 +181,12 @@ export default function DashboardPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {vehicles.map((vehicle) => (
-            <div key={vehicle.id} className="rounded-2xl border p-4 flex flex-col gap-4 bg-card hover:bg-muted/50 transition-colors">
+          {vehicles.map((vehicle, index) => (
+            <div 
+              key={vehicle.id} 
+              className="rounded-2xl border p-4 flex flex-col gap-4 bg-card hover:bg-muted/50 transition-colors animate-fade-in-up"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
               <Image
                 src={vehicle.imageUrl}
                 alt={vehicle.name}

@@ -97,7 +97,7 @@ export default function InsurancePage() {
     const sortedInsurance = [...insurancePolicies].sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
     
     return (
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-8 animate-fade-in">
             <div className="flex items-center justify-between mb-8">
                  <h2 className="text-3xl font-bold font-headline text-foreground">
                     Insurance Status
@@ -213,7 +213,7 @@ export default function InsurancePage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2 text-xl">
                   <ShieldCheck className="text-primary" /> Insurance Status
@@ -221,7 +221,7 @@ export default function InsurancePage() {
                 <CardDescription>Policy renewal dates</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {sortedInsurance.map(policy => {
+                {sortedInsurance.map((policy, index) => {
                    const expiryDate = new Date(policy.expiryDate);
                    const daysLeft = differenceInDays(expiryDate, new Date());
                    const isExpired = isPast(expiryDate);
@@ -230,7 +230,11 @@ export default function InsurancePage() {
                    const progress = isExpired ? 100 : Math.min(100, (daysPassed / totalDuration) * 100);
 
                   return (
-                    <div key={policy.id}>
+                    <div 
+                      key={policy.id}
+                      className="animate-fade-in-up"
+                      style={{ animationDelay: `${index * 50 + 200}ms` }}
+                    >
                       <div className="flex justify-between items-baseline mb-1">
                         <div>
                             <p className="font-semibold">{policy.vehicleName}</p>

@@ -88,7 +88,7 @@ export default function ExpensesPage() {
     const recentExpenses = expenses.slice(0, 10);
 
     return (
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-8 animate-fade-in">
             <div className="flex items-center justify-between mb-8">
                 <h2 className="text-3xl font-bold font-headline text-foreground">
                     Recent Expenses
@@ -186,7 +186,7 @@ export default function ExpensesPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <Card>
+            <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2 text-xl">
                   <IndianRupee className="text-primary" /> Recent Expenses
@@ -195,8 +195,12 @@ export default function ExpensesPage() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
-                  {recentExpenses.map((expense) => (
-                    <li key={expense.id} className="flex justify-between items-center">
+                  {recentExpenses.map((expense, index) => (
+                    <li 
+                      key={expense.id} 
+                      className="flex justify-between items-center animate-fade-in-up"
+                      style={{ animationDelay: `${index * 50 + 200}ms` }}
+                    >
                       <div>
                         <p className="font-semibold">{expense.description}</p>
                         <p className="text-sm text-muted-foreground">{expense.vehicleName} - {expense.category}</p>
