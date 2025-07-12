@@ -35,7 +35,7 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
       <Link
         href={href}
         className={cn(
-          "flex items-center justify-center rounded-full transition-all text-sm font-medium bg-accent text-accent-foreground shadow-lg hover:bg-accent/90",
+          "flex items-center justify-center rounded-full transition-all text-sm font-medium bg-orange-500 text-white shadow-lg hover:bg-orange-600",
           "h-14 w-14 -translate-y-2 md:h-16 md:w-16"
         )}
       >
