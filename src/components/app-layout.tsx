@@ -15,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -69,7 +70,7 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -87,6 +88,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  const getInitials = (email: string) => {
+    if (!email) return "?";
+    return email[0].toUpperCase();
+  };
 
   return (
     <TooltipProvider>
@@ -99,12 +104,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2">
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href="/profile">
-                            <User className="h-5 w-5" />
-                            <span className="sr-only">Profile</span>
-                        </Link>
-                    </Button>
+                    <Link href="/profile">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email || ''} />
+                            <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
+                                {user ? getInitials(user.email) : <User />}
+                            </AvatarFallback>
+                        </Avatar>
+                    </Link>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>Profile</p>
