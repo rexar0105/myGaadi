@@ -13,8 +13,8 @@ import React from "react";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/services", label: "Services", icon: Wrench },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
