@@ -20,21 +20,21 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <circle cx="9.5" cy="19" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="7" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="8" cy="12" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="11" cy="9" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="14" cy="8" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="17" cy="9" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="20" cy="12" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="21" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="18.5" cy="19" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="14" cy="18" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="15.5" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="17" cy="13" r="1" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="18.5" cy="10.5" r="1" fill="hsl(var(--primary-foreground))"/>
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
+        <circle cx="9.37" cy="22.63" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="12" cy="24" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="15.06" cy="24.44" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="18.12" cy="23.88" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="20.88" cy="22.38" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="23.06" cy="20.06" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="24.44" cy="17.19" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="25" cy="14" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="24.44" cy="10.81" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="23.06" cy="7.94" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="16" cy="16" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="19.12" cy="12.88" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="22.25" cy="9.75" r="1.5" fill="hsl(var(--primary-foreground))"/>
     </svg>
 )
 
