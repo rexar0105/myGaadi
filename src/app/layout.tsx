@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { Inter } from 'next/font/google';
 import { AppLayout } from '@/components/app-layout';
+import { AuthProvider } from '@/context/auth-context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -28,8 +29,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans antialiased">
-        <AppLayout>{children}</AppLayout>
-        <Toaster />
+        <AuthProvider>
+            <AppLayout>{children}</AppLayout>
+            <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

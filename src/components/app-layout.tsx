@@ -1,10 +1,14 @@
+
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Car, IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Car, IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
+import { Button } from "./ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -35,15 +39,48 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+  const pathname = usePathname();
+
+  const handleLogout = () => {
+    logout();
+    toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out."
+    })
+    router.push("/login");
+  };
+
+  if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
+    // In a real app, you might have a loading spinner here
+    // or use a protected route component.
+    // For simplicity, we'll just render null or redirect in a useEffect.
+    if (typeof window !== 'undefined') {
+        router.push('/login');
+    }
+    return null; 
+  }
+
+  if (!isAuthenticated && (pathname === '/login' || pathname === '/signup')) {
+    return <>{children}</>;
+  }
+
+
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
+      <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
         <Link href="/" className="flex items-center gap-2 font-semibold">
             <div className="bg-primary text-primary-foreground p-2 rounded-full">
             <Car className="h-6 w-6" />
             </div>
             <span className="font-headline text-xl">myGaadi</span>
         </Link>
+        <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <LogOut className="h-5 w-5" />
+            <span className="sr-only">Logout</span>
+        </Button>
       </header>
 
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
