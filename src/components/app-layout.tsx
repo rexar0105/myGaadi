@@ -3,8 +3,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
-
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell } from "lucide-react";
+import { differenceInDays, isPast } from "date-fns";
+import { serviceRecords } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
@@ -16,13 +17,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M24 20C24 14.4772 19.5228 10 14 10C8.47715 10 4 14.4772 4 20" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M23 20C23 15.0294 18.9706 11 14 11C9.02944 11 5 15.0294 5 20" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
         <circle cx="14" cy="20" r="2.5" fill="hsl(var(--primary-foreground))"/>
-        <line x1="14" y1="20" x2="21" y2="13" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="14" y1="20" x2="20" y2="14" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
 )
 
@@ -93,6 +95,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return email[0].toUpperCase();
   };
 
+  const urgentServicesCount = serviceRecords
+    .filter((s) => {
+        if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) {
+            return false;
+        }
+        const daysLeft = differenceInDays(new Date(s.nextDueDate), new Date());
+        return daysLeft <= 14;
+    }).length;
+
   return (
     <TooltipProvider>
     <div className="flex flex-col min-h-screen">
@@ -104,14 +115,33 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2">
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Link href="/profile">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email || ''} />
-                            <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
-                                {user ? getInitials(user.email) : <User />}
-                            </AvatarFallback>
-                        </Avatar>
-                    </Link>
+                    <Button asChild variant="ghost" size="icon" className="relative">
+                        <Link href="/alerts">
+                            <Bell />
+                             {urgentServicesCount > 0 && (
+                                <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{urgentServicesCount}</Badge>
+                            )}
+                            <span className="sr-only">Alerts</span>
+                        </Link>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Notifications</p>
+                </TooltipContent>
+            </Tooltip>
+             <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button asChild variant="ghost" size="icon">
+                        <Link href="/profile">
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email || ''} />
+                                <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
+                                    {user ? getInitials(user.email) : <User />}
+                                </AvatarFallback>
+                            </Avatar>
+                            <span className="sr-only">Profile</span>
+                        </Link>
+                    </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>Profile</p>

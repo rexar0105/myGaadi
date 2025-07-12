@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { AlertTriangle, Car, PlusCircle, Wrench } from "lucide-react";
-import { vehicles as initialVehicles, serviceRecords } from "@/lib/data";
+import { Car, PlusCircle } from "lucide-react";
+import { vehicles as initialVehicles } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,11 +35,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { differenceInDays, isPast, format } from "date-fns";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -80,16 +75,6 @@ export default function DashboardPage() {
     setDialogOpen(false);
     form.reset();
   }
-
-  const upcomingServices = serviceRecords
-    .filter((s) => {
-        if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) {
-            return false;
-        }
-        const daysLeft = differenceInDays(new Date(s.nextDueDate), new Date());
-        return daysLeft <= 14;
-    })
-    .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
 
   return (
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
@@ -193,42 +178,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-8">
-        {upcomingServices.length > 0 && (
-            <Alert variant="destructive" className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle className="font-headline flex items-center gap-2 text-lg">
-                  Service Reminders
-                </AlertTitle>
-                <AlertDescription>
-                   <ul className="space-y-3 mt-2">
-                      {upcomingServices.map((service, index) => {
-                        const dueDate = new Date(service.nextDueDate!);
-                        const daysLeft = differenceInDays(dueDate, new Date());
-                        
-                        return (
-                            <li 
-                              key={service.id}
-                              className="animate-fade-in-up"
-                              style={{ animationDelay: `${index * 50 + 200}ms` }}
-                            >
-                              <div className="flex justify-between items-center">
-                                <div>
-                                  <p className="font-semibold">{service.service} for <span className="font-bold">{service.vehicleName}</span></p>
-                                  <p className="text-xs text-destructive/80 mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
-                                </div>
-                                <Badge variant="destructive">
-                                  {daysLeft <= 0 ? "Due Today" : `${daysLeft} days left`}
-                                </Badge>
-                              </div>
-                              {index < upcomingServices.length -1 && <Separator className="my-2 bg-destructive/20"/>}
-                            </li>
-                        )
-                      })}
-                    </ul>
-                </AlertDescription>
-            </Alert>
-        )}
-
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-xl">
