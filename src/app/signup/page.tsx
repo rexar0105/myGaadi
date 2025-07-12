@@ -22,11 +22,8 @@ import { Separator } from "@/components/ui/separator";
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M14 18C16.2091 18 18 16.2091 18 14C18 11.7909 16.2091 10 14 10C11.7909 10 10 11.7909 10 14C10 16.2091 11.7909 18 14 18Z" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M14 7V10" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M14 18V21" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M19.071 8.92896L16.9497 11.0503" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M11.0503 16.9497L8.92896 19.071" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M9 19C11.2091 19 13 17.2091 13 15C13 12.7909 11.2091 11 9 11C6.79086 11 5 12.7909 5 15C5 17.2091 6.79086 19 9 19Z" fill="hsl(var(--primary-foreground))"/>
+        <rect x="12" y="11" width="11" height="8" rx="4" fill="hsl(var(--primary-foreground))"/>
     </svg>
 )
 
