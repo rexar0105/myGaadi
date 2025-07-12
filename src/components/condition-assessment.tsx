@@ -86,16 +86,16 @@ export function ConditionAssessment() {
   };
 
   return (
-    <Card className="shadow-lg transition-all hover:shadow-xl">
+    <Card>
       <CardHeader>
-        <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 bg-accent/50 text-accent-foreground p-3 rounded-lg">
+        <div className="flex items-center gap-4">
+            <div className="flex-shrink-0 bg-primary/10 text-primary p-3 rounded-full">
                 <Sparkles className="h-6 w-6"/>
             </div>
             <div>
-                <CardTitle className="font-headline text-2xl">AI-Powered Condition Assessment</CardTitle>
+                <CardTitle className="font-headline text-xl">AI Condition Assessment</CardTitle>
                 <CardDescription>
-                Upload a photo to get an AI-driven analysis of your vehicle's condition.
+                Upload a photo for an AI-driven analysis.
                 </CardDescription>
             </div>
         </div>
@@ -105,7 +105,7 @@ export function ConditionAssessment() {
           <div className="flex flex-col gap-4 items-center">
             <Label
               htmlFor="photo-upload"
-              className="w-full h-48 border-2 border-dashed rounded-lg flex flex-col justify-center items-center cursor-pointer hover:bg-accent/50 transition-colors"
+              className="w-full h-48 border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer hover:bg-primary/5 transition-colors"
             >
               {previewUrl ? (
                 <Image
@@ -133,7 +133,7 @@ export function ConditionAssessment() {
               className="hidden"
               disabled={isPending}
             />
-            <Button type="submit" disabled={isPending || !file} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button type="submit" disabled={isPending || !file} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -145,12 +145,12 @@ export function ConditionAssessment() {
             </Button>
           </div>
 
-          <div className="min-h-[250px] bg-muted/30 p-4 rounded-lg">
+          <div className="min-h-[250px] bg-secondary/50 p-4 rounded-xl">
             {isPending && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin" />
-                    <p>Analyzing image...</p>
-                    <p className="text-sm">This may take a moment.</p>
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm font-medium">Analyzing image...</p>
+                    <p className="text-xs">This may take a moment.</p>
                 </div>
             )}
             {error && (

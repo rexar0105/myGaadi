@@ -3,7 +3,7 @@ import type { Vehicle, ServiceRecord, Expense, InsurancePolicy } from './types';
 export const vehicles: Vehicle[] = [
   {
     id: 'v1',
-    name: 'My Swift',
+    name: 'Swift',
     make: 'Maruti Suzuki',
     model: 'Swift VXI',
     year: 2021,
@@ -13,7 +13,7 @@ export const vehicles: Vehicle[] = [
   },
   {
     id: 'v2',
-    name: 'Family Creta',
+    name: 'Creta',
     make: 'Hyundai',
     model: 'Creta SX',
     year: 2022,
@@ -23,7 +23,7 @@ export const vehicles: Vehicle[] = [
   },
   {
     id: 'v3',
-    name: 'Weekend Rider',
+    name: 'Classic 350',
     make: 'Royal Enfield',
     model: 'Classic 350',
     year: 2020,
@@ -44,7 +44,7 @@ export const serviceRecords: ServiceRecord[] = [
   {
     id: 's1',
     vehicleId: 'v1',
-    vehicleName: 'My Swift',
+    vehicleName: 'Swift',
     service: 'General Service',
     date: addDays(today, -90).toISOString(),
     cost: 4500,
@@ -54,7 +54,7 @@ export const serviceRecords: ServiceRecord[] = [
   {
     id: 's2',
     vehicleId: 'v2',
-    vehicleName: 'Family Creta',
+    vehicleName: 'Creta',
     service: 'Tire Rotation',
     date: addDays(today, -30).toISOString(),
     cost: 800,
@@ -64,7 +64,7 @@ export const serviceRecords: ServiceRecord[] = [
   {
     id: 's3',
     vehicleId: 'v3',
-    vehicleName: 'Weekend Rider',
+    vehicleName: 'Classic 350',
     service: 'Chain Lubrication',
     date: addDays(today, -15).toISOString(),
     cost: 350,
@@ -74,7 +74,7 @@ export const serviceRecords: ServiceRecord[] = [
   {
     id: 's4',
     vehicleId: 'v1',
-    vehicleName: 'My Swift',
+    vehicleName: 'Swift',
     service: 'AC Check-up',
     date: addDays(today, -180).toISOString(),
     cost: 1200,
@@ -87,7 +87,7 @@ export const expenses: Expense[] = [
   {
     id: 'e1',
     vehicleId: 'v1',
-    vehicleName: 'My Swift',
+    vehicleName: 'Swift',
     category: 'Fuel',
     date: addDays(today, -2).toISOString(),
     amount: 2000,
@@ -96,7 +96,7 @@ export const expenses: Expense[] = [
   {
     id: 'e2',
     vehicleId: 'v2',
-    vehicleName: 'Family Creta',
+    vehicleName: 'Creta',
     category: 'Fuel',
     date: addDays(today, -5).toISOString(),
     amount: 3500,
@@ -105,7 +105,7 @@ export const expenses: Expense[] = [
   {
     id: 'e3',
     vehicleId: 'v3',
-    vehicleName: 'Weekend Rider',
+    vehicleName: 'Classic 350',
     category: 'Repair',
     date: addDays(today, -40).toISOString(),
     amount: 900,
@@ -114,7 +114,7 @@ export const expenses: Expense[] = [
   {
     id: 'e4',
     vehicleId: 'v1',
-    vehicleName: 'My Swift',
+    vehicleName: 'Swift',
     category: 'Other',
     date: addDays(today, -10).toISOString(),
     amount: 500,
@@ -126,7 +126,7 @@ export const insurancePolicies: InsurancePolicy[] = [
   {
     id: 'i1',
     vehicleId: 'v1',
-    vehicleName: 'My Swift',
+    vehicleName: 'Swift',
     provider: 'Go Digit',
     policyNumber: 'GDI-123456789',
     expiryDate: addDays(today, 65).toISOString(),
@@ -134,7 +134,7 @@ export const insurancePolicies: InsurancePolicy[] = [
   {
     id: 'i2',
     vehicleId: 'v2',
-    vehicleName: 'Family Creta',
+    vehicleName: 'Creta',
     provider: 'Acko',
     policyNumber: 'ACKO-987654321',
     expiryDate: addDays(today, 25).toISOString(),
@@ -142,7 +142,7 @@ export const insurancePolicies: InsurancePolicy[] = [
   {
     id: 'i3',
     vehicleId: 'v3',
-    vehicleName: 'Weekend Rider',
+    vehicleName: 'Classic 350',
     provider: 'HDFC Ergo',
     policyNumber: 'HDF-555444333',
     expiryDate: addDays(today, 150).toISOString(),
