@@ -1,23 +1,39 @@
 
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
   const getInitials = (email: string) => {
     if (!email) return "?";
     return email[0].toUpperCase();
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out."
+    })
+    router.push("/login");
   };
 
   return (
@@ -32,7 +48,7 @@ export default function ProfilePage() {
         <CardHeader>
           <div className="flex items-center gap-4">
              <Avatar className="h-16 w-16">
-                <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email} />
+                <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email || ''} />
                 <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold">
                     {user ? getInitials(user.email) : <User />}
                 </AvatarFallback>
@@ -44,8 +60,15 @@ export default function ProfilePage() {
           </div>
         </CardHeader>
         <CardContent>
-           <p className="text-muted-foreground text-sm">More profile settings and information will be available here in the future.</p>
+           <Separator />
         </CardContent>
+        <CardFooter className="flex-col items-start gap-4">
+             <Button variant="destructive" onClick={handleLogout} className="w-full md:w-auto">
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+           <p className="text-xs text-muted-foreground">More profile settings and information will be available here in the future.</p>
+        </CardFooter>
       </Card>
     </div>
   );

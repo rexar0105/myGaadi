@@ -3,12 +3,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
-import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import {
   Tooltip,
@@ -70,9 +69,8 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const { toast } = useToast();
   const pathname = usePathname();
 
   React.useEffect(() => {
@@ -80,16 +78,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       router.push('/login');
     }
   }, [isAuthenticated, pathname, router]);
-
-
-  const handleLogout = () => {
-    logout();
-    toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out."
-    })
-    router.push("/login");
-  };
 
   if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
     return null; 
@@ -120,17 +108,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>Profile</p>
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" onClick={handleLogout}>
-                        <LogOut className="h-5 w-5" />
-                        <span className="sr-only">Logout</span>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>Logout</p>
                 </TooltipContent>
             </Tooltip>
         </div>
