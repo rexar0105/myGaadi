@@ -35,14 +35,14 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
          <Link
             href={href}
             className={cn(
-                "flex flex-col items-center justify-center gap-1 p-2 rounded-full transition-all -translate-y-2.5 h-14 w-14",
+                "flex items-center justify-center gap-2 rounded-full transition-all text-sm font-medium h-10 px-4",
                 isActive
-                ? "bg-primary text-primary-foreground shadow-lg"
-                : "bg-background text-primary shadow-md hover:bg-primary/90 hover:text-primary-foreground"
+                ? "bg-primary text-primary-foreground shadow-inner"
+                : "bg-primary/10 text-primary hover:bg-primary/20"
             )}
         >
-            <Icon className="h-6 w-6" />
-            <span className="text-xs font-medium text-center">{label}</span>
+            <Icon className="h-5 w-5" />
+            <span className="hidden sm:inline">{label}</span>
         </Link>
     )
   }
@@ -86,7 +86,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
-    // Return null or a loading spinner while redirecting
     return null; 
   }
 
@@ -136,7 +135,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-1 md:h-auto items-center">
+        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-2 md:h-auto items-center justify-items-center">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>
