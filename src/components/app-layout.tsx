@@ -20,15 +20,8 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <g fill="hsl(var(--primary-foreground))">
-            <circle cx="8" cy="11" r="1.5"/>
-            <circle cx="14" cy="11" r="1.5"/>
-            <circle cx="20" cy="11" r="1.5"/>
-            <circle cx="8" cy="17" r="1.5"/>
-            <circle cx="20" cy="17" r="1.5"/>
-            <circle cx="11" cy="20" r="1.5"/>
-            <circle cx="17" cy="20" r="1.5"/>
-        </g>
+        <path d="M10.5 17.5V14H14C15.933 14 17.5 15.567 17.5 17.5C17.5 19.433 15.933 21 14 21H11.5" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M14 7V21" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 )
 
