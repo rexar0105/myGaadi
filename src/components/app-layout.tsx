@@ -20,9 +20,9 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M9 22C9 16.4772 13.4772 12 19 12C24.5228 12 29 16.4772 29 22" transform="rotate(-30 19 12)" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="16" cy="21" r="2" fill="hsl(var(--primary-foreground))"/>
-        <line x1="16" y1="21" x2="22.5" y2="14.5" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M7 22C7 15.3726 12.3726 10 19 10C25.6274 10 31 15.3726 31 22" transform="rotate(-45 19 10)" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="16" cy="19" r="2.5" fill="hsl(var(--primary-foreground))"/>
+        <line x1="16" y1="19" x2="23" y2="12" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
 )
 
@@ -43,11 +43,11 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
       <Link
         href={href}
         className={cn(
-          "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-orange-500 text-white shadow-lg hover:bg-orange-600",
+          "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-accent text-accent-foreground shadow-lg hover:bg-accent/90",
           "h-14 w-14 -translate-y-2 md:h-16 md:w-16"
         )}
       >
-        <Icon className="h-6 w-6 group-hover:[animation:twinkle_0.5s_ease-in-out_infinite]" />
+        <Icon className="h-6 w-6 group-hover:animate-twinkle" />
         <span className="sr-only">{label}</span>
       </Link>
     );
@@ -57,10 +57,10 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1.5 p-2 rounded-md transition-all text-muted-foreground",
+        "flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-all text-muted-foreground",
         isActive
-          ? "text-primary bg-primary/10"
-          : "hover:text-primary hover:bg-primary/5"
+          ? "text-primary"
+          : "hover:text-primary"
       )}
     >
       <Icon className="h-5 w-5" />
