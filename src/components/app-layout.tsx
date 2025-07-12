@@ -20,8 +20,19 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M8 20C8 16.6863 10.6863 14 14 14C17.3137 14 20 16.6863 20 20" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M14 14L18.5 9.5" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="9.5" cy="19" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="7" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="8" cy="12" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="11" cy="9" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="14" cy="8" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="17" cy="9" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="20" cy="12" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="21" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="18.5" cy="19" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="14" cy="18" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="15.5" cy="15.5" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="17" cy="13" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="18.5" cy="10.5" r="1" fill="hsl(var(--primary-foreground))"/>
     </svg>
 )
 
