@@ -22,19 +22,15 @@ import { Separator } from "@/components/ui/separator";
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <circle cx="9.37" cy="22.63" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="12" cy="24" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="15.06" cy="24.44" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="18.12" cy="23.88" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="20.88" cy="22.38" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        {/* Dots with increasing radius */}
+        <circle cx="9.37" cy="22.63" r="1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="12" cy="24" r="1.1" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="15.06" cy="24.44" r="1.2" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="18.12" cy="23.88" r="1.3" fill="hsl(var(--primary-foreground))"/>
+        <circle cx="20.88" cy="22.38" r="1.4" fill="hsl(var(--primary-foreground))"/>
         <circle cx="23.06" cy="20.06" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="24.44" cy="17.19" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="25" cy="14" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="24.44" cy="10.81" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="23.06" cy="7.94" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="16" cy="16" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="19.12" cy="12.88" r="1.5" fill="hsl(var(--primary-foreground))"/>
-        <circle cx="22.25" cy="9.75" r="1.5" fill="hsl(var(--primary-foreground))"/>
+        {/* Needle - shortened to not overlap dots */}
+        <line x1="16" y1="16" x2="21.5" y2="19.1" stroke="hsl(var(--primary-foreground))" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
 )
 
