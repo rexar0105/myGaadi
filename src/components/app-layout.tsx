@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Car, IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
+import { IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -17,6 +17,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
+        <rect x="6" y="12" width="16" height="8" rx="4" fill="hsl(var(--primary-foreground))"/>
+        <path d="M10 12C10 9.79086 11.7909 8 14 8V12H10Z" fill="hsl(var(--primary-foreground))"/>
+    </svg>
+)
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -96,11 +103,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <TooltipProvider>
     <div className="flex flex-col min-h-screen">
       <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
-        <Link href="/" className="flex items-center gap-2 font-semibold">
-            <div className="bg-primary text-primary-foreground p-2 rounded-full">
-            <Car className="h-6 w-6" />
-            </div>
-            <span className="font-headline text-xl">myGaadi</span>
+        <Link href="/" className="flex items-center gap-3 font-semibold">
+            <AppLogo />
+            <span className="font-headline text-xl font-semibold">myGaadi</span>
         </Link>
         <div className="flex items-center gap-2">
             <Tooltip>

@@ -17,8 +17,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { Car } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+
+const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
+        <rect x="6" y="12" width="16" height="8" rx="4" fill="hsl(var(--primary-foreground))"/>
+        <path d="M10 12C10 9.79086 11.7909 8 14 8V12H10Z" fill="hsl(var(--primary-foreground))"/>
+    </svg>
+)
 
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" {...props}>
@@ -76,11 +83,9 @@ export default function SignupPage() {
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-            <div className="flex justify-center items-center gap-2 mb-4">
-                <div className="bg-primary text-primary-foreground p-2 rounded-full">
-                    <Car className="h-6 w-6" />
-                </div>
-                <span className="font-headline text-2xl">myGaadi</span>
+            <div className="flex justify-center items-center gap-3 mb-4">
+                <AppLogo />
+                <span className="font-headline text-2xl font-semibold">myGaadi</span>
             </div>
             <CardTitle className="text-2xl font-bold font-headline">Create an Account</CardTitle>
             <CardDescription>Enter your email and password to get started.</CardDescription>
