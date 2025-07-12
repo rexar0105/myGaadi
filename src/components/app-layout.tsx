@@ -20,8 +20,8 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <rect x="6" y="12" width="16" height="8" rx="4" fill="hsl(var(--primary-foreground))"/>
-        <path d="M10 12C10 9.79086 11.7909 8 14 8V12H10Z" fill="hsl(var(--primary-foreground))"/>
+        <path d="M7 18C7 17.4477 7.44772 17 8 17H20C20.5523 17 21 17.4477 21 18C21 18.5523 20.5523 19 20 19H8C7.44772 19 7 18.5523 7 18Z" fill="hsl(var(--primary-foreground))" />
+        <path d="M8 12C7.44772 12 7 12.4477 7 13V15C7 15.5523 7.44772 16 8 16H20C20.5523 16 21 15.5523 21 15V13C21 12.4477 20.5523 12 20 12H17L15 9H13L11 12H8Z" fill="hsl(var(--primary-foreground))" />
     </svg>
 )
 
@@ -138,7 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="flex h-16 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-4 md:h-auto md:gap-4">
+        <div className="flex h-16 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-4 md:py-2 md:h-auto md:gap-4">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>
