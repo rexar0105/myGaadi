@@ -80,9 +80,12 @@ export default function DashboardPage() {
   return (
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
       <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-bold font-headline text-foreground">
-          Your Vehicles
-        </h2>
+        <div>
+            <h1 className="text-3xl font-bold text-foreground mb-1">
+                Your Garage
+            </h1>
+            <p className="text-muted-foreground">Manage all your registered vehicles.</p>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button>
@@ -184,18 +187,20 @@ export default function DashboardPage() {
           {vehicles.map((vehicle, index) => (
             <div 
               key={vehicle.id} 
-              className="rounded-2xl border p-4 flex flex-col gap-4 bg-card hover:bg-muted/50 transition-colors animate-fade-in-up"
+              className="rounded-2xl border bg-card hover:border-primary/50 transition-colors animate-fade-in-up group"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <Image
-                src={vehicle.imageUrl}
-                alt={vehicle.name}
-                width={400}
-                height={200}
-                className="rounded-lg object-cover aspect-video"
-                data-ai-hint={vehicle.dataAiHint}
-              />
-              <div>
+              <div className="overflow-hidden rounded-t-2xl">
+                <Image
+                    src={vehicle.imageUrl}
+                    alt={vehicle.name}
+                    width={400}
+                    height={200}
+                    className="rounded-t-lg object-cover aspect-video group-hover:scale-105 transition-transform duration-300"
+                    data-ai-hint={vehicle.dataAiHint}
+                />
+              </div>
+              <div className="p-4">
                 <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
                 <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
                 <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
@@ -203,8 +208,10 @@ export default function DashboardPage() {
             </div>
           ))}
            {vehicles.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-10">
-              <p>No vehicles yet. Click &quot;Add Vehicle&quot; to get started!</p>
+            <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                <Car className="h-10 w-10 text-muted-foreground/50"/>
+                <p className="font-medium">No vehicles in your garage yet.</p>
+                <p className="text-sm">Click "Add Vehicle" to get started!</p>
             </div>
           )}
         </CardContent>

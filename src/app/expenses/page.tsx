@@ -90,9 +90,12 @@ export default function ExpensesPage() {
     return (
         <div className="p-4 md:p-8 animate-fade-in">
             <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold font-headline text-foreground">
-                    Recent Expenses
-                </h2>
+                <div>
+                    <h1 className="text-3xl font-bold text-foreground mb-1">
+                        Expense Tracker
+                    </h1>
+                    <p className="text-muted-foreground">Keep a log of all your vehicle-related expenses.</p>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
@@ -210,8 +213,10 @@ export default function ExpensesPage() {
                     </li>
                   ))}
                    {recentExpenses.length === 0 && (
-                        <div className="col-span-full text-center text-muted-foreground py-10">
-                            <p>No expenses logged yet. Click &quot;Add Expense&quot; to get started!</p>
+                        <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                            <IndianRupee className="h-10 w-10 text-muted-foreground/50"/>
+                            <p className="font-medium">No expenses logged yet.</p>
+                            <p className="text-sm">Click "Add Expense" to get started!</p>
                         </div>
                     )}
                 </ul>

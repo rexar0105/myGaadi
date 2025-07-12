@@ -99,9 +99,12 @@ export default function InsurancePage() {
     return (
         <div className="p-4 md:p-8 animate-fade-in">
             <div className="flex items-center justify-between mb-8">
-                 <h2 className="text-3xl font-bold font-headline text-foreground">
-                    Insurance Status
-                </h2>
+                 <div>
+                    <h1 className="text-3xl font-bold text-foreground mb-1">
+                        Insurance Manager
+                    </h1>
+                    <p className="text-muted-foreground">Keep track of your vehicle insurance policies.</p>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
@@ -218,7 +221,7 @@ export default function InsurancePage() {
                 <CardTitle className="font-headline flex items-center gap-2 text-xl">
                   <ShieldCheck className="text-primary" /> Insurance Status
                 </CardTitle>
-                <CardDescription>Policy renewal dates</CardDescription>
+                <CardDescription>Policy renewal dates for all your vehicles</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {sortedInsurance.map((policy, index) => {
@@ -253,8 +256,10 @@ export default function InsurancePage() {
                   )
                 })}
                 {sortedInsurance.length === 0 && (
-                    <div className="text-center text-muted-foreground py-10">
-                        <p>No insurance policies added yet. Click &quot;Add Policy&quot; to get started!</p>
+                    <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                        <ShieldCheck className="h-10 w-10 text-muted-foreground/50"/>
+                        <p className="font-medium">No insurance policies added yet.</p>
+                        <p className="text-sm">Click "Add Policy" to get started!</p>
                     </div>
                 )}
               </CardContent>

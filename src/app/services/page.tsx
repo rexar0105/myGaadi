@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Wrench, PlusCircle } from "lucide-react";
-import { format, isPast } from "date-fns";
+import { format, isPast, differenceInDays } from "date-fns";
 import { serviceRecords as initialRecords, vehicles } from "@/lib/data";
 import type { ServiceRecord } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -100,9 +101,12 @@ export default function ServicesPage() {
     return (
         <div className="p-4 md:p-8 animate-fade-in">
              <div className="flex items-center justify-between mb-8">
-                 <h2 className="text-3xl font-bold font-headline text-foreground">
-                    Services
-                </h2>
+                 <div>
+                    <h1 className="text-3xl font-bold text-foreground mb-1">
+                        Service Center
+                    </h1>
+                    <p className="text-muted-foreground">Log service history and track upcoming maintenance.</p>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
@@ -214,7 +218,7 @@ export default function ServicesPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <div className="grid gap-6">
+            <div className="grid gap-8">
                 <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
                   <CardHeader>
                     <CardTitle className="font-headline flex items-center gap-2 text-xl">
@@ -226,7 +230,7 @@ export default function ServicesPage() {
                     <ul className="space-y-4">
                       {upcomingServices.map((service, index) => {
                         const dueDate = new Date(service.nextDueDate!);
-                        const daysLeft = Math.max(0, Math.ceil((dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)));
+                        const daysLeft = differenceInDays(dueDate, new Date());
                         const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
                         
                         return (
@@ -244,12 +248,18 @@ export default function ServicesPage() {
                                   {daysLeft} days left
                                 </Badge>
                               </div>
-                               <p className="text-xs text-muted-foreground mt-1">{format(dueDate, "dd MMM, yyyy")}</p>
+                               <p className="text-xs text-muted-foreground mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
                               {index < upcomingServices.length -1 && <Separator className="my-3"/>}
                             </li>
                         )
                       })}
-                      {upcomingServices.length === 0 && <p className="text-muted-foreground text-center py-4 text-sm">No upcoming services scheduled.</p>}
+                      {upcomingServices.length === 0 && (
+                          <div className="text-center text-muted-foreground py-4 flex flex-col items-center gap-2">
+                            <Wrench className="h-10 w-10 text-muted-foreground/50"/>
+                            <p className="font-medium">No upcoming services.</p>
+                            <p className="text-sm">You're all caught up!</p>
+                        </div>
+                      )}
                     </ul>
                   </CardContent>
                 </Card>
@@ -263,7 +273,10 @@ export default function ServicesPage() {
                             {serviceHistory.map((record, index) => (
                                 <li 
                                   key={record.id}
-                                  className="animate-fade-in-up"
+                                  className={cn(
+                                    "animate-fade-in-up",
+                                    index < serviceHistory.length - 1 && "pb-4 border-b"
+                                    )}
                                   style={{ animationDelay: `${index * 50 + 300}ms` }}
                                 >
                                     <div className="flex justify-between items-start">
@@ -275,12 +288,13 @@ export default function ServicesPage() {
                                         <p className="font-mono font-semibold text-foreground text-lg">₹{record.cost.toLocaleString('en-IN')}</p>
                                     </div>
                                     {record.notes && <p className="text-sm text-muted-foreground mt-2 bg-secondary/30 p-2 rounded-md">{record.notes}</p>}
-                                    {index < serviceHistory.length - 1 && <Separator className="my-4" />}
                                 </li>
                             ))}
                             {serviceHistory.length === 0 && (
-                                <div className="text-center text-muted-foreground py-10">
-                                    <p>No services logged yet. Click &quot;Add Service&quot; to get started!</p>
+                                <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                                    <Wrench className="h-10 w-10 text-muted-foreground/50"/>
+                                    <p className="font-medium">No services logged yet.</p>
+                                    <p className="text-sm">Click "Add Service" to get started!</p>
                                 </div>
                             )}
                         </ul>

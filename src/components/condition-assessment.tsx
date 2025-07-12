@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useTransition } from "react";
@@ -6,15 +7,9 @@ import {
   assessVehicleCondition,
   AssessVehicleConditionOutput,
 } from "@/ai/flows/assess-vehicle-condition";
-import { Loader2, Sparkles, Upload } from "lucide-react";
+import { Check, Info, Loader2, Sparkles, Upload, Wand2, X } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,65 +82,57 @@ export function ConditionAssessment() {
 
   return (
     <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-      <CardHeader>
-        <div className="flex items-center gap-4">
-            <div className="flex-shrink-0 bg-primary/10 text-primary p-3 rounded-full">
-                <Sparkles className="h-6 w-6"/>
-            </div>
-            <div>
-                <CardTitle className="font-headline text-xl">AI Condition Assessment</CardTitle>
-                <CardDescription>
-                Upload a photo for an AI-driven analysis.
-                </CardDescription>
-            </div>
-        </div>
-      </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="grid md:grid-cols-2 gap-6 items-start">
-          <div className="flex flex-col gap-4 items-center">
-            <Label
-              htmlFor="photo-upload"
-              className="w-full h-48 border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer hover:bg-primary/5 transition-colors"
-            >
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Vehicle preview"
-                  width={200}
-                  height={192}
-                  className="object-contain h-full w-full p-2 rounded-lg"
+        <CardContent className="grid md:grid-cols-2 gap-6 items-start pt-6">
+          <div className="flex flex-col gap-4">
+             <div className="aspect-video w-full">
+                <Label
+                htmlFor="photo-upload"
+                className="w-full h-full border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20"
+                >
+                {previewUrl ? (
+                    <Image
+                    src={previewUrl}
+                    alt="Vehicle preview"
+                    width={400}
+                    height={225}
+                    className="object-cover h-full w-full rounded-lg"
+                    />
+                ) : (
+                    <>
+                    <Upload className="h-10 w-10 text-muted-foreground" />
+                    <span className="mt-2 font-medium text-foreground">
+                        Click to upload a photo
+                    </span>
+                    <span className="text-sm text-muted-foreground/80">PNG, JPG, or WEBP</span>
+                    </>
+                )}
+                </Label>
+                <input
+                id="photo-upload"
+                type="file"
+                accept="image/png, image/jpeg, image/webp"
+                onChange={handleFileChange}
+                className="hidden"
+                disabled={isPending}
                 />
-              ) : (
-                <>
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <span className="mt-2 text-sm text-muted-foreground">
-                    Click to upload a photo
-                  </span>
-                  <span className="text-xs text-muted-foreground/80">PNG, JPG, WEBP</span>
-                </>
-              )}
-            </Label>
-            <input
-              id="photo-upload"
-              type="file"
-              accept="image/png, image/jpeg, image/webp"
-              onChange={handleFileChange}
-              className="hidden"
-              disabled={isPending}
-            />
-            <Button type="submit" disabled={isPending || !file} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+            </div>
+            <Button type="submit" disabled={isPending || !file} size="lg" className="w-full">
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Assessing...
                 </>
               ) : (
-                "Assess Condition"
+                <>
+                 <Wand2 className="mr-2"/>
+                 Assess Condition
+                </>
               )}
             </Button>
           </div>
 
-          <div className="min-h-[250px] bg-secondary/50 p-4 rounded-xl">
+          <div className="min-h-[250px] bg-muted/40 p-4 rounded-xl relative overflow-hidden">
             {isPending && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -155,30 +142,32 @@ export function ConditionAssessment() {
             )}
             {error && (
               <Alert variant="destructive">
+                 <X className="h-4 w-4"/>
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {result && (
-              <Accordion type="single" collapsible defaultValue="item-1" className="w-full animate-fade-in">
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>AI Assessment</AccordionTrigger>
-                  <AccordionContent>{result.assessment}</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>Risk Assessment</AccordionTrigger>
-                  <AccordionContent>{result.riskAssessment}</AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger>Maintenance Tips</AccordionTrigger>
-                  <AccordionContent>{result.maintenanceTips}</AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                <div className="space-y-4 animate-fade-in">
+                    <div className="space-y-2">
+                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Check className="text-green-500"/> AI Assessment</h4>
+                        <p className="text-sm text-muted-foreground">{result.assessment}</p>
+                    </div>
+                    <div className="space-y-2">
+                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Info className="text-amber-500"/> Risk Assessment</h4>
+                        <p className="text-sm text-muted-foreground">{result.riskAssessment}</p>
+                    </div>
+                     <div className="space-y-2">
+                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Sparkles className="text-blue-500"/> Maintenance Tips</h4>
+                        <p className="text-sm text-muted-foreground">{result.maintenanceTips}</p>
+                    </div>
+                </div>
             )}
             {!isPending && !result && !error && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                    <Sparkles className="h-8 w-8" />
-                    <p>Your assessment will appear here.</p>
+                    <Wand2 className="h-10 w-10 text-muted-foreground/50" />
+                    <p className="font-medium">Your assessment will appear here</p>
+                    <p className="text-sm text-center">Upload a vehicle photo to begin.</p>
                 </div>
             )}
           </div>

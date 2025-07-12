@@ -22,9 +22,12 @@ export default function ProfilePage() {
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
-      <h2 className="text-3xl font-bold font-headline text-foreground mb-8">
+      <h1 className="text-3xl font-bold text-foreground mb-1">
         Your Profile
-      </h2>
+      </h1>
+      <p className="text-muted-foreground mb-8">
+        Manage your account settings and preferences.
+      </p>
       <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
         <CardHeader>
           <div className="flex items-center gap-4">
@@ -36,7 +39,7 @@ export default function ProfilePage() {
             </Avatar>
             <div>
               <CardTitle className="font-headline text-2xl">{user?.email}</CardTitle>
-              <CardDescription>Manage your account settings.</CardDescription>
+              <CardDescription>Member since {new Date().getFullYear()}</CardDescription>
             </div>
           </div>
         </CardHeader>
