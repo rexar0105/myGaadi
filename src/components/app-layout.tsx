@@ -3,13 +3,20 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Car, IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { Car, IndianRupee, LayoutDashboard, LogOut, ShieldCheck, Sparkles, User, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -72,6 +79,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
 
   return (
+    <TooltipProvider>
     <div className="flex flex-col min-h-screen">
       <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
         <Link href="/" className="flex items-center gap-2 font-semibold">
@@ -80,10 +88,32 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
             <span className="font-headline text-xl">myGaadi</span>
         </Link>
-        <Button variant="ghost" size="icon" onClick={handleLogout}>
-            <LogOut className="h-5 w-5" />
-            <span className="sr-only">Logout</span>
-        </Button>
+        <div className="flex items-center gap-2">
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/profile">
+                            <User className="h-5 w-5" />
+                            <span className="sr-only">Profile</span>
+                        </Link>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Profile</p>
+                </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={handleLogout}>
+                        <LogOut className="h-5 w-5" />
+                        <span className="sr-only">Logout</span>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Logout</p>
+                </TooltipContent>
+            </Tooltip>
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
@@ -94,5 +124,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
     </div>
+    </TooltipProvider>
   );
 }
