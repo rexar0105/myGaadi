@@ -2,25 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Car, IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, Wrench, PanelLeft } from "lucide-react";
+import { Car, IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/assessment", label: "AI Assessment", icon: Sparkles },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/services", label: "Services", icon: Wrench },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
 
-function NavLink({ href, icon: Icon, label, isMobile = false }: { href: string; icon: React.ElementType; label: string; isMobile?: boolean }) {
+function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
@@ -28,72 +22,37 @@ function NavLink({ href, icon: Icon, label, isMobile = false }: { href: string; 
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+        "flex flex-col items-center justify-center gap-1.5 p-2 rounded-md transition-all text-muted-foreground",
         isActive
-          ? "bg-primary text-primary-foreground"
-          : "text-muted-foreground hover:text-foreground"
+          ? "text-primary bg-primary/10"
+          : "hover:text-primary hover:bg-primary/5"
       )}
     >
-      <Icon className="h-4 w-4" />
-      {label}
+      <Icon className="h-5 w-5" />
+      <span className="text-xs font-medium text-center">{label}</span>
     </Link>
   );
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <div className="bg-primary text-primary-foreground p-2 rounded-full">
-                <Car className="h-6 w-6" />
-              </div>
-              <span className="font-headline text-xl">myGaadi</span>
-            </Link>
-          </div>
-          <nav className="flex-1 grid items-start px-2 text-sm font-medium lg:px-4">
+    <div className="flex flex-col min-h-screen">
+      <header className="flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
+        <Link href="/" className="flex items-center gap-2 font-semibold">
+            <div className="bg-primary text-primary-foreground p-2 rounded-full">
+            <Car className="h-6 w-6" />
+            </div>
+            <span className="font-headline text-xl">myGaadi</span>
+        </Link>
+      </header>
+
+      <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
+
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
+        <div className="grid grid-cols-5 h-16 max-w-lg mx-auto md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:p-1 md:h-auto">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
-          </nav>
         </div>
-      </div>
-      <div className="flex flex-col">
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="shrink-0 md:hidden"
-              >
-                <PanelLeft className="h-5 w-5" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col">
-              <nav className="grid gap-2 text-lg font-medium">
-                <Link
-                  href="#"
-                  className="flex items-center gap-2 text-lg font-semibold mb-4"
-                >
-                  <div className="bg-primary text-primary-foreground p-2 rounded-full">
-                    <Car className="h-6 w-6" />
-                  </div>
-                  <span className="font-headline text-xl">myGaadi</span>
-                </Link>
-                {navItems.map(item => <NavLink key={item.href} {...item} isMobile />)}
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <div className="w-full flex-1">
-            {/* Can add search or other header items here */}
-          </div>
-        </header>
-        <main className="flex flex-1 flex-col gap-4 bg-muted/40">
-            {children}
-        </main>
-      </div>
+      </nav>
     </div>
   );
 }
