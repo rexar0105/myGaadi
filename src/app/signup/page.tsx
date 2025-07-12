@@ -83,7 +83,7 @@ export default function SignupPage() {
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-            <div className="flex justify-center items-center gap-3 mb-4">
+            <div className="flex justify-center items-center gap-2 mb-4">
                 <AppLogo />
                 <span className="font-headline text-2xl font-semibold">myGaadi</span>
             </div>

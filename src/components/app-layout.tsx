@@ -103,7 +103,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     <TooltipProvider>
     <div className="flex flex-col min-h-screen">
       <header className="flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 sticky top-0 z-40">
-        <Link href="/" className="flex items-center gap-3 font-semibold">
+        <Link href="/" className="flex items-center gap-2 font-semibold">
             <AppLogo />
             <span className="font-headline text-xl font-semibold">myGaadi</span>
         </Link>
