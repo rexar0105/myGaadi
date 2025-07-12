@@ -20,10 +20,8 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M8 12C8 10.8954 8.89543 10 10 10H18C19.1046 10 20 10.8954 20 12V18H8V12Z" stroke="hsl(var(--primary-foreground))" strokeWidth="2"/>
-        <path d="M12 18V20" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M16 18V20" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M8 14H20" stroke="hsl(var(--primary-foreground))" strokeWidth="2"/>
+        <path d="M14 22C18.4183 22 22 18.4183 22 14C22 9.58172 18.4183 6 14 6C9.58172 6 6 9.58172 6 14" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M14 14L18 10" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 )
 
@@ -140,7 +138,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="flex h-16 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-4 md:py-2 md:h-auto md:gap-4">
+        <div className="flex h-16 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-4 md:gap-2">
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>

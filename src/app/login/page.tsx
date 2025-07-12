@@ -22,10 +22,8 @@ import { Separator } from "@/components/ui/separator";
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="28" height="28" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M8 12C8 10.8954 8.89543 10 10 10H18C19.1046 10 20 10.8954 20 12V18H8V12Z" stroke="hsl(var(--primary-foreground))" strokeWidth="2"/>
-        <path d="M12 18V20" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M16 18V20" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M8 14H20" stroke="hsl(var(--primary-foreground))" strokeWidth="2"/>
+        <path d="M14 22C18.4183 22 22 18.4183 22 14C22 9.58172 18.4183 6 14 6C9.58172 6 6 9.58172 6 14" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M14 14L18 10" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 )
 
