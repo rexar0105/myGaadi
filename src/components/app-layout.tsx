@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
 import { useToast } from "@/hooks/use-toast";
+import React from "react";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -44,6 +45,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const pathname = usePathname();
 
+  React.useEffect(() => {
+    if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, pathname, router]);
+
+
   const handleLogout = () => {
     logout();
     toast({
@@ -54,12 +62,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
-    // In a real app, you might have a loading spinner here
-    // or use a protected route component.
-    // For simplicity, we'll just render null or redirect in a useEffect.
-    if (typeof window !== 'undefined') {
-        router.push('/login');
-    }
+    // Return null or a loading spinner while redirecting
     return null; 
   }
 
