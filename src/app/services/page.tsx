@@ -87,6 +87,7 @@ export default function ServicesPage() {
         });
         setDialogOpen(false);
         form.reset();
+        form.setValue("date", new Date().toISOString().split("T")[0]);
     }
 
     const upcomingServices = serviceRecords
@@ -216,7 +217,7 @@ export default function ServicesPage() {
             <div className="grid gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="font-headline flex items-center gap-2">
+                    <CardTitle className="font-headline flex items-center gap-2 text-xl">
                       <Wrench className="text-primary" /> Upcoming Services
                     </CardTitle>
                     <CardDescription>Scheduled maintenance and checks</CardDescription>
@@ -250,7 +251,7 @@ export default function ServicesPage() {
                 </Card>
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline">Service History</CardTitle>
+                        <CardTitle className="font-headline text-xl">Service History</CardTitle>
                         <CardDescription>All recorded services for your vehicles</CardDescription>
                     </CardHeader>
                     <CardContent>

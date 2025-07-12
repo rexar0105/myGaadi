@@ -82,6 +82,7 @@ export default function ExpensesPage() {
         });
         setDialogOpen(false);
         form.reset();
+        form.setValue("date", new Date().toISOString());
     }
     
     const recentExpenses = expenses.slice(0, 10);
@@ -187,7 +188,7 @@ export default function ExpensesPage() {
             </div>
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2">
+                <CardTitle className="font-headline flex items-center gap-2 text-xl">
                   <IndianRupee className="text-primary" /> Recent Expenses
                 </CardTitle>
                 <CardDescription>Last 10 recorded expenses</CardDescription>

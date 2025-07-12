@@ -215,7 +215,7 @@ export default function InsurancePage() {
             </div>
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline flex items-center gap-2">
+                <CardTitle className="font-headline flex items-center gap-2 text-xl">
                   <ShieldCheck className="text-primary" /> Insurance Status
                 </CardTitle>
                 <CardDescription>Policy renewal dates</CardDescription>
@@ -225,7 +225,9 @@ export default function InsurancePage() {
                    const expiryDate = new Date(policy.expiryDate);
                    const daysLeft = differenceInDays(expiryDate, new Date());
                    const isExpired = isPast(expiryDate);
-                   const progress = isExpired ? 100 : Math.max(0, 100 - (daysLeft / 365 * 100));
+                   const totalDuration = 365; // Assuming a 1 year policy
+                   const daysPassed = totalDuration - Math.max(0, daysLeft);
+                   const progress = isExpired ? 100 : Math.min(100, (daysPassed / totalDuration) * 100);
 
                   return (
                     <div key={policy.id}>
