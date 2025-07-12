@@ -20,9 +20,9 @@ import {
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M6 21C6 15.4772 10.4772 11 16 11C21.5228 11 26 15.4772 26 21" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="16" cy="21" r="2" fill="hsl(var(--primary-foreground))"/>
-        <line x1="16" y1="21" x2="22.5" y2="14.5" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
+        <path d="M7 21C7 14.9249 11.0294 10 16 10C20.9706 10 25 14.9249 25 21" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="16" cy="21" r="2.5" fill="hsl(var(--primary-foreground))"/>
+        <line x1="16" y1="20" x2="22" y2="14" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
     </svg>
 )
 
@@ -43,11 +43,11 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
       <Link
         href={href}
         className={cn(
-          "flex items-center justify-center rounded-full transition-all text-sm font-medium bg-orange-500 text-white shadow-lg hover:bg-orange-600",
+          "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-orange-500 text-white shadow-lg hover:bg-orange-600",
           "h-14 w-14 -translate-y-2 md:h-16 md:w-16"
         )}
       >
-        <Icon className="h-6 w-6" />
+        <Icon className="h-6 w-6 group-hover:[animation:twinkle_0.5s_ease-in-out_infinite]" />
         <span className="sr-only">{label}</span>
       </Link>
     );
