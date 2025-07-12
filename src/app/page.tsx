@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Car, PlusCircle, Wrench } from "lucide-react";
+import { AlertTriangle, Car, PlusCircle, Wrench } from "lucide-react";
 import { vehicles as initialVehicles, serviceRecords } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ import { cn } from "@/lib/utils";
 import { differenceInDays, isPast, format } from "date-fns";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -193,19 +194,16 @@ export default function DashboardPage() {
 
       <div className="grid gap-8">
         {upcomingServices.length > 0 && (
-            <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-                <CardHeader>
-                    <CardTitle className="font-headline flex items-center gap-2 text-xl">
-                      <Wrench className="text-primary" /> Service Reminders
-                    </CardTitle>
-                    <CardDescription>Your next upcoming services due within 14 days.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                   <ul className="space-y-4">
+            <Alert variant="destructive" className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle className="font-headline flex items-center gap-2 text-lg">
+                  Service Reminders
+                </AlertTitle>
+                <AlertDescription>
+                   <ul className="space-y-3 mt-2">
                       {upcomingServices.map((service, index) => {
                         const dueDate = new Date(service.nextDueDate!);
                         const daysLeft = differenceInDays(dueDate, new Date());
-                        const urgency = daysLeft < 7 ? "destructive" : "secondary";
                         
                         return (
                             <li 
@@ -215,21 +213,20 @@ export default function DashboardPage() {
                             >
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <p className="font-semibold">{service.service}</p>
-                                  <p className="text-sm text-muted-foreground">{service.vehicleName}</p>
+                                  <p className="font-semibold">{service.service} for <span className="font-bold">{service.vehicleName}</span></p>
+                                  <p className="text-xs text-destructive/80 mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
                                 </div>
-                                <Badge variant={urgency}>
+                                <Badge variant="destructive">
                                   {daysLeft <= 0 ? "Due Today" : `${daysLeft} days left`}
                                 </Badge>
                               </div>
-                               <p className="text-xs text-muted-foreground mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
-                              {index < upcomingServices.length -1 && <Separator className="my-3"/>}
+                              {index < upcomingServices.length -1 && <Separator className="my-2 bg-destructive/20"/>}
                             </li>
                         )
                       })}
                     </ul>
-                </CardContent>
-            </Card>
+                </AlertDescription>
+            </Alert>
         )}
 
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
