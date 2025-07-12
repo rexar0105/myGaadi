@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Car, PlusCircle } from "lucide-react";
-import { vehicles as initialVehicles } from "@/lib/data";
+import { Car, PlusCircle, Wrench } from "lucide-react";
+import { vehicles as initialVehicles, serviceRecords } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +36,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { differenceInDays, isPast, format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -76,6 +79,11 @@ export default function DashboardPage() {
     setDialogOpen(false);
     form.reset();
   }
+
+  const upcomingServices = serviceRecords
+    .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
+    .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime())
+    .slice(0, 3);
 
   return (
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
@@ -177,45 +185,88 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-headline flex items-center gap-2 text-xl">
-            <Car className="text-primary" /> Registered Vehicles
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {vehicles.map((vehicle, index) => (
-            <div 
-              key={vehicle.id} 
-              className="rounded-2xl border bg-card hover:border-primary/50 transition-colors animate-fade-in-up group"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="overflow-hidden rounded-t-2xl">
-                <Image
-                    src={vehicle.imageUrl}
-                    alt={vehicle.name}
-                    width={400}
-                    height={200}
-                    className="rounded-t-lg object-cover aspect-video group-hover:scale-105 transition-transform duration-300"
-                    data-ai-hint={vehicle.dataAiHint}
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
-                <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
-                <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
-              </div>
-            </div>
-          ))}
-           {vehicles.length === 0 && (
-            <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
-                <Car className="h-10 w-10 text-muted-foreground/50"/>
-                <p className="font-medium">No vehicles in your garage yet.</p>
-                <p className="text-sm">Click "Add Vehicle" to get started!</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+      <div className="grid gap-8">
+        {upcomingServices.length > 0 && (
+            <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+                <CardHeader>
+                    <CardTitle className="font-headline flex items-center gap-2 text-xl">
+                      <Wrench className="text-primary" /> Service Reminders
+                    </CardTitle>
+                    <CardDescription>Your next upcoming services.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                   <ul className="space-y-4">
+                      {upcomingServices.map((service, index) => {
+                        const dueDate = new Date(service.nextDueDate!);
+                        const daysLeft = differenceInDays(dueDate, new Date());
+                        const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
+                        
+                        return (
+                            <li 
+                              key={service.id}
+                              className="animate-fade-in-up"
+                              style={{ animationDelay: `${index * 50 + 200}ms` }}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <p className="font-semibold">{service.service}</p>
+                                  <p className="text-sm text-muted-foreground">{service.vehicleName}</p>
+                                </div>
+                                <Badge variant={urgency === 'default' ? 'outline' : urgency}>
+                                  {daysLeft} days left
+                                </Badge>
+                              </div>
+                               <p className="text-xs text-muted-foreground mt-1">Due on: {format(dueDate, "dd MMM, yyyy")}</p>
+                              {index < upcomingServices.length -1 && <Separator className="my-3"/>}
+                            </li>
+                        )
+                      })}
+                    </ul>
+                </CardContent>
+            </Card>
+        )}
+
+        <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <CardHeader>
+            <CardTitle className="font-headline flex items-center gap-2 text-xl">
+                <Car className="text-primary" /> Registered Vehicles
+            </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {vehicles.map((vehicle, index) => (
+                <div 
+                key={vehicle.id} 
+                className="rounded-2xl border bg-card hover:border-primary/50 transition-colors animate-fade-in-up group"
+                style={{ animationDelay: `${index * 100}ms` }}
+                >
+                <div className="overflow-hidden rounded-t-2xl">
+                    <Image
+                        src={vehicle.imageUrl}
+                        alt={vehicle.name}
+                        width={400}
+                        height={200}
+                        className="rounded-t-lg object-cover aspect-video group-hover:scale-105 transition-transform duration-300"
+                        data-ai-hint={vehicle.dataAiHint}
+                    />
+                </div>
+                <div className="p-4">
+                    <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
+                    <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
+                    <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
+                </div>
+                </div>
+            ))}
+            {vehicles.length === 0 && (
+                <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                    <Car className="h-10 w-10 text-muted-foreground/50"/>
+                    <p className="font-medium">No vehicles in your garage yet.</p>
+                    <p className="text-sm">Click "Add Vehicle" to get started!</p>
+                </div>
+            )}
+            </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }
