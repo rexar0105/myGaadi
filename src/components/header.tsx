@@ -13,9 +13,6 @@ export function Header() {
             myGaadi
           </h1>
         </div>
-        <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
-          <UserCircle className="h-8 w-8 text-muted-foreground" />
-        </Button>
       </div>
     </header>
   );
