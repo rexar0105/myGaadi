@@ -14,13 +14,15 @@ interface AuthContextType {
   login: (email: string, pass: string) => boolean;
   signup: (email: string, pass: string) => void;
   logout: () => void;
+  loginWithGoogle: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // A mock user database
 const MOCK_USERS: { [email: string]: string } = {
-    "test@example.com": "password123"
+    "test@example.com": "password123",
+    "user@google.com": "google-provided-password", // Mock google user
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -55,6 +57,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return false;
   };
 
+  const loginWithGoogle = (): boolean => {
+    // In a real app, this would involve a popup and token exchange with a backend.
+    // Here, we'll just simulate a successful Google login.
+    const googleUser = { id: 'google-user-123', email: 'user@google.com' };
+    setUser(googleUser);
+    setIsAuthenticated(true);
+    localStorage.setItem("myGaadiUser", JSON.stringify(googleUser));
+    return true;
+  }
+
   const signup = (email: string, pass: string) => {
     if (MOCK_USERS[email]) {
       throw new Error("User with this email already exists.");
@@ -78,7 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, signup, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, signup, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
