@@ -32,19 +32,17 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
 
   if (highlighted) {
     return (
-         <Link
-            href={href}
-            className={cn(
-                "flex items-center justify-center gap-2 rounded-full transition-all text-sm font-medium h-10 px-4",
-                isActive
-                ? "bg-primary text-primary-foreground shadow-inner"
-                : "bg-primary/10 text-primary hover:bg-primary/20"
-            )}
-        >
-            <Icon className="h-5 w-5" />
-            <span className="hidden sm:inline">{label}</span>
-        </Link>
-    )
+      <Link
+        href={href}
+        className={cn(
+          "flex items-center justify-center rounded-full transition-all text-sm font-medium bg-accent text-accent-foreground shadow-lg hover:bg-accent/90",
+          "h-14 w-14 -translate-y-2 md:h-16 md:w-16"
+        )}
+      >
+        <Icon className="h-6 w-6" />
+        <span className="sr-only">{label}</span>
+      </Link>
+    );
   }
 
   return (
