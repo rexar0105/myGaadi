@@ -153,12 +153,12 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                                         <Input 
                                             type="file" 
                                             accept="image/*"
-                                            className="file:hidden"
+                                            className="file:hidden pl-10"
                                             onChange={(e) => field.onChange(e.target.files)}
                                         />
-                                        <div className="absolute inset-0 flex items-center justify-start pl-3 pointer-events-none text-muted-foreground">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
                                            <Upload className="h-4 w-4 mr-2"/>
-                                           <span>{field.value?.[0]?.name ?? 'Upload a new image...'}</span>
+                                           <span className="truncate max-w-[150px] sm:max-w-xs">{field.value?.[0]?.name ?? 'Upload a new image...'}</span>
                                         </div>
                                     </div>
                                 </FormControl>
@@ -287,12 +287,12 @@ export default function DashboardPage() {
                                 <Input 
                                     type="file" 
                                     accept="image/*"
-                                    className="file:hidden"
+                                    className="file:hidden pl-10"
                                     onChange={(e) => field.onChange(e.target.files)}
                                 />
-                                <div className="absolute inset-0 flex items-center justify-start pl-3 pointer-events-none text-muted-foreground">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
                                     <Upload className="h-4 w-4 mr-2"/>
-                                    <span>{field.value?.[0]?.name ?? 'Upload an image...'}</span>
+                                    <span className="truncate max-w-[150px] sm:max-w-xs">{field.value?.[0]?.name ?? 'Upload an image...'}</span>
                                 </div>
                             </div>
                         </FormControl>
@@ -474,3 +474,5 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+    
