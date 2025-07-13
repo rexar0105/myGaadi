@@ -73,33 +73,89 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
+                     <FormField
                         control={form.control}
                         name="name"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Vehicle Name</FormLabel>
                                 <FormControl>
-                                    <Input {...field} />
+                                    <Input placeholder="My Red Car" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="make"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Make</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="Maruti Suzuki" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="model"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Model</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="Swift VXI" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="year"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Year</FormLabel>
+                                    <FormControl>
+                                    <Input type="number" placeholder="2021" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="registrationNumber"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Registration No.</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="MH 12 AB 3456" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                      <FormField
                         control={form.control}
                         name="image"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Vehicle Image</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={(e) => field.onChange(e.target.files)}
-                                />
-                            </FormControl>
-                            <FormMessage />
+                                <FormLabel>Vehicle Image</FormLabel>
+                                <FormControl>
+                                    <Input 
+                                        type="file" 
+                                        accept="image/*"
+                                        onChange={(e) => field.onChange(e.target.files)}
+                                    />
+                                </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                         />
