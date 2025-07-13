@@ -31,46 +31,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { settings } = useSettings();
 
   useEffect(() => {
-    const initializeAuth = () => {
-      setIsAuthLoading(true);
-      // Simulate checking for an existing session. In a real app, this would be an API call.
-      const localUser: User = { id: 'local-user', email: 'user@example.com' };
-      setUser(localUser);
+    setIsAuthLoading(true);
+    // Simulate checking for an existing session. In a real app, this would be an API call.
+    // For this demo, we'll assume the user is always logged in.
+    const localUser: User = { id: 'local-user', email: 'user@example.com' };
+    setUser(localUser);
 
-      // Load profile from localStorage after confirming user
-      try {
-        const storedProfile = localStorage.getItem('myGaadiProfile');
-        if (storedProfile) {
-          setProfileState(JSON.parse(storedProfile));
-        } else {
-          // If no profile, create and store a default one.
-          const defaultProfile: ProfileState = {
-            name: localUser.email.split('@')[0] || "New User",
-            avatarUrl: null,
-          };
-          setProfileState(defaultProfile);
-          localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-        }
-      } catch (e) {
-        console.error("Failed to load or create profile", e);
-        // Fallback to a default profile in case of storage error
+    try {
+      const storedProfile = localStorage.getItem('myGaadiProfile');
+      if (storedProfile) {
+        setProfileState(JSON.parse(storedProfile));
+      } else {
         const defaultProfile: ProfileState = {
-            name: localUser.email.split('@')[0] || "New User",
-            avatarUrl: null
+          name: localUser.email.split('@')[0] || "New User",
+          avatarUrl: null,
         };
         setProfileState(defaultProfile);
-      } finally {
-         setIsAuthLoading(false);
+        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
       }
-    };
-    initializeAuth();
+    } catch (e) {
+      console.error("Failed to load or create profile", e);
+      const defaultProfile: ProfileState = {
+          name: localUser.email.split('@')[0] || "New User",
+          avatarUrl: null
+      };
+      setProfileState(defaultProfile);
+    } finally {
+       setIsAuthLoading(false);
+    }
   }, []);
 
   const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
     const localUser = { id: 'local-user', email };
     setUser(localUser);
     
-    // Set up default profile if none exists
     const defaultProfile: ProfileState = {
         name: email.split('@')[0] || "New User",
         avatarUrl: null
@@ -81,7 +75,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
-    // Mock implementation
     const localUser = { id: 'local-user', email: 'user@example.com' };
     setUser(localUser);
 
@@ -95,7 +88,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signup = async (email: string, pass: string) => {
-     // Mock implementation for demo purposes
      const defaultProfile: ProfileState = {
         name: email.split('@')[0] || "New User",
         avatarUrl: null
