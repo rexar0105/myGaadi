@@ -188,30 +188,42 @@ export default function ProfilePage() {
             {isEditing ? (
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onProfileSubmit)} className="space-y-4">
-                        <FormField
+                       <FormField
                             control={form.control}
                             name="avatar"
-                            render={({ field: { onChange, value, ...rest } }) => (
+                            render={({ field: { onChange, value, ...rest } }) => {
+                                const newImagePreview = value?.[0] ? URL.createObjectURL(value[0]) : null;
+                                return (
                                 <FormItem>
                                     <FormLabel>Profile Picture</FormLabel>
                                     <FormControl>
-                                        <div className="flex items-center gap-4">
-                                            <Avatar className="h-16 w-16">
-                                                <AvatarImage src={profile.avatarUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
-                                                <AvatarFallback>{getInitials(profile.name || user?.email || '')}</AvatarFallback>
-                                            </Avatar>
-                                            <Input 
-                                                type="file" 
-                                                accept="image/*"
-                                                className="file:text-primary file:font-semibold"
-                                                onChange={(e) => onChange(e.target.files)}
-                                                {...rest}
-                                            />
+                                        <div className="flex justify-center py-4">
+                                            <div className="relative w-24 h-24">
+                                                <Avatar className="h-24 w-24 text-3xl">
+                                                    <AvatarImage src={newImagePreview || profile.avatarUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
+                                                    <AvatarFallback>{getInitials(profile.name || user?.email || '')}</AvatarFallback>
+                                                </Avatar>
+                                                <Input 
+                                                    id="avatar-upload"
+                                                    type="file" 
+                                                    accept="image/*"
+                                                    className="sr-only"
+                                                    onChange={(e) => onChange(e.target.files)}
+                                                    {...rest}
+                                                />
+                                                <label 
+                                                    htmlFor="avatar-upload"
+                                                    className="absolute -bottom-1 -right-1 flex items-center justify-center h-8 w-8 bg-primary rounded-full text-primary-foreground cursor-pointer hover:bg-primary/90 transition-colors border-2 border-card"
+                                                >
+                                                    <PenLine className="h-4 w-4" />
+                                                </label>
+                                            </div>
                                         </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            )}
+                                )
+                            }}
                         />
                         <FormField
                             control={form.control}
