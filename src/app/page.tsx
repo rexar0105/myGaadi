@@ -50,6 +50,7 @@ const vehicleSchema = z.object({
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
 function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void, onCancel: () => void }) {
+    const { toast } = useToast();
     const form = useForm<VehicleFormValues>({
         resolver: zodResolver(vehicleSchema),
         defaultValues: {
@@ -60,6 +61,10 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
             registrationNumber: vehicle.registrationNumber,
         }
     });
+
+    const currentImageFile = form.watch('image');
+    const currentImageName = currentImageFile?.[0]?.name;
+
 
     const onSubmit = (data: VehicleFormValues) => {
         onSave(data, vehicle.id);
@@ -149,18 +154,19 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                             <FormItem>
                                 <FormLabel>Vehicle Image</FormLabel>
                                 <FormControl>
-                                    <div className="relative">
+                                    <>
                                         <Input 
+                                            id="edit-image-upload"
                                             type="file" 
                                             accept="image/*"
-                                            className="file:hidden pl-10"
+                                            className="sr-only"
                                             onChange={(e) => field.onChange(e.target.files)}
                                         />
-                                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+                                        <label htmlFor="edit-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
                                            <Upload className="h-4 w-4 mr-2"/>
-                                           <span className="truncate max-w-[150px] sm:max-w-xs">{field.value?.[0]?.name ?? 'Upload a new image...'}</span>
-                                        </div>
-                                    </div>
+                                           <span className="truncate max-w-[calc(100%-2rem)]">{currentImageName ?? 'Upload a new image...'}</span>
+                                        </label>
+                                    </>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -191,6 +197,10 @@ export default function DashboardPage() {
       registrationNumber: "",
     },
   });
+
+  const newImageFile = addVehicleForm.watch('image');
+  const newImageName = newImageFile?.[0]?.name;
+
 
   function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
     const newVehicle: Vehicle = {
@@ -283,18 +293,19 @@ export default function DashboardPage() {
                         <FormItem>
                         <FormLabel>Vehicle Image (Optional)</FormLabel>
                         <FormControl>
-                             <div className="relative">
+                             <>
                                 <Input 
+                                    id="new-image-upload"
                                     type="file" 
                                     accept="image/*"
-                                    className="file:hidden pl-10"
+                                    className="sr-only"
                                     onChange={(e) => field.onChange(e.target.files)}
                                 />
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+                                <label htmlFor="new-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
                                     <Upload className="h-4 w-4 mr-2"/>
-                                    <span className="truncate max-w-[150px] sm:max-w-xs">{field.value?.[0]?.name ?? 'Upload an image...'}</span>
-                                </div>
-                            </div>
+                                    <span className="truncate max-w-[calc(100%-2rem)]">{newImageName ?? 'Upload an image...'}</span>
+                                </label>
+                            </>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -474,5 +485,3 @@ export default function DashboardPage() {
     </main>
   );
 }
-
-    
