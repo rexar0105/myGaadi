@@ -9,7 +9,7 @@ export const vehicles: Vehicle[] = [
     year: 2021,
     registrationNumber: 'MH 12 AB 3456',
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'white car',
+    dataAiHint: 'car',
   },
   {
     id: 'v2',
@@ -19,7 +19,7 @@ export const vehicles: Vehicle[] = [
     year: 2022,
     registrationNumber: 'DL 3C CD 7890',
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'red suv',
+    dataAiHint: 'suv',
   },
   {
     id: 'v3',
@@ -29,7 +29,7 @@ export const vehicles: Vehicle[] = [
     year: 2020,
     registrationNumber: 'KA 05 EF 1212',
     imageUrl: 'https://placehold.co/600x400.png',
-    dataAiHint: 'black motorcycle',
+    dataAiHint: 'motorcycle',
   },
 ];
 
