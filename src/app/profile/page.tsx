@@ -30,6 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useData } from "@/context/data-context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -89,6 +90,35 @@ const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     return nameOrEmail[0].toUpperCase();
   };
 
+function ProfileSkeleton() {
+    return (
+        <div className="p-4 md:p-8 space-y-8">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                    <div className="flex justify-center py-4">
+                        <Skeleton className="h-24 w-24 rounded-full" />
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-1/3" />
+                </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-lg" />)}
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
 
 export default function ProfilePage() {
   const { user, logout, profile, setProfile } = useAuth();
@@ -96,7 +126,6 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -118,9 +147,8 @@ export default function ProfilePage() {
         emergencyContactPhone: profile.emergencyContactPhone || '',
         avatar: undefined,
       });
-      setIsLoadingProfile(false);
     }
-  }, [profile, form]);
+  }, [profile, form.reset]);
 
 
   const handleLogout = () => {
@@ -214,24 +242,23 @@ export default function ProfilePage() {
     }
   ];
 
-  if (isLoadingProfile || !profile || isDataLoading) {
-      // Add a skeleton loader for the profile section
-      return <div className="p-4 md:p-8">Loading Profile...</div>;
+  if (!profile || isDataLoading) {
+      return <ProfileSkeleton />;
   }
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="grid gap-8">
         <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          <CardHeader className="flex flex-row justify-between items-start">
+          <CardHeader className="flex flex-col sm:flex-row justify-between sm:items-center">
              <div>
                 <CardTitle className="font-headline text-xl">User Profile</CardTitle>
                 <CardDescription>Your personal information and app settings</CardDescription>
              </div>
 
-             <div className="flex gap-2">
+             <div className="flex gap-2 pt-4 sm:pt-0">
                 {isEditing && (
-                     <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
+                     <Button type="button" variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
                         Cancel
                     </Button>
                 )}
@@ -242,7 +269,7 @@ export default function ProfilePage() {
                         setIsEditing(true);
                     }
                 }}
-                 disabled={isEditing && (!form.formState.isDirty || !form.formState.isValid)}
+                 disabled={isEditing && !form.formState.isDirty}
                 >
                     {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
                     <span>{isEditing ? 'Save' : 'Edit'}</span>
