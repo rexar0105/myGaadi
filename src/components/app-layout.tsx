@@ -31,10 +31,9 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
-  { href: "/documents", label: "Documents", icon: FileText },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles },
 ];
 
 function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
@@ -165,15 +164,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
         <div className="grid h-20 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-2 md:gap-2" style={navGrid}>
-            {navItems.map(item => {
-              if (item.href === '/assessment') {
-                const assessItem = navItems.splice(navItems.findIndex(i => i.href === '/assessment'), 1)[0];
-                const middleIndex = Math.floor(navItems.length / 2);
-                navItems.splice(middleIndex, 0, assessItem);
-              }
-              return null;
-            })}
-            {navItems.map(item => <NavLink key={item.href} {...item} />)}
+            {navItems.map((item) => (
+                <NavLink key={item.href} {...item} />
+            ))}
         </div>
       </nav>
     </div>
