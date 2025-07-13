@@ -62,6 +62,25 @@
     @apply bg-background text-foreground;
   }
 
+  .perspective-container {
+    perspective: 1000px;
+  }
+  .card-flipper {
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .card-flipper.is-flipped {
+    transform: rotateY(180deg);
+  }
+  .card-front,
+  .card-back {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .card-back {
+    transform: rotateY(180deg);
+  }
+
   @keyframes fade-in {
     from {
       opacity: 0;

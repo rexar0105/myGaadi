@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Car, PlusCircle } from "lucide-react";
-import { vehicles as initialVehicles } from "@/lib/data";
+import { Car, PlusCircle, Wrench, ShieldCheck, Calendar, Info } from "lucide-react";
+import { vehicles as initialVehicles, serviceRecords, insurancePolicies } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { format, differenceInDays } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -47,6 +49,7 @@ const vehicleSchema = z.object({
 export default function DashboardPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof vehicleSchema>>({
@@ -74,6 +77,10 @@ export default function DashboardPage() {
     });
     setDialogOpen(false);
     form.reset();
+  }
+
+  const handleCardClick = (vehicleId: string) => {
+    setFlippedCardId(prevId => prevId === vehicleId ? null : vehicleId);
   }
 
   return (
@@ -185,29 +192,80 @@ export default function DashboardPage() {
             </CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vehicles.map((vehicle, index) => (
-                <div 
-                key={vehicle.id} 
-                className="rounded-2xl border bg-card hover:border-primary/50 transition-colors animate-fade-in-up group"
-                style={{ animationDelay: `${index * 100}ms` }}
-                >
-                <div className="overflow-hidden rounded-t-2xl">
-                    <Image
-                        src={vehicle.imageUrl}
-                        alt={vehicle.name}
-                        width={400}
-                        height={200}
-                        className="rounded-t-lg object-cover aspect-video group-hover:scale-105 transition-transform duration-300"
-                        data-ai-hint={vehicle.dataAiHint}
-                    />
+            {vehicles.map((vehicle, index) => {
+              const lastService = serviceRecords.filter(s => s.vehicleId === vehicle.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+              const insurance = insurancePolicies.find(p => p.vehicleId === vehicle.id);
+
+              return (
+                  <div 
+                    key={vehicle.id}
+                    className="perspective-container animate-fade-in-up"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                    onClick={() => handleCardClick(vehicle.id)}
+                  >
+                    <div className={cn("card-flipper w-full h-full relative", flippedCardId === vehicle.id && "is-flipped")}>
+                      {/* Front of Card */}
+                      <div className="card-front absolute w-full h-full rounded-2xl border bg-card hover:border-primary/50 transition-colors group cursor-pointer">
+                          <div className="overflow-hidden rounded-t-2xl">
+                              <Image
+                                  src={vehicle.imageUrl}
+                                  alt={vehicle.name}
+                                  width={400}
+                                  height={200}
+                                  className="rounded-t-lg object-cover aspect-video group-hover:scale-105 transition-transform duration-300"
+                                  data-ai-hint={vehicle.dataAiHint}
+                              />
+                          </div>
+                          <div className="p-4">
+                              <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
+                              <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
+                              <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
+                          </div>
+                          <div className="absolute bottom-2 right-3 text-muted-foreground/50 text-xs flex items-center gap-1">
+                            <Info className="h-3 w-3" /> Click for details
+                          </div>
+                      </div>
+
+                      {/* Back of Card */}
+                      <div className="card-back absolute w-full h-full rounded-2xl border bg-card p-4 flex flex-col gap-4 justify-center">
+                          <h3 className="font-bold text-xl font-headline text-center -mt-4">{vehicle.name}</h3>
+                           <div className="space-y-3 text-sm">
+                             {lastService && (
+                                <div className="flex items-start gap-3">
+                                  <Wrench className="h-4 w-4 text-primary mt-1" />
+                                  <div>
+                                    <p className="font-semibold">Last Service</p>
+                                    <p className="text-muted-foreground">{lastService.service} on {format(new Date(lastService.date), "dd MMM, yyyy")}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {lastService?.nextDueDate && (
+                                <div className="flex items-start gap-3">
+                                  <Calendar className="h-4 w-4 text-primary mt-1" />
+                                  <div>
+                                    <p className="font-semibold">Next Service</p>
+                                    <p className="text-muted-foreground">Due in {differenceInDays(new Date(lastService.nextDueDate), new Date())} days</p>
+                                  </div>
+                                </div>
+                              )}
+                              {insurance && (
+                                <div className="flex items-start gap-3">
+                                  <ShieldCheck className="h-4 w-4 text-primary mt-1" />
+                                  <div>
+                                    <p className="font-semibold">Insurance</p>
+                                    <p className="text-muted-foreground">Expires in {differenceInDays(new Date(insurance.expiryDate), new Date())} days</p>
+                                  </div>
+                                </div>
+                              )}
+                              {!lastService && !insurance && (
+                                <p className="text-center text-muted-foreground">No service or insurance data found.</p>
+                              )}
+                          </div>
+                      </div>
+                    </div>
                 </div>
-                <div className="p-4">
-                    <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
-                    <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
-                    <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
-                </div>
-                </div>
-            ))}
+              )
+            })}
             {vehicles.length === 0 && (
                 <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
                     <Car className="h-10 w-10 text-muted-foreground/50"/>
