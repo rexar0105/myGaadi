@@ -44,10 +44,9 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     return (
         <Link
             href={href}
-            className="relative -top-6 flex flex-col items-center justify-center gap-1.5 h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
         >
-            <Icon className="h-7 w-7" />
-            <span className="text-xs font-medium">{label}</span>
+            <Icon className="h-8 w-8" />
         </Link>
     );
   }
