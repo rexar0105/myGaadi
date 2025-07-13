@@ -88,15 +88,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-             <Separator />
-          </CardContent>
-          <CardFooter>
-               <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
-          </CardFooter>
         </Card>
 
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
@@ -162,6 +153,13 @@ export default function ProfilePage() {
                 )}
             </CardContent>
         </Card>
+
+        <div className="flex justify-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
+            <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+            </Button>
+        </div>
       </div>
     </div>
   );
