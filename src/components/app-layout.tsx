@@ -173,7 +173,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-28 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex h-20 w-auto items-center justify-center bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-4 gap-2">
+        <div className="flex h-24 w-auto items-center justify-center bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-6 gap-4">
             {navItems.map((item) => (
                 <NavLink key={item.href} {...item} />
             ))}
