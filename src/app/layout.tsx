@@ -31,12 +31,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <SettingsProvider>
-            <DataProvider>
-              <AuthProvider>
+            <AuthProvider>
+              <DataProvider>
                 <AppLayout>{children}</AppLayout>
                 <Toaster />
-              </AuthProvider>
-            </DataProvider>
+              </DataProvider>
+            </AuthProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>

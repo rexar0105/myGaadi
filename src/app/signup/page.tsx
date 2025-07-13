@@ -44,10 +44,10 @@ export default function SignupPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      signup(email, password);
+      await signup(email, password);
       toast({
         title: "Signup Successful",
         description: "You can now log in with your new account.",
@@ -63,8 +63,9 @@ export default function SignupPage() {
     }
   };
 
-  const handleGoogleSignup = () => {
-    if (loginWithGoogle()) {
+  const handleGoogleSignup = async () => {
+    const success = await loginWithGoogle();
+    if (success) {
         toast({
             title: "Signup Successful",
             description: "Welcome to myGaadi!",

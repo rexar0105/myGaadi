@@ -44,9 +44,10 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (login(email, password)) {
+    const success = await login(email, password);
+    if (success) {
       toast({
         title: "Login Successful",
         description: "Welcome back!",
@@ -61,15 +62,15 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    if (loginWithGoogle()) {
+  const handleGoogleLogin = async () => {
+    const success = await loginWithGoogle();
+    if (success) {
         toast({
             title: "Login Successful",
             description: "Welcome back!",
         });
         router.push("/");
     } else {
-        // This path should ideally not be hit in the simulation
         toast({
             variant: "destructive",
             title: "Google Login Failed",

@@ -1,5 +1,7 @@
+
 export type Vehicle = {
   id: string;
+  userId: string;
   name: string;
   make: string;
   model: string;
@@ -12,6 +14,7 @@ export type Vehicle = {
 
 export type ServiceRecord = {
   id: string;
+  userId: string;
   vehicleId: string;
   vehicleName: string;
   service: string;
@@ -23,6 +26,7 @@ export type ServiceRecord = {
 
 export type Expense = {
   id: string;
+  userId: string;
   vehicleId: string;
   vehicleName: string;
   category: 'Fuel' | 'Repair' | 'Insurance' | 'Other';
@@ -33,6 +37,7 @@ export type Expense = {
 
 export type InsurancePolicy = {
   id: string;
+  userId: string;
   vehicleId: string;
   vehicleName: string;
   provider: string;
@@ -42,6 +47,7 @@ export type InsurancePolicy = {
 
 export type Document = {
     id: string;
+    userId: string;
     vehicleId: string;
     vehicleName: string;
     documentType: 'Registration' | 'Insurance' | 'Service' | 'Other';

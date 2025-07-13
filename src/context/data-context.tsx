@@ -2,13 +2,16 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, query, where, orderBy, writeBatch } from 'firebase/firestore';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy, Document } from '@/lib/types';
-import { 
-    vehicles as initialVehicles, 
-    serviceRecords as initialServiceRecords, 
-    expenses as initialExpenses, 
-    insurancePolicies as initialInsurancePolicies, 
-    documents as initialDocuments 
+import { db } from '@/lib/firebase';
+import { useAuth } from './auth-context';
+import {
+    vehicles as initialVehicles,
+    serviceRecords as initialServiceRecords,
+    expenses as initialExpenses,
+    insurancePolicies as initialInsurancePolicies,
+    documents as initialDocuments
 } from '@/lib/data';
 
 interface DataContextType {
@@ -17,8 +20,8 @@ interface DataContextType {
   expenses: Expense[];
   insurancePolicies: InsurancePolicy[];
   documents: Document[];
-  addVehicle: (vehicle: Omit<Vehicle, 'id'>) => void;
-  updateVehicle: (vehicleId: string, updatedData: Partial<Vehicle>) => void;
+  addVehicle: (vehicle: Omit<Vehicle, 'id' | 'userId'>) => void;
+  updateVehicle: (vehicleId: string, updatedData: Partial<Omit<Vehicle, 'id' | 'userId'>>) => void;
   addServiceRecord: (record: Omit<ServiceRecord, 'id' | 'vehicleName'>) => void;
   addExpense: (expense: Omit<Expense, 'id' | 'vehicleName'>) => void;
   addInsurancePolicy: (policy: Omit<InsurancePolicy, 'id' | 'vehicleName'>) => void;
@@ -30,31 +33,8 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-const getLocalStorageItem = <T,>(key: string, fallback: T): T => {
-    if (typeof window === 'undefined') {
-        return fallback;
-    }
-    try {
-        const item = window.localStorage.getItem(key);
-        return item ? JSON.parse(item) : fallback;
-    } catch (error) {
-        console.error(`Error reading from localStorage key “${key}”:`, error);
-        return fallback;
-    }
-};
-
-const setLocalStorageItem = <T,>(key: string, value: T) => {
-    if (typeof window === 'undefined') {
-        return;
-    }
-    try {
-        window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-        console.error(`Error writing to localStorage key “${key}”:`, error);
-    }
-};
-
 export const DataProvider = ({ children }: { children: ReactNode }) => {
+    const { user, isAuthenticated } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>([]);
@@ -62,96 +42,140 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>([]);
     const [documents, setDocuments] = useState<Document[]>([]);
 
+    const fetchDataForUser = useCallback(async (userId: string) => {
+        setIsLoading(true);
+        try {
+            const collections = {
+                vehicles: collection(db, 'vehicles'),
+                serviceRecords: collection(db, 'serviceRecords'),
+                expenses: collection(db, 'expenses'),
+                insurancePolicies: collection(db, 'insurancePolicies'),
+                documents: collection(db, 'documents'),
+            };
+
+            const q = (col: any) => query(col, where("userId", "==", userId));
+
+            const [
+                vehiclesSnap,
+                serviceRecordsSnap,
+                expensesSnap,
+                insurancePoliciesSnap,
+                documentsSnap
+            ] = await Promise.all([
+                getDocs(q(collections.vehicles)),
+                getDocs(q(collections.serviceRecords)),
+                getDocs(q(collections.expenses)),
+                getDocs(q(collections.insurancePolicies)),
+                getDocs(q(collections.documents))
+            ]);
+
+            const userVehicles = vehiclesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Vehicle));
+            const vehicleNameMap = new Map(userVehicles.map(v => [v.id, v.name]));
+
+            setVehicles(userVehicles.sort((a,b) => a.name.localeCompare(b.name)));
+            
+            setServiceRecords(serviceRecordsSnap.docs.map(d => ({ id: d.id, vehicleName: vehicleNameMap.get(d.data().vehicleId) || 'Unknown', ...d.data() } as ServiceRecord)).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            
+            setExpenses(expensesSnap.docs.map(d => ({ id: d.id, vehicleName: vehicleNameMap.get(d.data().vehicleId) || 'Unknown', ...d.data() } as Expense)).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            
+            setInsurancePolicies(insurancePoliciesSnap.docs.map(d => ({ id: d.id, vehicleName: vehicleNameMap.get(d.data().vehicleId) || 'Unknown', ...d.data() } as InsurancePolicy)).sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()));
+
+            setDocuments(documentsSnap.docs.map(d => ({ id: d.id, vehicleName: vehicleNameMap.get(d.data().vehicleId) || 'Unknown', ...d.data() } as Document)).sort((a,b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()));
+
+        } catch (error) {
+            console.error("Error fetching data from Firestore:", error);
+            // Handle error, maybe show a toast
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
-        setVehicles(getLocalStorageItem('myGaadi_vehicles', initialVehicles));
-        setServiceRecords(getLocalStorageItem('myGaadi_serviceRecords', initialServiceRecords));
-        setExpenses(getLocalStorageItem('myGaadi_expenses', initialExpenses));
-        setInsurancePolicies(getLocalStorageItem('myGaadi_insurancePolicies', initialInsurancePolicies));
-        setDocuments(getLocalStorageItem('myGaadi_documents', initialDocuments));
-        setIsLoading(false);
-    }, []);
+        if (isAuthenticated && user) {
+            fetchDataForUser(user.id);
+        } else if (!isAuthenticated) {
+            // Clear data if user logs out
+            setVehicles([]);
+            setServiceRecords([]);
+            setExpenses([]);
+            setInsurancePolicies([]);
+            setDocuments([]);
+            setIsLoading(false);
+        }
+    }, [user, isAuthenticated, fetchDataForUser]);
 
-    const saveData = useCallback(<T,>(key: string, data: T, setter: React.Dispatch<React.SetStateAction<T>>) => {
-        setLocalStorageItem(key, data);
-        setter(data);
-    }, []);
+    const addVehicle = async (vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {
+        if (!user) return;
+        const newVehicleData = { ...vehicleData, userId: user.id };
+        const docRef = await addDoc(collection(db, "vehicles"), newVehicleData);
+        setVehicles(prev => [...prev, { id: docRef.id, ...newVehicleData }].sort((a,b) => a.name.localeCompare(b.name)));
+    };
 
-    const addVehicle = useCallback((vehicleData: Omit<Vehicle, 'id'>) => {
-        const newVehicle: Vehicle = {
-            id: `v${Date.now()}`,
-            ...vehicleData,
-        };
-        const newVehicles = [...vehicles, newVehicle];
-        saveData('myGaadi_vehicles', newVehicles, setVehicles);
-    }, [vehicles, saveData]);
+    const updateVehicle = async (vehicleId: string, updatedData: Partial<Omit<Vehicle, 'id' | 'userId'>>) => {
+        if (!user) return;
+        const vehicleRef = doc(db, "vehicles", vehicleId);
+        await updateDoc(vehicleRef, updatedData);
+        setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, ...updatedData } : v));
+    };
 
-    const updateVehicle = useCallback((vehicleId: string, updatedData: Partial<Vehicle>) => {
-        const newVehicles = vehicles.map(v => v.id === vehicleId ? { ...v, ...updatedData } : v);
-        saveData('myGaadi_vehicles', newVehicles, setVehicles);
-    }, [vehicles, saveData]);
-
-    const addServiceRecord = useCallback((recordData: Omit<ServiceRecord, 'id' | 'vehicleName'>) => {
+    const addServiceRecord = async (recordData: Omit<ServiceRecord, 'id' | 'vehicleName'>) => {
+        if (!user) return;
         const vehicleName = vehicles.find(v => v.id === recordData.vehicleId)?.name || 'Unknown';
-        const newRecord: ServiceRecord = {
-            id: `s${Date.now()}`,
-            ...recordData,
-            vehicleName,
-        };
-        const newRecords = [newRecord, ...serviceRecords].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        saveData('myGaadi_serviceRecords', newRecords, setServiceRecords);
-    }, [serviceRecords, vehicles, saveData]);
+        const newRecordData = { ...recordData, userId: user.id };
+        const docRef = await addDoc(collection(db, "serviceRecords"), newRecordData);
+        setServiceRecords(prev => [{ id: docRef.id, ...newRecordData, vehicleName }, ...prev].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    };
 
-    const addExpense = useCallback((expenseData: Omit<Expense, 'id' | 'vehicleName'>) => {
+    const addExpense = async (expenseData: Omit<Expense, 'id' | 'vehicleName'>) => {
+        if (!user) return;
         const vehicleName = vehicles.find(v => v.id === expenseData.vehicleId)?.name || 'Unknown';
-        const newExpense: Expense = {
-            id: `e${Date.now()}`,
-            ...expenseData,
-            vehicleName,
-        };
-        const newExpenses = [newExpense, ...expenses].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        saveData('myGaadi_expenses', newExpenses, setExpenses);
-    }, [expenses, vehicles, saveData]);
+        const newExpenseData = { ...expenseData, userId: user.id };
+        const docRef = await addDoc(collection(db, "expenses"), newExpenseData);
+        setExpenses(prev => [{ id: docRef.id, ...newExpenseData, vehicleName }, ...prev].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    };
 
-    const addInsurancePolicy = useCallback((policyData: Omit<InsurancePolicy, 'id' | 'vehicleName'>) => {
+    const addInsurancePolicy = async (policyData: Omit<InsurancePolicy, 'id' | 'vehicleName'>) => {
+        if (!user) return;
         const vehicleName = vehicles.find(v => v.id === policyData.vehicleId)?.name || 'Unknown';
-        const newPolicy: InsurancePolicy = {
-            id: `i${Date.now()}`,
-            ...policyData,
-            vehicleName,
-        };
-        const newPolicies = [...insurancePolicies, newPolicy].sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
-        saveData('myGaadi_insurancePolicies', newPolicies, setInsurancePolicies);
-    }, [insurancePolicies, vehicles, saveData]);
+        const newPolicyData = { ...policyData, userId: user.id };
+        const docRef = await addDoc(collection(db, "insurancePolicies"), newPolicyData);
+        setInsurancePolicies(prev => [...prev, { id: docRef.id, ...newPolicyData, vehicleName }].sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()));
+    };
 
-    const addDocument = useCallback((docData: Omit<Document, 'id' | 'vehicleName'>) => {
+    const addDocument = async (docData: Omit<Document, 'id' | 'vehicleName'>) => {
+        if (!user) return;
         const vehicleName = vehicles.find(v => v.id === docData.vehicleId)?.name || 'Unknown';
-        const newDocument: Document = {
-            id: `d${Date.now()}`,
-            ...docData,
-            vehicleName,
-        };
-        const newDocuments = [newDocument, ...documents].sort((a,b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
-        saveData('myGaadi_documents', newDocuments, setDocuments);
-    }, [documents, vehicles, saveData]);
+        const newDocData = { ...docData, userId: user.id };
+        const docRef = await addDoc(collection(db, "documents"), newDocData);
+        setDocuments(prev => [{ id: docRef.id, ...newDocData, vehicleName }, ...prev].sort((a,b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()));
+    };
 
-    const deleteDocument = useCallback((docId: string) => {
-        const newDocuments = documents.filter(d => d.id !== docId);
-        saveData('myGaadi_documents', newDocuments, setDocuments);
-    }, [documents, saveData]);
+    const deleteDocument = async (docId: string) => {
+        if (!user) return;
+        await deleteDoc(doc(db, "documents", docId));
+        setDocuments(prev => prev.filter(d => d.id !== docId));
+    };
 
-    const clearAllData = useCallback(() => {
-        if (typeof window === 'undefined') return;
-        window.localStorage.removeItem('myGaadi_vehicles');
-        window.localStorage.removeItem('myGaadi_serviceRecords');
-        window.localStorage.removeItem('myGaadi_expenses');
-        window.localStorage.removeItem('myGaadi_insurancePolicies');
-        window.localStorage.removeItem('myGaadi_documents');
-        setVehicles(initialVehicles);
-        setServiceRecords(initialServiceRecords);
-        setExpenses(initialExpenses);
-        setInsurancePolicies(initialInsurancePolicies);
-        setDocuments(initialDocuments);
-    }, []);
+    const clearAllData = async () => {
+        if (!user) return;
+        setIsLoading(true);
+        const batch = writeBatch(db);
+        
+        const collectionsToDelete = ['vehicles', 'serviceRecords', 'expenses', 'insurancePolicies', 'documents'];
+
+        for (const colName of collectionsToDelete) {
+            const q = query(collection(db, colName), where("userId", "==", user.id));
+            const snapshot = await getDocs(q);
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        }
+
+        await batch.commit();
+        
+        // Refetch to confirm empty state
+        await fetchDataForUser(user.id);
+        setIsLoading(false);
+    };
+
 
     const value = {
         vehicles, serviceRecords, expenses, insurancePolicies, documents,

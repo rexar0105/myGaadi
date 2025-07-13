@@ -229,6 +229,8 @@ export default function DashboardPage() {
 
 
   function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
+    // In a real app, you would upload the image to a storage service (like Firebase Storage)
+    // and get a URL back. For now, we'll continue using local URLs.
     const newVehicleData = {
       name: values.name,
       make: values.make,
@@ -249,6 +251,7 @@ export default function DashboardPage() {
   }
 
   const handleEditVehicleSave = (data: VehicleFormValues, vehicleId: string) => {
+    // Image handling would also need to be updated for a real backend
     const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : (vehicles.find(v => v.id === vehicleId)?.customImageUrl);
     const updatedData = {
         ...data,

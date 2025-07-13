@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import {
@@ -30,6 +30,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useData } from "@/context/data-context";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -46,20 +48,11 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-const initialProfileData = {
-    name: "John Doe",
-    dob: new Date("1990-01-01"),
-    bloodGroup: "O+",
-    phone: "+91 98765 43210",
-    address: "123, Main Street, New Delhi, India",
-    licenseNumber: "DL14 20110012345",
-    licenseExpiryDate: new Date("2030-12-31"),
-    emergencyContactName: "Jane Doe",
-    emergencyContactPhone: "+91 98765 01234",
-    avatarUrl: null as string | null,
+type ProfileState = Omit<ProfileFormValues, 'avatar' | 'dob' | 'licenseExpiryDate'> & {
+    dob?: string, // Stored as ISO string
+    licenseExpiryDate?: string, // Stored as ISO string
+    avatarUrl: string | null
 };
-
-type ProfileState = Omit<ProfileFormValues, 'avatar'> & { avatarUrl: string | null };
 
 const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" {...props}>
@@ -94,15 +87,50 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<ProfileState>(initialProfileData);
+  const [profile, setProfile] = useState<ProfileState | null>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-        ...profile,
-        avatar: undefined
-    },
+    // Default values will be set once profile is loaded
   });
+
+   useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      setIsLoadingProfile(true);
+      const profileRef = doc(db, "profiles", user.id);
+      const profileSnap = await getDoc(profileRef);
+
+      if (profileSnap.exists()) {
+        setProfile(profileSnap.data() as ProfileState);
+      } else {
+        // Create a default profile if one doesn't exist
+        const defaultProfile: ProfileState = {
+            name: user.email?.split('@')[0] || "New User",
+            avatarUrl: null
+        }
+        setProfile(defaultProfile);
+        await setDoc(profileRef, defaultProfile);
+      }
+      setIsLoadingProfile(false);
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  useEffect(() => {
+    // Once profile is loaded, reset the form with the fetched data
+    if (profile) {
+      form.reset({
+        ...profile,
+        dob: profile.dob ? new Date(profile.dob) : undefined,
+        licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
+        avatar: undefined,
+      });
+    }
+  }, [profile, form]);
+
 
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return "?";
@@ -123,7 +151,11 @@ export default function ProfilePage() {
     router.push("/login");
   };
 
-  function onProfileSubmit(data: ProfileFormValues) {
+  async function onProfileSubmit(data: ProfileFormValues) {
+    if (!user || !profile) return;
+    
+    // In a real app, image upload would be handled here, uploading to Firebase Storage
+    // and getting a URL back. We are simulating this with a local URL.
     const newAvatarFile = data.avatar?.[0];
     let newAvatarUrl = profile.avatarUrl;
 
@@ -131,10 +163,19 @@ export default function ProfilePage() {
         newAvatarUrl = URL.createObjectURL(newAvatarFile);
     }
     
-    setProfile({
+    const updatedProfileData = {
         ...data,
+        dob: data.dob?.toISOString(),
+        licenseExpiryDate: data.licenseExpiryDate?.toISOString(),
         avatarUrl: newAvatarUrl
-    });
+    };
+    
+    delete updatedProfileData.avatar; // Don't store the file object in Firestore
+
+    const profileRef = doc(db, "profiles", user.id);
+    await setDoc(profileRef, updatedProfileData, { merge: true });
+
+    setProfile(updatedProfileData as ProfileState);
 
     setIsEditing(false);
     toast({
@@ -193,6 +234,11 @@ export default function ProfilePage() {
     }
   ];
 
+  if (isLoadingProfile || !profile) {
+      // Add a skeleton loader for the profile section
+      return <div className="p-4 md:p-8">Loading Profile...</div>;
+  }
+
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="grid gap-8">
@@ -210,6 +256,8 @@ export default function ProfilePage() {
                     setIsEditing(true);
                     form.reset({
                         ...profile,
+                        dob: profile.dob ? new Date(profile.dob) : undefined,
+                        licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
                         avatar: undefined,
                     }); 
                 }
@@ -481,7 +529,7 @@ export default function ProfilePage() {
                       </div>
                       <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DOB</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.dob ? format(profile.dob, "dd-MM-yyyy") : 'Not set'}</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.dob ? format(new Date(profile.dob), "dd-MM-yyyy") : 'Not set'}</p>
                       </div>
                       <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">BLOOD</p>
@@ -489,7 +537,7 @@ export default function ProfilePage() {
                       </div>
                        <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">VALID THRU</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseExpiryDate ? format(profile.licenseExpiryDate, "MM/yy") : 'N/A'}</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseExpiryDate ? format(new Date(profile.licenseExpiryDate), "MM/yy") : 'N/A'}</p>
                       </div>
                       <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DL NO.</p>
@@ -497,7 +545,7 @@ export default function ProfilePage() {
                       </div>
                        <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMERGENCY CONTACT</p>
-                        <p className="font-medium text-foreground">{profile.emergencyContactName} ({profile.emergencyContactPhone})</p>
+                        <p className="font-medium text-foreground">{profile.emergencyContactName && profile.emergencyContactPhone ? `${profile.emergencyContactName} (${profile.emergencyContactPhone})` : 'Not set'}</p>
                       </div>
                     </div>
                   </div>
@@ -561,5 +609,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    

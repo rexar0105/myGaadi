@@ -2,8 +2,17 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
+import { app } from "@/lib/firebase"; // Use your firebase config
 import { useSettings } from "./settings-context";
-import { useData } from "./data-context";
 
 interface User {
   id: string;
@@ -13,89 +22,76 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (email: string, pass: string) => boolean;
-  signup: (email: string, pass: string) => void;
+  login: (email: string, pass: string) => Promise<boolean>;
+  signup: (email: string, pass: string) => Promise<void>;
   logout: () => void;
-  loginWithGoogle: () => boolean;
+  loginWithGoogle: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// A mock user database
-const MOCK_USERS: { [email: string]: string } = {
-    "test@example.com": "password123",
-    "user@google.com": "google-provided-password", // Mock google user
-};
+const auth = getAuth(app);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { settings } = useSettings();
-  const data = useData();
 
   useEffect(() => {
-    // Mock checking for a session token in localStorage
-    try {
-      const storedUser = localStorage.getItem("myGaadiUser");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-        setIsAuthenticated(true);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser && firebaseUser.email) {
+        setUser({ id: firebaseUser.uid, email: firebaseUser.email });
+      } else {
+        setUser(null);
       }
-    } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        localStorage.removeItem("myGaadiUser");
-    } finally {
-        setIsLoading(false);
-    }
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = (email: string, pass: string): boolean => {
-    if (MOCK_USERS[email] && MOCK_USERS[email] === pass) {
-      const loggedInUser = { id: Date.now().toString(), email };
-      setUser(loggedInUser);
-      setIsAuthenticated(true);
-      localStorage.setItem("myGaadiUser", JSON.stringify(loggedInUser));
+  const login = async (email: string, pass: string): Promise<boolean> => {
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
       return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-    return false;
   };
 
-  const loginWithGoogle = (): boolean => {
-    // In a real app, this would involve a popup and token exchange with a backend.
-    // Here, we'll just simulate a successful Google login.
-    const googleUser = { id: 'google-user-123', email: 'user@google.com' };
-    setUser(googleUser);
-    setIsAuthenticated(true);
-    localStorage.setItem("myGaadiUser", JSON.stringify(googleUser));
-    return true;
-  }
-
-  const signup = (email: string, pass: string) => {
-    if (MOCK_USERS[email]) {
-      throw new Error("User with this email already exists.");
+  const loginWithGoogle = async (): Promise<boolean> => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      return true;
+    } catch (error) {
+      console.error("Google login failed:", error);
+      return false;
     }
-    if(pass.length < 6) {
+  };
+
+  const signup = async (email: string, pass: string) => {
+    if (pass.length < 6) {
         throw new Error("Password must be at least 6 characters long.");
     }
-    MOCK_USERS[email] = pass;
-    // In a real app, you might auto-login or just show a success message
+    await createUserWithEmailAndPassword(auth, email, pass);
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem("myGaadiUser");
+  const logout = async () => {
+    await signOut(auth);
     if (settings.clearDataOnLogout) {
       sessionStorage.clear();
-      data?.clearAllData();
+      // Data is cleared automatically by the effect in DataProvider when auth state changes.
     }
   };
 
   if (isLoading) {
-    // You can return a loading spinner here
+    // You can return a global loading spinner here
     return null;
   }
+  
+  const isAuthenticated = !!user;
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, user, login, signup, logout, loginWithGoogle }}>
