@@ -154,7 +154,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                             <FormItem>
                                 <FormLabel>Vehicle Image</FormLabel>
                                 <FormControl>
-                                    <div>
+                                    <>
                                         <Input 
                                             id="edit-image-upload"
                                             type="file" 
@@ -163,11 +163,15 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                                             onChange={(e) => onChange(e.target.files)}
                                             {...rest}
                                         />
-                                        <label htmlFor="edit-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
-                                           <Upload className="h-4 w-4 mr-2"/>
-                                           <span className="truncate max-w-[calc(100%-2rem)]">{currentImageName ?? 'Upload a new image...'}</span>
-                                        </label>
-                                    </div>
+                                        <Button asChild variant="outline" className="w-full font-normal">
+                                            <label htmlFor="edit-image-upload" className="w-full cursor-pointer">
+                                                <Upload className="mr-2"/>
+                                                <span className="truncate max-w-[calc(100%-2rem)]">
+                                                    {currentImageName ?? 'Upload a new image...'}
+                                                </span>
+                                            </label>
+                                        </Button>
+                                    </>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -289,20 +293,24 @@ export default function DashboardPage() {
                         <FormItem>
                         <FormLabel>Vehicle Image (Optional)</FormLabel>
                         <FormControl>
-                            <div>
-                                <Input 
-                                    id="new-image-upload"
-                                    type="file" 
-                                    accept="image/*"
-                                    className="sr-only"
-                                    onChange={(e) => onChange(e.target.files)}
-                                    {...rest}
-                                />
-                                <label htmlFor="new-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
-                                    <Upload className="h-4 w-4 mr-2"/>
-                                    <span className="truncate max-w-[calc(100%-2rem)]">{newImageName ?? 'Upload an image...'}</span>
-                                </label>
-                            </div>
+                           <>
+                             <Input 
+                                id="new-image-upload"
+                                type="file" 
+                                accept="image/*"
+                                className="sr-only"
+                                onChange={(e) => onChange(e.target.files)}
+                                {...rest}
+                             />
+                             <Button asChild variant="outline" className="w-full font-normal">
+                               <label htmlFor="new-image-upload" className="w-full cursor-pointer">
+                                 <Upload className="mr-2"/>
+                                 <span className="truncate max-w-[calc(100%-2rem)]">
+                                    {newImageName ?? 'Upload an image...'}
+                                 </span>
+                               </label>
+                             </Button>
+                           </>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
