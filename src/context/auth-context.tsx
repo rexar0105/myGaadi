@@ -2,16 +2,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut,
-  GoogleAuthProvider,
-  signInWithPopup
-} from "firebase/auth";
-import { app } from "@/lib/firebase"; // Use your firebase config
 import { useSettings } from "./settings-context";
 
 interface User {
@@ -30,67 +20,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const auth = getAuth(app);
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const { settings } = useSettings();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser && firebaseUser.email) {
-        setUser({ id: firebaseUser.uid, email: firebaseUser.email });
-      } else {
-        setUser(null);
-      }
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const [user, setUser] = useState<User | null>({ id: 'local-user', email: 'user@example.com' });
 
   const login = async (email: string, pass: string): Promise<boolean> => {
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      return true;
-    } catch (error) {
-      console.error("Login failed:", error);
-      return false;
-    }
+    console.log("Login attempt with:", email);
+    setUser({ id: 'local-user', email });
+    return true;
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      return true;
-    } catch (error) {
-      console.error("Google login failed:", error);
-      return false;
-    }
+    console.log("Google login attempt");
+    setUser({ id: 'local-user', email: 'user@example.com' });
+    return true;
   };
 
   const signup = async (email: string, pass: string) => {
-    if (pass.length < 6) {
-        throw new Error("Password must be at least 6 characters long.");
-    }
-    await createUserWithEmailAndPassword(auth, email, pass);
+     console.log("Signup attempt with:", email);
+     setUser({ id: 'local-user', email });
   };
 
   const logout = async () => {
-    await signOut(auth);
-    if (settings.clearDataOnLogout) {
-      sessionStorage.clear();
-      // Data is cleared automatically by the effect in DataProvider when auth state changes.
-    }
+    console.log("Logout");
+    setUser(null);
   };
 
-  if (isLoading) {
-    // You can return a global loading spinner here
-    return null;
-  }
-  
   const isAuthenticated = !!user;
 
   return (

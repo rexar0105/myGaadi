@@ -30,8 +30,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useData } from "@/context/data-context";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -83,7 +81,7 @@ const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
-  const { vehicles, expenses, serviceRecords, documents, insurancePolicies } = useData();
+  const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading: isDataLoading } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -99,19 +97,17 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       if (!user) return;
       setIsLoadingProfile(true);
-      const profileRef = doc(db, "profiles", user.id);
-      const profileSnap = await getDoc(profileRef);
 
-      if (profileSnap.exists()) {
-        setProfile(profileSnap.data() as ProfileState);
+      const storedProfile = localStorage.getItem('myGaadiProfile');
+      if (storedProfile) {
+        setProfile(JSON.parse(storedProfile));
       } else {
-        // Create a default profile if one doesn't exist
         const defaultProfile: ProfileState = {
             name: user.email?.split('@')[0] || "New User",
             avatarUrl: null
         }
         setProfile(defaultProfile);
-        await setDoc(profileRef, defaultProfile);
+        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
       }
       setIsLoadingProfile(false);
     };
@@ -154,8 +150,6 @@ export default function ProfilePage() {
   async function onProfileSubmit(data: ProfileFormValues) {
     if (!user || !profile) return;
     
-    // In a real app, image upload would be handled here, uploading to Firebase Storage
-    // and getting a URL back. We are simulating this with a local URL.
     const newAvatarFile = data.avatar?.[0];
     let newAvatarUrl = profile.avatarUrl;
 
@@ -163,19 +157,21 @@ export default function ProfilePage() {
         newAvatarUrl = URL.createObjectURL(newAvatarFile);
     }
     
-    const updatedProfileData = {
-        ...data,
+    const updatedProfileData: ProfileState = {
+        name: data.name,
         dob: data.dob?.toISOString(),
+        bloodGroup: data.bloodGroup,
+        phone: data.phone,
+        address: data.address,
+        licenseNumber: data.licenseNumber,
         licenseExpiryDate: data.licenseExpiryDate?.toISOString(),
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
         avatarUrl: newAvatarUrl
     };
     
-    delete updatedProfileData.avatar; // Don't store the file object in Firestore
-
-    const profileRef = doc(db, "profiles", user.id);
-    await setDoc(profileRef, updatedProfileData, { merge: true });
-
-    setProfile(updatedProfileData as ProfileState);
+    localStorage.setItem('myGaadiProfile', JSON.stringify(updatedProfileData));
+    setProfile(updatedProfileData);
 
     setIsEditing(false);
     toast({
@@ -234,7 +230,7 @@ export default function ProfilePage() {
     }
   ];
 
-  if (isLoadingProfile || !profile) {
+  if (isLoadingProfile || !profile || isDataLoading) {
       // Add a skeleton loader for the profile section
       return <div className="p-4 md:p-8">Loading Profile...</div>;
   }
