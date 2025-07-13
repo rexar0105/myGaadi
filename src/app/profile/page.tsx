@@ -107,14 +107,20 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       form.reset({
-        ...profile,
+        name: profile.name || '',
         dob: profile.dob ? new Date(profile.dob) : undefined,
+        bloodGroup: profile.bloodGroup || '',
+        phone: profile.phone || '',
+        address: profile.address || '',
+        licenseNumber: profile.licenseNumber || '',
         licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
+        emergencyContactName: profile.emergencyContactName || '',
+        emergencyContactPhone: profile.emergencyContactPhone || '',
         avatar: undefined,
       });
       setIsLoadingProfile(false);
     }
-  }, [profile, form, isEditing]);
+  }, [profile, form]);
 
 
   const handleLogout = () => {
@@ -219,7 +225,7 @@ export default function ProfilePage() {
         <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           <CardHeader className="flex flex-row justify-between items-start">
              <div>
-                <CardTitle className="font-headline text-2xl">User Profile</CardTitle>
+                <CardTitle className="font-headline text-xl">User Profile</CardTitle>
                 <CardDescription>Your personal information and app settings</CardDescription>
              </div>
 
