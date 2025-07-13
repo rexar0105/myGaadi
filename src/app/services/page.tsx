@@ -47,6 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useData } from "@/context/data-context";
 import { useSettings } from "@/context/settings-context";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -58,8 +59,54 @@ const serviceSchema = z.object({
 });
 
 
+function ServicesPageSkeleton() {
+    return (
+        <div className="grid gap-8">
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-56" />
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     {[...Array(2)].map((_, i) => (
+                        <div key={i}>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <Skeleton className="h-5 w-40 mb-2" />
+                                    <Skeleton className="h-4 w-24" />
+                                </div>
+                                <Skeleton className="h-6 w-20" />
+                            </div>
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="h-4 w-64" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    {[...Array(3)].map((_, i) => (
+                        <div key={i}>
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <Skeleton className="h-5 w-48 mb-2" />
+                                    <Skeleton className="h-4 w-32" />
+                                </div>
+                                <Skeleton className="h-6 w-24" />
+                            </div>
+                            <Skeleton className="h-10 w-full mt-2" />
+                        </div>
+                    ))}
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
 export default function ServicesPage() {
-    const { vehicles, serviceRecords, addServiceRecord } = useData();
+    const { vehicles, serviceRecords, addServiceRecord, isLoading } = useData();
     const { settings } = useSettings();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
@@ -227,6 +274,7 @@ export default function ServicesPage() {
                     </DialogContent>
                 </Dialog>
             </div>
+            {isLoading ? <ServicesPageSkeleton /> : (
             <div className="grid gap-8">
                 <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
                   <CardHeader>
@@ -308,6 +356,7 @@ export default function ServicesPage() {
                     </CardContent>
                 </Card>
             </div>
+            )}
         </div>
     )
 }
