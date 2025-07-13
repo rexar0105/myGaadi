@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, FileText } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -31,9 +31,10 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
+  { href: "/documents", label: "Documents", icon: FileText },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles },
 ];
 
 function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
@@ -109,6 +110,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         return daysLeft <= 30;
     })
   ].length;
+  
+  const navGrid = {
+    gridTemplateColumns: `repeat(${navItems.length}, 1fr)`
+  }
 
   return (
     <TooltipProvider>
@@ -159,7 +164,15 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="grid h-20 max-w-md mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-2 md:gap-2" style={{gridTemplateColumns: 'repeat(5, 1fr)'}}>
+        <div className="grid h-20 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-2 md:gap-2" style={navGrid}>
+            {navItems.map(item => {
+              if (item.href === '/assessment') {
+                const assessItem = navItems.splice(navItems.findIndex(i => i.href === '/assessment'), 1)[0];
+                const middleIndex = Math.floor(navItems.length / 2);
+                navItems.splice(middleIndex, 0, assessItem);
+              }
+              return null;
+            })}
             {navItems.map(item => <NavLink key={item.href} {...item} />)}
         </div>
       </nav>

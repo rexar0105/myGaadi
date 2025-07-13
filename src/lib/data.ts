@@ -1,4 +1,4 @@
-import type { Vehicle, ServiceRecord, Expense, InsurancePolicy } from './types';
+import type { Vehicle, ServiceRecord, Expense, InsurancePolicy, Document } from './types';
 
 export const vehicles: Vehicle[] = [
   {
@@ -148,3 +148,33 @@ export const insurancePolicies: InsurancePolicy[] = [
     expiryDate: addDays(today, 150).toISOString(),
   },
 ];
+
+export const documents: Document[] = [
+  {
+    id: 'd1',
+    vehicleId: 'v1',
+    vehicleName: 'Swift',
+    documentType: 'Registration',
+    fileName: 'Swift_RC.pdf',
+    uploadDate: addDays(today, -400).toISOString(),
+    fileUrl: '#'
+  },
+  {
+    id: 'd2',
+    vehicleId: 'v1',
+    vehicleName: 'Swift',
+    documentType: 'Insurance',
+    fileName: 'Insurance_2024.pdf',
+    uploadDate: addDays(today, -300).toISOString(),
+    fileUrl: '#'
+  },
+  {
+    id: 'd3',
+    vehicleId: 'v2',
+    vehicleName: 'Creta',
+    documentType: 'Registration',
+    fileName: 'Creta_Reg.pdf',
+    uploadDate: addDays(today, -350).toISOString(),
+    fileUrl: '#'
+  }
+]

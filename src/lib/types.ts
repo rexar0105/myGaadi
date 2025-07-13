@@ -38,3 +38,13 @@ export type InsurancePolicy = {
   policyNumber: string;
   expiryDate: string; // ISO string
 };
+
+export type Document = {
+    id: string;
+    vehicleId: string;
+    vehicleName: string;
+    documentType: 'Registration' | 'Insurance' | 'Service' | 'Other';
+    fileName: string;
+    uploadDate: string; // ISO string
+    fileUrl: string; // URL to the stored file
+}

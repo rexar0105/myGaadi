@@ -12,11 +12,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Palette, History, Settings } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Palette, History, Settings, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import { vehicles, expenses, serviceRecords } from "@/lib/data";
+import { vehicles, expenses, serviceRecords, documents } from "@/lib/data";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { format } from "date-fns";
 
@@ -42,6 +42,7 @@ export default function ProfilePage() {
   const totalVehicles = vehicles.length;
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalServices = serviceRecords.length;
+  const totalDocuments = documents.length;
 
   const stats = [
     {
@@ -58,6 +59,11 @@ export default function ProfilePage() {
       icon: Wrench,
       label: "Services Logged",
       value: totalServices,
+    },
+    {
+      icon: FileText,
+      label: "Documents Stored",
+      value: totalDocuments
     }
   ];
 
@@ -113,7 +119,7 @@ export default function ProfilePage() {
                 <CardTitle className="font-headline text-xl">Your Stats</CardTitle>
                 <CardDescription>An overview of your activity.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-3">
+            <CardContent className="grid gap-4 sm:grid-cols-2">
                 {stats.map((stat, index) => (
                     <div key={index} className="flex items-center gap-4 rounded-lg border p-4 bg-muted/40">
                         <stat.icon className="h-8 w-8 text-primary"/>
