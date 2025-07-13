@@ -29,6 +29,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -111,6 +112,14 @@ export default function ProfilePage() {
     },
   ];
 
+  const recentActivity = [
+    ...expenses.map(e => ({ type: 'expense' as const, ...e})),
+    ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
+  ]
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  .slice(0, 5);
+
+
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="grid gap-8">
@@ -129,10 +138,14 @@ export default function ProfilePage() {
               </div>
             </div>
             <Button variant={isEditing ? "default" : "outline"} size="icon" onClick={() => {
-                setIsEditing(!isEditing);
-                form.reset(profile); // Reset form to current profile data on toggle
+                if (isEditing) {
+                    form.handleSubmit(onProfileSubmit)();
+                } else {
+                    setIsEditing(true);
+                    form.reset(profile); 
+                }
             }}>
-                {isEditing ? <Save className="h-4 w-4" onClick={form.handleSubmit(onProfileSubmit)}/> : <Edit className="h-4 w-4" />}
+                {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
                 <span className="sr-only">{isEditing ? 'Save' : 'Edit'}</span>
             </Button>
           </CardHeader>
@@ -244,7 +257,6 @@ export default function ProfilePage() {
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="w-full">Save Changes</Button>
                     </form>
                 </Form>
             ) : (
@@ -281,6 +293,57 @@ export default function ProfilePage() {
 
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <CardHeader>
+                <CardTitle className="font-headline text-xl">Your Stats</CardTitle>
+                <CardDescription>An overview of your activity.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                    {stats.map((stat, index) => (
+                        <div key={index} className="flex items-center gap-4 rounded-lg border p-4 bg-muted/40">
+                            <stat.icon className="h-8 w-8 text-primary"/>
+                            <div>
+                                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                                <p className="text-2xl font-bold">{stat.value}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <Separator className="my-4" />
+
+                <div>
+                    <h4 className="font-headline text-lg mb-3">Recent Activity</h4>
+                    {recentActivity.length > 0 ? (
+                        <ul className="space-y-4">
+                            {recentActivity.map((activity) => (
+                            <li key={`${activity.type}-${activity.id}`} className="flex items-center gap-4">
+                                <div className="bg-muted p-3 rounded-full">
+                                    {activity.type === 'expense' ? <IndianRupee className="h-5 w-5 text-primary" /> : <Wrench className="h-5 w-5 text-primary" />}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-semibold">
+                                        {activity.type === 'expense' ? activity.description : activity.service}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {activity.vehicleName}
+                                    </p>
+                                </div>
+                                <div className="text-right">
+                                    {activity.type === 'expense' && <p className="font-mono text-foreground font-semibold">₹{activity.amount.toLocaleString('en-IN')}</p>}
+                                    <p className="text-xs text-muted-foreground">{format(new Date(activity.date), "dd MMM, yyyy")}</p>
+                                </div>
+                            </li>
+                            ))}
+                        </ul>
+                        ) : (
+                        <p className="text-muted-foreground text-sm text-center py-4">No recent activity.</p>
+                        )}
+                </div>
+            </CardContent>
+        </Card>
+
+        <Card className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+            <CardHeader>
                 <CardTitle className="font-headline text-xl flex items-center gap-2"><Settings/> App Settings</CardTitle>
                 <CardDescription>Customize the look and feel of the application.</CardDescription>
             </CardHeader>
@@ -290,24 +353,6 @@ export default function ProfilePage() {
         </Card>
 
         <MyDocuments />
-
-        <Card className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-            <CardHeader>
-                <CardTitle className="font-headline text-xl">Your Stats</CardTitle>
-                <CardDescription>An overview of your activity.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {stats.map((stat, index) => (
-                    <div key={index} className="flex items-center gap-4 rounded-lg border p-4 bg-muted/40">
-                        <stat.icon className="h-8 w-8 text-primary"/>
-                        <div>
-                            <p className="text-sm text-muted-foreground">{stat.label}</p>
-                            <p className="text-2xl font-bold">{stat.value}</p>
-                        </div>
-                    </div>
-                ))}
-            </CardContent>
-        </Card>
 
         <div className="flex justify-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
             <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">

@@ -14,30 +14,29 @@ import {
 
 export default function ActivityPage() {
 
-  const recentActivity = [
+  const allActivity = [
     ...expenses.map(e => ({ type: 'expense' as const, ...e})),
     ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
   ]
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  .slice(0, 10);
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
         <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-1">Recent Activity</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-1">Full Activity Log</h1>
             <p className="text-muted-foreground">
-            A log of your recent expenses and services.
+            A complete history of all your expenses and services.
             </p>
         </div>
         <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <CardHeader>
-                <CardTitle className="font-headline text-xl flex items-center gap-2"><History/> Activity Log</CardTitle>
-                <CardDescription>Your last 10 recorded actions.</CardDescription>
+                <CardTitle className="font-headline text-xl flex items-center gap-2"><History/> Activity History</CardTitle>
+                <CardDescription>All your recorded actions.</CardDescription>
             </CardHeader>
             <CardContent>
-                {recentActivity.length > 0 ? (
+                {allActivity.length > 0 ? (
                   <ul className="space-y-4">
-                    {recentActivity.map((activity, index) => (
+                    {allActivity.map((activity, index) => (
                       <li key={`${activity.type}-${activity.id}`} className="flex items-center gap-4">
                          <div className="bg-muted p-3 rounded-full">
                            {activity.type === 'expense' ? <IndianRupee className="h-5 w-5 text-primary" /> : <Wrench className="h-5 w-5 text-primary" />}
@@ -58,7 +57,7 @@ export default function ActivityPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">No recent activity.</p>
+                  <p className="text-muted-foreground text-sm text-center py-4">No activity recorded.</p>
                 )}
             </CardContent>
         </Card>
