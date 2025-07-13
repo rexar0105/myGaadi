@@ -253,65 +253,61 @@ export default function ProfilePage() {
                     </form>
                 </Form>
             ) : (
-              <div className="rounded-lg border bg-muted/20 p-4 font-mono text-sm max-w-2xl mx-auto shadow-md">
+              <div className="rounded-xl border bg-card p-4 font-sans text-sm max-w-2xl mx-auto shadow-lg overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b-2 border-primary/20 pb-2 mb-4">
                     <div className="text-left">
-                        <p className="font-sans font-bold text-primary text-lg">myGaadi ID</p>
-                        <p className="text-xs text-muted-foreground font-sans">VIRTUAL IDENTIFICATION</p>
+                        <p className="font-bold text-primary text-lg tracking-wider">myGaadi ID</p>
+                        <p className="text-xs text-muted-foreground font-medium tracking-widest">VIRTUAL ID</p>
                     </div>
                     <AppLogoMini />
                 </div>
                 
                 {/* Body */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-shrink-0">
-                    <Avatar className="h-28 w-24 rounded-md border-2 border-muted">
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                  <div className="flex-shrink-0 mx-auto sm:mx-0">
+                    <Avatar className="h-32 w-28 rounded-lg border-4 border-muted shadow-md">
                         <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
-                        <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold rounded-md">
+                        <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold rounded-lg">
                             {getInitials(profile.name || user?.email || '')}
                         </AvatarFallback>
                     </Avatar>
                   </div>
-                  <div className="flex-1 space-y-2">
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                      <div>
-                        <p className="text-xs text-muted-foreground">NAME</p>
-                        <p className="font-sans font-semibold text-base text-foreground">{profile.name}</p>
+                  <div className="flex-1 w-full">
+                    <div className="mb-2">
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">NAME</p>
+                        <p className="font-bold text-xl text-foreground -mt-1">{profile.name}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                      <div className="col-span-2">
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">ADDRESS</p>
+                        <p className="font-medium text-foreground text-base">{profile.address || 'Not set'}</p>
                       </div>
-                       <div>
-                        <p className="text-xs text-muted-foreground">EMAIL</p>
-                        <p className="font-sans font-semibold text-foreground truncate">{user?.email}</p>
+                      <div>
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">DOB</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.dob ? format(profile.dob, "dd-MM-yyyy") : 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">BLOOD</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.bloodGroup || 'Not set'}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-xs text-muted-foreground">ADDRESS</p>
-                        <p className="font-sans font-semibold text-foreground">{profile.address || 'Not set'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">DATE OF BIRTH</p>
-                        <p className="font-sans font-semibold text-foreground">{profile.dob ? format(profile.dob, "dd-MM-yyyy") : 'Not set'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">BLOOD GROUP</p>
-                        <p className="font-sans font-semibold text-foreground">{profile.bloodGroup || 'Not set'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">CLASS</p>
-                        <p className="font-sans font-semibold text-foreground">ALL</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">EXPIRES</p>
-                        <p className="font-sans font-semibold text-foreground">NEVER</p>
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMAIL</p>
+                        <p className="font-medium text-foreground truncate">{user?.email}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Footer / Signature */}
-                <div className="flex justify-end items-end mt-2">
-                    <div className="w-1/2">
-                        <p className="font-cursive text-2xl text-foreground/80 border-b border-muted-foreground pb-1">{profile.name}</p>
-                        <p className="text-xs text-muted-foreground text-center">SIGNATURE</p>
+                <div className="flex justify-between items-end mt-2">
+                    <div className="text-left">
+                        <p className="font-mono text-xs text-muted-foreground">Class: ALL</p>
+                        <p className="font-mono text-xs text-muted-foreground">Expires: NEVER</p>
+                    </div>
+                    <div className="w-2/5">
+                        <p className="font-serif text-2xl text-foreground/80 border-b border-muted-foreground pb-1 text-center italic">{profile.name}</p>
+                        <p className="text-xs text-muted-foreground text-center font-semibold tracking-wide">SIGNATURE</p>
                     </div>
                 </div>
             </div>
