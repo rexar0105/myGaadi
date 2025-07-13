@@ -53,17 +53,18 @@ export default function AlertsPage() {
         let isUrgent = false;
         let title = '';
         let description = '';
+        const { reminderLeadTime } = settings;
 
         if (alert.type === 'service') {
           const daysLeft = differenceInDays(new Date(alert.nextDueDate!), new Date());
-          if (daysLeft < 7) {
+          if (daysLeft < reminderLeadTime) {
             isUrgent = true;
             title = `Service Due Soon: ${alert.vehicleName}`;
             description = `${alert.service} is due in ${daysLeft} days.`;
           }
         } else { // Insurance
           const daysLeft = differenceInDays(new Date(alert.expiryDate), new Date());
-           if (daysLeft < 15) {
+           if (daysLeft < reminderLeadTime) {
             isUrgent = true;
             title = `Insurance Expiring: ${alert.vehicleName}`;
             description = `Policy from ${alert.provider} expires in ${daysLeft} days.`;
@@ -81,7 +82,7 @@ export default function AlertsPage() {
       });
 
       sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
-    }, [toast, settings.notificationsEnabled, allAlerts]);
+    }, [toast, settings.notificationsEnabled, allAlerts, settings.reminderLeadTime]);
 
 
   return (
@@ -108,7 +109,7 @@ export default function AlertsPage() {
                   if (alert.type === 'service') {
                     const dueDate = new Date(alert.nextDueDate!);
                     const daysLeft = differenceInDays(dueDate, new Date());
-                    const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
+                    const urgency = daysLeft < settings.reminderLeadTime/2 ? "destructive" : daysLeft < settings.reminderLeadTime ? "secondary" : "default";
 
                     return (
                       <li 
@@ -136,7 +137,7 @@ export default function AlertsPage() {
                   } else { // Insurance
                     const expiryDate = new Date(alert.expiryDate);
                     const daysLeft = differenceInDays(expiryDate, new Date());
-                    const urgency = daysLeft < 15 ? "destructive" : daysLeft < 45 ? "secondary" : "default";
+                    const urgency = daysLeft < settings.reminderLeadTime/2 ? "destructive" : daysLeft < settings.reminderLeadTime ? "secondary" : "default";
 
                     return (
                         <li 

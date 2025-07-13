@@ -6,6 +6,8 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 interface AppSettings {
   notificationsEnabled: boolean;
   clearDataOnLogout: boolean;
+  defaultSortOrder: 'newest' | 'oldest';
+  reminderLeadTime: number; // in days
 }
 
 interface SettingsContextType {
@@ -18,6 +20,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 const defaultSettings: AppSettings = {
   notificationsEnabled: true,
   clearDataOnLogout: false,
+  defaultSortOrder: 'newest',
+  reminderLeadTime: 14,
 };
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {

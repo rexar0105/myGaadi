@@ -45,6 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { ChartConfig } from "@/components/ui/chart";
 import { useData } from "@/context/data-context";
+import { useSettings } from "@/context/settings-context";
 
 const expenseSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -80,6 +81,7 @@ const chartConfig: ChartConfig = {
 
 export default function ExpensesPage() {
   const { vehicles, expenses, addExpense } = useData();
+  const { settings } = useSettings();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -112,7 +114,11 @@ export default function ExpensesPage() {
   }
 
   const sortedExpenses = [...expenses].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+      }
   );
 
   const recentExpenses = sortedExpenses.slice(0, 10);
@@ -332,7 +338,7 @@ export default function ExpensesPage() {
             <CardTitle className="font-headline flex items-center gap-2 text-xl">
               Recent Expenses
             </CardTitle>
-            <CardDescription>Last 10 recorded expenses</CardDescription>
+            <CardDescription>Last 10 recorded expenses (sorted by {settings.defaultSortOrder === 'newest' ? 'most recent' : 'oldest'})</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">

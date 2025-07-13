@@ -11,15 +11,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useData } from "@/context/data-context";
+import { useSettings } from "@/context/settings-context";
 
 export default function ActivityPage() {
   const { expenses, serviceRecords } = useData();
+  const { settings } = useSettings();
 
   const allActivity = [
     ...expenses.map(e => ({ type: 'expense' as const, ...e})),
     ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
   ]
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  .sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+  });
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -32,7 +38,7 @@ export default function ActivityPage() {
         <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <CardHeader>
                 <CardTitle className="font-headline text-xl flex items-center gap-2"><History/> Activity History</CardTitle>
-                <CardDescription>All your recorded actions.</CardDescription>
+                <CardDescription>All your recorded actions sorted by {settings.defaultSortOrder === 'newest' ? 'most recent' : 'oldest'}.</CardDescription>
             </CardHeader>
             <CardContent>
                 {allActivity.length > 0 ? (

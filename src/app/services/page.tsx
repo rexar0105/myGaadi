@@ -46,6 +46,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useData } from "@/context/data-context";
+import { useSettings } from "@/context/settings-context";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -59,6 +60,7 @@ const serviceSchema = z.object({
 
 export default function ServicesPage() {
     const { vehicles, serviceRecords, addServiceRecord } = useData();
+    const { settings } = useSettings();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
 
@@ -98,7 +100,11 @@ export default function ServicesPage() {
     .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
     .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
 
-    const serviceHistory = [...serviceRecords].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const serviceHistory = [...serviceRecords].sort((a,b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
 
 
     return (
@@ -268,7 +274,7 @@ export default function ServicesPage() {
                 <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
                     <CardHeader>
                         <CardTitle className="font-headline text-xl">Service History</CardTitle>
-                        <CardDescription>All recorded services for your vehicles</CardDescription>
+                        <CardDescription>All recorded services for your vehicles, sorted by {settings.defaultSortOrder === 'newest' ? 'most recent' : 'oldest'}</CardDescription>
                     </CardHeader>
                     <CardContent>
                          <ul className="space-y-4">
