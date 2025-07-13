@@ -154,7 +154,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                             <FormItem>
                                 <FormLabel>Vehicle Image</FormLabel>
                                 <FormControl>
-                                    <>
+                                    <div>
                                         <Input 
                                             id="edit-image-upload"
                                             type="file" 
@@ -166,7 +166,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                                            <Upload className="h-4 w-4 mr-2"/>
                                            <span className="truncate max-w-[calc(100%-2rem)]">{currentImageName ?? 'Upload a new image...'}</span>
                                         </label>
-                                    </>
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -293,7 +293,7 @@ export default function DashboardPage() {
                         <FormItem>
                         <FormLabel>Vehicle Image (Optional)</FormLabel>
                         <FormControl>
-                             <>
+                             <div>
                                 <Input 
                                     id="new-image-upload"
                                     type="file" 
@@ -305,7 +305,7 @@ export default function DashboardPage() {
                                     <Upload className="h-4 w-4 mr-2"/>
                                     <span className="truncate max-w-[calc(100%-2rem)]">{newImageName ?? 'Upload an image...'}</span>
                                 </label>
-                            </>
+                            </div>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
