@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
@@ -49,6 +49,13 @@ const initialProfileData: ProfileFormValues = {
     address: "123, Main Street, New Delhi, India"
 };
 
+const AppLogoMini = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <path d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm0 2c6.075 0 11 4.925 11 11s-4.925 11-11 11S5 22.075 5 16 9.925 5 16 5z" fill="hsl(var(--primary))" fillOpacity="0.2"/>
+      <path d="M16.064 10.339c-3.153 0-5.71 2.556-5.71 5.71s2.557 5.71 5.71 5.71c3.154 0 5.71-2.556 5.71-5.71s-2.556-5.71-5.71-5.71zm.001 2.057a3.655 3.655 0 110 7.31 3.655 3.655 0 010-7.31z" fill="hsl(var(--primary))" />
+      <path d="M19.982 11.082l2.96 2.457-4.48 5.418-2.96-2.457 4.48-5.418z" fill="hsl(var(--primary))"/>
+    </svg>
+)
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -118,19 +125,12 @@ export default function ProfilePage() {
       <div className="grid gap-8">
         <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           <CardHeader className="flex flex-row justify-between items-start">
-            <div className="flex items-center gap-4">
-               <Avatar className="h-16 w-16">
-                  <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
-                  <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold">
-                      {getInitials(profile.name || user?.email || '')}
-                  </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="font-headline text-2xl">{profile.name}</CardTitle>
-                <CardDescription>{user?.email}</CardDescription>
-              </div>
-            </div>
-            <Button variant={isEditing ? "default" : "outline"} size="icon" onClick={() => {
+             <div>
+                <CardTitle className="font-headline text-2xl">User Profile</CardTitle>
+                <CardDescription>Your personal information and app settings</CardDescription>
+             </div>
+
+            <Button variant={isEditing ? "default" : "outline"} size="sm" className="gap-2" onClick={() => {
                 if (isEditing) {
                     form.handleSubmit(onProfileSubmit)();
                 } else {
@@ -139,7 +139,7 @@ export default function ProfilePage() {
                 }
             }}>
                 {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-                <span className="sr-only">{isEditing ? 'Save' : 'Edit'}</span>
+                <span>{isEditing ? 'Save' : 'Edit'}</span>
             </Button>
           </CardHeader>
           <CardContent>
@@ -253,33 +253,68 @@ export default function ProfilePage() {
                     </form>
                 </Form>
             ) : (
-                <div className="space-y-4">
-                   <div className="flex items-center text-sm">
-                        <UserCircle className="h-4 w-4 mr-3 text-muted-foreground"/>
-                        <span className="font-semibold w-28">Full Name</span>
-                        <span>{profile.name}</span>
-                   </div>
-                   <div className="flex items-center text-sm">
-                        <CalendarIcon className="h-4 w-4 mr-3 text-muted-foreground"/>
-                        <span className="font-semibold w-28">Date of Birth</span>
-                        <span>{profile.dob ? format(profile.dob, "do MMMM, yyyy") : 'Not set'}</span>
-                   </div>
-                   <div className="flex items-center text-sm">
-                        <Droplets className="h-4 w-4 mr-3 text-muted-foreground"/>
-                        <span className="font-semibold w-28">Blood Group</span>
-                        <span>{profile.bloodGroup || 'Not set'}</span>
-                   </div>
-                    <div className="flex items-center text-sm">
-                        <Phone className="h-4 w-4 mr-3 text-muted-foreground"/>
-                        <span className="font-semibold w-28">Phone Number</span>
-                        <span>{profile.phone || 'Not set'}</span>
-                   </div>
-                   <div className="flex items-center text-sm">
-                        <MapPin className="h-4 w-4 mr-3 text-muted-foreground"/>
-                        <span className="font-semibold w-28">Address</span>
-                        <span className="flex-1">{profile.address || 'Not set'}</span>
-                   </div>
+              <div className="rounded-lg border bg-muted/20 p-4 font-mono text-sm max-w-2xl mx-auto shadow-md">
+                {/* Header */}
+                <div className="flex justify-between items-center border-b-2 border-primary/20 pb-2 mb-4">
+                    <div className="text-left">
+                        <p className="font-sans font-bold text-primary text-lg">myGaadi ID</p>
+                        <p className="text-xs text-muted-foreground font-sans">VIRTUAL IDENTIFICATION</p>
+                    </div>
+                    <AppLogoMini />
                 </div>
+                
+                {/* Body */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-shrink-0">
+                    <Avatar className="h-28 w-24 rounded-md border-2 border-muted">
+                        <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
+                        <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold rounded-md">
+                            {getInitials(profile.name || user?.email || '')}
+                        </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                      <div>
+                        <p className="text-xs text-muted-foreground">NAME</p>
+                        <p className="font-sans font-semibold text-base text-foreground">{profile.name}</p>
+                      </div>
+                       <div>
+                        <p className="text-xs text-muted-foreground">EMAIL</p>
+                        <p className="font-sans font-semibold text-foreground truncate">{user?.email}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-xs text-muted-foreground">ADDRESS</p>
+                        <p className="font-sans font-semibold text-foreground">{profile.address || 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">DATE OF BIRTH</p>
+                        <p className="font-sans font-semibold text-foreground">{profile.dob ? format(profile.dob, "dd-MM-yyyy") : 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">BLOOD GROUP</p>
+                        <p className="font-sans font-semibold text-foreground">{profile.bloodGroup || 'Not set'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">CLASS</p>
+                        <p className="font-sans font-semibold text-foreground">ALL</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">EXPIRES</p>
+                        <p className="font-sans font-semibold text-foreground">NEVER</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer / Signature */}
+                <div className="flex justify-end items-end mt-2">
+                    <div className="w-1/2">
+                        <p className="font-cursive text-2xl text-foreground/80 border-b border-muted-foreground pb-1">{profile.name}</p>
+                        <p className="text-xs text-muted-foreground text-center">SIGNATURE</p>
+                    </div>
+                </div>
+            </div>
             )}
           </CardContent>
         </Card>
