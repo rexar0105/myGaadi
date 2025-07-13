@@ -199,13 +199,13 @@ export default function DashboardPage() {
               return (
                   <div 
                     key={vehicle.id}
-                    className="perspective-container animate-fade-in-up"
+                    className="perspective-container animate-fade-in-up h-[320px]"
                     style={{ animationDelay: `${index * 100}ms` }}
                     onClick={() => handleCardClick(vehicle.id)}
                   >
                     <div className={cn("card-flipper w-full h-full relative", flippedCardId === vehicle.id && "is-flipped")}>
                       {/* Front of Card */}
-                      <div className="card-front absolute w-full h-full rounded-2xl border bg-card hover:border-primary/50 transition-colors group cursor-pointer">
+                      <div className="card-front absolute w-full h-full rounded-2xl border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm">
                           <div className="overflow-hidden rounded-t-2xl">
                               <Image
                                   src={vehicle.imageUrl}
@@ -227,12 +227,12 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Back of Card */}
-                      <div className="card-back absolute w-full h-full rounded-2xl border bg-card p-4 flex flex-col gap-4 justify-center">
+                      <div className="card-back absolute w-full h-full rounded-2xl border bg-card p-4 flex flex-col gap-3 justify-center shadow-sm">
                           <h3 className="font-bold text-xl font-headline text-center -mt-4">{vehicle.name}</h3>
                            <div className="space-y-3 text-sm">
                              {lastService && (
                                 <div className="flex items-start gap-3">
-                                  <Wrench className="h-4 w-4 text-primary mt-1" />
+                                  <Wrench className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
                                   <div>
                                     <p className="font-semibold">Last Service</p>
                                     <p className="text-muted-foreground">{lastService.service} on {format(new Date(lastService.date), "dd MMM, yyyy")}</p>
@@ -241,7 +241,7 @@ export default function DashboardPage() {
                               )}
                               {lastService?.nextDueDate && (
                                 <div className="flex items-start gap-3">
-                                  <Calendar className="h-4 w-4 text-primary mt-1" />
+                                  <Calendar className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
                                   <div>
                                     <p className="font-semibold">Next Service</p>
                                     <p className="text-muted-foreground">Due in {differenceInDays(new Date(lastService.nextDueDate), new Date())} days</p>
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                               )}
                               {insurance && (
                                 <div className="flex items-start gap-3">
-                                  <ShieldCheck className="h-4 w-4 text-primary mt-1" />
+                                  <ShieldCheck className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
                                   <div>
                                     <p className="font-semibold">Insurance</p>
                                     <p className="text-muted-foreground">Expires in {differenceInDays(new Date(insurance.expiryDate), new Date())} days</p>
