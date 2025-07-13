@@ -49,7 +49,7 @@ const vehicleSchema = z.object({
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
-function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void, onCancel: () => void }) {
+function EditVehicleForm({ vehicle, onSave }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void }) {
     const { toast } = useToast();
     const form = useForm<VehicleFormValues>({
         resolver: zodResolver(vehicleSchema),
@@ -380,7 +380,7 @@ export default function DashboardPage() {
       </div>
 
        <Dialog open={!!editingVehicle} onOpenChange={(isOpen) => !isOpen && setEditingVehicle(null)}>
-           {editingVehicle && <EditVehicleForm vehicle={editingVehicle} onSave={handleEditVehicleSave} onCancel={() => setEditingVehicle(null)} />}
+           {editingVehicle && <EditVehicleForm vehicle={editingVehicle} onSave={handleEditVehicleSave} />}
        </Dialog>
 
 

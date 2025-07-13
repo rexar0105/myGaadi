@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -22,9 +22,9 @@ import { Badge } from "./ui/badge";
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
         <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <circle cx="16" cy="16" r="10" stroke="hsl(var(--primary-foreground))" strokeOpacity="0.8" strokeWidth="2"/>
-        <path d="M16 16L22 13" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="16" cy="16" r="2" fill="hsl(var(--primary-foreground))"/>
+        <path d="M19.1818 9H12.8182C10.7091 9 9 10.7091 9 12.8182V19.1818C9 21.2909 10.7091 23 12.8182 23H19.1818C21.2909 23 23 21.2909 23 19.1818V12.8182C23 10.7091 21.2909 9 19.1818 9Z" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M16 19.1818C17.7613 19.1818 19.1818 17.7613 19.1818 16C19.1818 14.2387 17.7613 12.8182 16 12.8182C14.2387 12.8182 12.8182 14.2387 12.8182 16C12.8182 17.7613 14.2387 19.1818 16 19.1818Z" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M19.8636 12.1364H19.8727" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
 )
 
