@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Bell, ShieldCheck, Wrench } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -21,22 +21,25 @@ export default function AlertsPage() {
     const { settings } = useSettings();
     const { serviceRecords, insurancePolicies } = useData();
 
-    const upcomingServices = serviceRecords
-        .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
-        .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
-    
-    const upcomingRenewals = insurancePolicies
-        .filter((p) => !isPast(new Date(p.expiryDate)))
-        .sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
+    const allAlerts = useMemo(() => {
+        const upcomingServices = serviceRecords
+            .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
+            .map(s => ({...s, type: 'service' as const, id: `service-${s.id}`}));
+        
+        const upcomingRenewals = insurancePolicies
+            .filter((p) => !isPast(new Date(p.expiryDate)))
+            .map(p => ({...p, type: 'insurance' as const, id: `insurance-${p.id}`}));
 
-    const allAlerts = [
-        ...upcomingServices.map(s => ({...s, type: 'service' as const, id: `service-${s.id}`})),
-        ...upcomingRenewals.map(p => ({...p, type: 'insurance' as const, id: `insurance-${p.id}`}))
-    ].sort((a,b) => {
-        const dateA = new Date(a.type === 'service' ? a.nextDueDate! : a.expiryDate);
-        const dateB = new Date(b.type === 'service' ? b.nextDueDate! : b.expiryDate);
-        return dateA.getTime() - dateB.getTime();
-    });
+        return [
+            ...upcomingServices,
+            ...upcomingRenewals
+        ].sort((a,b) => {
+            const dateA = new Date(a.type === 'service' ? a.nextDueDate! : a.expiryDate);
+            const dateB = new Date(b.type === 'service' ? b.nextDueDate! : b.expiryDate);
+            return dateA.getTime() - dateB.getTime();
+        });
+    }, [serviceRecords, insurancePolicies]);
+
 
     useEffect(() => {
       if (!settings.notificationsEnabled) return;
@@ -78,7 +81,6 @@ export default function AlertsPage() {
       });
 
       sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, settings.notificationsEnabled, allAlerts]);
 
 
