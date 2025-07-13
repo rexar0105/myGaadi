@@ -40,11 +40,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Separator } from "./ui/separator";
+import { cn } from "@/lib/utils";
 
 const documentSchema = z.object({
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
-  fileName: z.string().min(1, "File name is required"),
+  file: z
+    .instanceof(FileList)
+    .refine((files) => files?.length === 1, "A file is required."),
 });
 
 function AddDocumentForm({
@@ -59,16 +61,19 @@ function AddDocumentForm({
     resolver: zodResolver(documentSchema),
     defaultValues: {
       documentType: "Registration",
-      fileName: "",
     },
   });
 
+  const fileRef = form.register("file");
+
   function onSubmit(values: z.infer<typeof documentSchema>) {
+    const fileName = values.file[0].name;
     const vehicleName =
       vehicles.find((v) => v.id === vehicleId)?.name || "Unknown Vehicle";
     const newDocument: Document = {
       id: `d${Date.now()}`,
-      ...values,
+      documentType: values.documentType,
+      fileName,
       vehicleId,
       vehicleName,
       uploadDate: new Date().toISOString(),
@@ -77,7 +82,7 @@ function AddDocumentForm({
     onDocumentAdded(newDocument);
     toast({
       title: "Document Uploaded!",
-      description: `${values.fileName} has been added.`,
+      description: `${fileName} has been added.`,
     });
     form.reset();
   }
@@ -115,22 +120,22 @@ function AddDocumentForm({
                 )}
             />
             <FormField
-                control={form.control}
-                name="fileName"
-                render={({ field }) => (
+              control={form.control}
+              name="file"
+              render={() => (
                 <FormItem>
-                    <FormLabel className="text-xs">File Name</FormLabel>
-                    <FormControl>
-                    <div className="relative">
-                        <Input placeholder="Registration_Cert.pdf" {...field} />
-                        <div className="absolute right-0 top-0 h-full flex items-center pr-3 pointer-events-none">
-                        <Upload className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                    </div>
-                    </FormControl>
-                    <FormMessage />
+                  <FormLabel className="text-xs">File</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      accept="image/*,.pdf"
+                      {...fileRef}
+                      className="file:text-primary file:font-semibold"
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
-                )}
+              )}
             />
             </div>
             <Button type="submit" size="sm" className="w-full sm:w-auto">
@@ -169,11 +174,6 @@ export function MyDocuments() {
     (acc[doc.vehicleName] = acc[doc.vehicleName] || []).push(doc);
     return acc;
   }, {} as Record<string, Document[]>);
-
-  const vehicleIdMap = vehicles.reduce((acc, v) => {
-    acc[v.name] = v.id;
-    return acc;
-  }, {} as Record<string, string>)
 
 
   return (
@@ -256,5 +256,3 @@ export function MyDocuments() {
     </Card>
   );
 }
-
-    
