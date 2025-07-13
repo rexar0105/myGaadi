@@ -112,14 +112,6 @@ export default function ProfilePage() {
     },
   ];
 
-  const recentActivity = [
-    ...expenses.map(e => ({ type: 'expense' as const, ...e})),
-    ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
-  ]
-  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  .slice(0, 5);
-
-
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="grid gap-8">
@@ -297,7 +289,7 @@ export default function ProfilePage() {
                 <CardDescription>An overview of your activity.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {stats.map((stat, index) => (
                         <div key={index} className="flex items-center gap-4 rounded-lg border p-4 bg-muted/40">
                             <stat.icon className="h-8 w-8 text-primary"/>
@@ -307,37 +299,6 @@ export default function ProfilePage() {
                             </div>
                         </div>
                     ))}
-                </div>
-
-                <Separator className="my-4" />
-
-                <div>
-                    <h4 className="font-headline text-lg mb-3">Recent Activity</h4>
-                    {recentActivity.length > 0 ? (
-                        <ul className="space-y-4">
-                            {recentActivity.map((activity) => (
-                            <li key={`${activity.type}-${activity.id}`} className="flex items-center gap-4">
-                                <div className="bg-muted p-3 rounded-full">
-                                    {activity.type === 'expense' ? <IndianRupee className="h-5 w-5 text-primary" /> : <Wrench className="h-5 w-5 text-primary" />}
-                                </div>
-                                <div className="flex-1">
-                                    <p className="font-semibold">
-                                        {activity.type === 'expense' ? activity.description : activity.service}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {activity.vehicleName}
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    {activity.type === 'expense' && <p className="font-mono text-foreground font-semibold">₹{activity.amount.toLocaleString('en-IN')}</p>}
-                                    <p className="text-xs text-muted-foreground">{format(new Date(activity.date), "dd MMM, yyyy")}</p>
-                                </div>
-                            </li>
-                            ))}
-                        </ul>
-                        ) : (
-                        <p className="text-muted-foreground text-sm text-center py-4">No recent activity.</p>
-                        )}
                 </div>
             </CardContent>
         </Card>
