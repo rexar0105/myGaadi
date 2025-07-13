@@ -51,10 +51,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
-  service: z.string().min(1, "Service description is required"),
-  date: z.string().min(1, "Date is required"),
+  service: z.string().min(3, "Service description must be at least 3 characters.").max(100, "Description is too long."),
+  date: z.string().refine((date) => !isNaN(Date.parse(date)), "A valid date is required."),
   cost: z.coerce.number().min(0, "Cost cannot be negative"),
-  notes: z.string().optional(),
+  notes: z.string().max(250, "Notes can't exceed 250 characters.").optional(),
   nextDueDate: z.string().optional(),
 });
 
@@ -64,12 +64,12 @@ function ServicesPageSkeleton() {
         <div className="grid gap-8">
             <Card>
                 <CardHeader>
-                    <Skeleton className="h-6 w-48" />
-                    <Skeleton className="h-4 w-56" />
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
                 </CardHeader>
                 <CardContent className="space-y-4">
                      {[...Array(2)].map((_, i) => (
-                        <div key={i}>
+                        <div key={i} className="py-2">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <Skeleton className="h-5 w-40 mb-2" />
@@ -83,12 +83,12 @@ function ServicesPageSkeleton() {
             </Card>
             <Card>
                 <CardHeader>
-                    <Skeleton className="h-6 w-40" />
-                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-6 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {[...Array(3)].map((_, i) => (
-                        <div key={i}>
+                        <div key={i} className="py-2">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <Skeleton className="h-5 w-48 mb-2" />
@@ -113,6 +113,7 @@ export default function ServicesPage() {
 
     const form = useForm<z.infer<typeof serviceSchema>>({
         resolver: zodResolver(serviceSchema),
+        mode: "onChange",
         defaultValues: {
             vehicleId: "",
             service: "",
@@ -122,6 +123,8 @@ export default function ServicesPage() {
             nextDueDate: "",
         },
     });
+
+    const notesValue = form.watch("notes") || "";
 
     function onSubmit(values: z.infer<typeof serviceSchema>) {
         const { vehicleId, service, date, cost, notes, nextDueDate } = values;
@@ -156,7 +159,7 @@ export default function ServicesPage() {
 
     return (
         <div className="p-4 md:p-8 animate-fade-in">
-             <div className="flex items-center justify-between mb-8">
+             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
                  <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                         Service Center
@@ -165,7 +168,7 @@ export default function ServicesPage() {
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button className="w-full sm:w-auto">
                             <PlusCircle />
                             Add Service
                         </Button>
@@ -249,8 +252,13 @@ export default function ServicesPage() {
                                         <FormItem>
                                             <FormLabel>Notes (Optional)</FormLabel>
                                             <FormControl>
-                                                <Textarea placeholder="e.g., Oil change, filter replacement..." {...field} />
+                                                <Textarea 
+                                                    placeholder="e.g., Oil change, filter replacement..." 
+                                                    {...field}
+                                                    maxLength={250}
+                                                />
                                             </FormControl>
+                                            <div className="text-xs text-muted-foreground text-right">{`${notesValue.length} / 250`}</div>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -268,7 +276,7 @@ export default function ServicesPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <Button type="submit" className="w-full">Log Service</Button>
+                                <Button type="submit" className="w-full" disabled={!form.formState.isValid}>Log Service</Button>
                             </form>
                         </Form>
                     </DialogContent>

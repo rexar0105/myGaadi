@@ -58,6 +58,7 @@ function AddDocumentForm({
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
+    mode: "onChange",
     defaultValues: {
       documentType: "Registration",
     },
@@ -136,7 +137,7 @@ function AddDocumentForm({
               )}
             />
             </div>
-            <Button type="submit" size="sm" className="w-full sm:w-auto">
+            <Button type="submit" size="sm" className="w-full sm:w-auto" disabled={!form.formState.isValid}>
             <PlusCircle />
             Upload Document
             </Button>

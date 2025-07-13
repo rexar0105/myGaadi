@@ -52,8 +52,8 @@ const expenseSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
   category: z.enum(["Fuel", "Repair", "Insurance", "Other"]),
   amount: z.coerce.number().min(1, "Amount must be greater than 0"),
-  description: z.string().min(1, "Description is required"),
-  date: z.string(),
+  description: z.string().min(3, "Description must be at least 3 characters.").max(100, "Description is too long."),
+  date: z.string().refine((date) => !isNaN(Date.parse(date)), "A valid date is required."),
 });
 
 const chartColors = ["#2563eb", "#f97316", "#16a34a", "#9333ea"];
@@ -85,8 +85,8 @@ function ExpenseSkeleton() {
     <div className="grid md:grid-cols-2 gap-8">
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-32" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
         </CardHeader>
         <CardContent className="h-64 flex items-center justify-center">
             <Skeleton className="h-48 w-48 rounded-full" />
@@ -94,8 +94,8 @@ function ExpenseSkeleton() {
       </Card>
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-56" />
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-4 w-3/4" />
         </CardHeader>
         <CardContent className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -121,6 +121,7 @@ export default function ExpensesPage() {
 
   const form = useForm<z.infer<typeof expenseSchema>>({
     resolver: zodResolver(expenseSchema),
+    mode: "onChange",
     defaultValues: {
       vehicleId: "",
       category: "Fuel",
@@ -170,7 +171,7 @@ export default function ExpensesPage() {
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
             Expense Tracker
@@ -181,7 +182,7 @@ export default function ExpensesPage() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <PlusCircle />
               Add Expense
             </Button>
@@ -274,6 +275,7 @@ export default function ExpensesPage() {
                         <Textarea
                           placeholder="Full tank of petrol..."
                           {...field}
+                          maxLength={100}
                         />
                       </FormControl>
                       <FormMessage />
@@ -293,7 +295,7 @@ export default function ExpensesPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
                   Add Expense
                 </Button>
               </form>

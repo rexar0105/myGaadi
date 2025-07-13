@@ -55,8 +55,8 @@ import { useData } from "@/context/data-context";
 
 const insuranceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
-  provider: z.string().min(1, "Provider name is required"),
-  policyNumber: z.string().min(1, "Policy number is required"),
+  provider: z.string().min(2, "Provider name must be at least 2 characters."),
+  policyNumber: z.string().min(5, "Policy number must be at least 5 characters."),
   expiryDate: z.date({
     required_error: "Expiry date is required.",
   }),
@@ -70,6 +70,7 @@ export default function InsurancePage() {
 
     const form = useForm<z.infer<typeof insuranceSchema>>({
         resolver: zodResolver(insuranceSchema),
+        mode: "onChange",
         defaultValues: {
             vehicleId: "",
             provider: "",
@@ -97,7 +98,7 @@ export default function InsurancePage() {
     
     return (
         <div className="p-4 md:p-8 animate-fade-in">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
                  <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                         Insurance Manager
@@ -106,7 +107,7 @@ export default function InsurancePage() {
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button className="w-full sm:w-auto">
                             <PlusCircle />
                             Add Policy
                         </Button>
@@ -209,7 +210,7 @@ export default function InsurancePage() {
                                         </FormItem>
                                     )}
                                     />
-                                <Button type="submit" className="w-full">Add Policy</Button>
+                                <Button type="submit" className="w-full" disabled={!form.formState.isValid}>Add Policy</Button>
                             </form>
                         </Form>
                     </DialogContent>

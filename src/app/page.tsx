@@ -40,20 +40,21 @@ import { useData } from "@/context/data-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const vehicleSchema = z.object({
-  name: z.string().min(1, "Vehicle name is required"),
-  make: z.string().min(1, "Make is required"),
-  model: z.string().min(1, "Model is required"),
-  year: z.coerce.number().min(1900, "Invalid year").max(new Date().getFullYear() + 1),
-  registrationNumber: z.string().min(1, "Registration number is required"),
+  name: z.string().min(2, "Vehicle name must be at least 2 characters."),
+  make: z.string().min(2, "Make is required."),
+  model: z.string().min(1, "Model is required."),
+  year: z.coerce.number().min(1900, "Invalid year").max(new Date().getFullYear() + 1, `Year can't be in the future.`),
+  registrationNumber: z.string().min(4, "Registration number seems too short.").regex(/^[A-Z]{2}[ -]?[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[ -]?[0-9]{4}$/i, "Invalid registration number format."),
   image: z.any().optional(),
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
-function EditVehicleForm({ vehicle, onSave }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void }) {
+function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void, onCancel: () => void }) {
     const { toast } = useToast();
     const form = useForm<VehicleFormValues>({
         resolver: zodResolver(vehicleSchema),
+        mode: "onChange",
         defaultValues: {
             name: vehicle.name,
             make: vehicle.make,
@@ -178,7 +179,10 @@ function EditVehicleForm({ vehicle, onSave }: { vehicle: Vehicle, onSave: (data:
                             </FormItem>
                         )}
                         />
-                    <Button type="submit" className="w-full">Save Changes</Button>
+                    <div className="flex gap-2 justify-end">
+                        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+                        <Button type="submit" disabled={!form.formState.isValid}>Save Changes</Button>
+                    </div>
                 </form>
             </Form>
         </DialogContent>
@@ -189,15 +193,18 @@ function GarageSkeleton() {
   return (
     <Card>
       <CardHeader>
-        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-6 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="min-h-[350px] border rounded-lg p-4 space-y-4">
-            <Skeleton className="aspect-video w-full rounded-t-lg" />
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-8 w-1/3 mt-auto" />
+          <div key={i} className="min-h-[350px] border rounded-lg p-4 flex flex-col">
+            <Skeleton className="aspect-video w-full rounded-md" />
+            <div className="mt-4 flex-grow">
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+            <Skeleton className="h-8 w-1/3 mt-4" />
           </div>
         ))}
       </CardContent>
@@ -215,12 +222,14 @@ export default function DashboardPage() {
 
   const addVehicleForm = useForm<z.infer<typeof vehicleSchema>>({
     resolver: zodResolver(vehicleSchema),
+    mode: 'onChange',
     defaultValues: {
       name: "",
       make: "",
       model: "",
       year: new Date().getFullYear(),
       registrationNumber: "",
+      image: null,
     },
   });
 
@@ -229,14 +238,12 @@ export default function DashboardPage() {
 
 
   function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
-    // In a real app, you would upload the image to a storage service (like Firebase Storage)
-    // and get a URL back. For now, we'll continue using local URLs.
     const newVehicleData = {
       name: values.name,
       make: values.make,
       model: values.model,
       year: values.year,
-      registrationNumber: values.registrationNumber,
+      registrationNumber: values.registrationNumber.toUpperCase(),
       imageUrl: "https://placehold.co/600x400.png",
       customImageUrl: values.image?.[0] ? URL.createObjectURL(values.image[0]) : undefined,
       dataAiHint: `${values.make.toLowerCase()} ${values.model.toLowerCase()}`,
@@ -251,10 +258,10 @@ export default function DashboardPage() {
   }
 
   const handleEditVehicleSave = (data: VehicleFormValues, vehicleId: string) => {
-    // Image handling would also need to be updated for a real backend
     const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : (vehicles.find(v => v.id === vehicleId)?.customImageUrl);
     const updatedData = {
         ...data,
+        registrationNumber: data.registrationNumber.toUpperCase(),
         customImageUrl: newImageUrl,
     }
     updateVehicle(vehicleId, updatedData);
@@ -274,7 +281,7 @@ export default function DashboardPage() {
 
   return (
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                 Your Garage
@@ -283,7 +290,7 @@ export default function DashboardPage() {
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="w-full sm:w-auto">
               <PlusCircle />
               Add Vehicle
             </Button>
@@ -396,7 +403,7 @@ export default function DashboardPage() {
                     )}
                   />
                  </div>
-                <Button type="submit" className="w-full">Add Vehicle</Button>
+                <Button type="submit" className="w-full" disabled={!addVehicleForm.formState.isValid}>Add Vehicle</Button>
               </form>
             </Form>
           </DialogContent>
@@ -404,7 +411,7 @@ export default function DashboardPage() {
       </div>
 
        <Dialog open={!!editingVehicle} onOpenChange={(isOpen) => !isOpen && setEditingVehicle(null)}>
-           {editingVehicle && <EditVehicleForm vehicle={editingVehicle} onSave={handleEditVehicleSave} />}
+           {editingVehicle && <EditVehicleForm vehicle={editingVehicle} onSave={handleEditVehicleSave} onCancel={() => setEditingVehicle(null)} />}
        </Dialog>
 
 
