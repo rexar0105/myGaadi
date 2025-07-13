@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
@@ -38,18 +38,22 @@ const profileSchema = z.object({
     phone: z.string().optional(),
     address: z.string().optional(),
     licenseNumber: z.string().optional(),
+    avatar: z.any().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-const initialProfileData: ProfileFormValues = {
+const initialProfileData = {
     name: "John Doe",
     dob: new Date("1990-01-01"),
     bloodGroup: "O+",
     phone: "+91 98765 43210",
     address: "123, Main Street, New Delhi, India",
-    licenseNumber: "DL14 20110012345"
+    licenseNumber: "DL14 20110012345",
+    avatarUrl: null as string | null,
 };
+
+type ProfileState = Omit<ProfileFormValues, 'avatar'> & { avatarUrl: string | null };
 
 const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" {...props}>
@@ -84,11 +88,14 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<ProfileFormValues>(initialProfileData);
+  const [profile, setProfile] = useState<ProfileState>(initialProfileData);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: profile,
+    defaultValues: {
+        ...profile,
+        avatar: undefined
+    },
   });
 
   const getInitials = (nameOrEmail: string) => {
@@ -111,7 +118,18 @@ export default function ProfilePage() {
   };
 
   function onProfileSubmit(data: ProfileFormValues) {
-    setProfile(data);
+    const newAvatarFile = data.avatar?.[0];
+    let newAvatarUrl = profile.avatarUrl;
+
+    if (newAvatarFile) {
+        newAvatarUrl = URL.createObjectURL(newAvatarFile);
+    }
+    
+    setProfile({
+        ...data,
+        avatarUrl: newAvatarUrl
+    });
+
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -156,7 +174,10 @@ export default function ProfilePage() {
                     form.handleSubmit(onProfileSubmit)();
                 } else {
                     setIsEditing(true);
-                    form.reset(profile); 
+                    form.reset({
+                        ...profile,
+                        avatar: undefined,
+                    }); 
                 }
             }}>
                 {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
@@ -167,6 +188,31 @@ export default function ProfilePage() {
             {isEditing ? (
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onProfileSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="avatar"
+                            render={({ field: { onChange, value, ...rest } }) => (
+                                <FormItem>
+                                    <FormLabel>Profile Picture</FormLabel>
+                                    <FormControl>
+                                        <div className="flex items-center gap-4">
+                                            <Avatar className="h-16 w-16">
+                                                <AvatarImage src={profile.avatarUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
+                                                <AvatarFallback>{getInitials(profile.name || user?.email || '')}</AvatarFallback>
+                                            </Avatar>
+                                            <Input 
+                                                type="file" 
+                                                accept="image/*"
+                                                className="file:text-primary file:font-semibold"
+                                                onChange={(e) => onChange(e.target.files)}
+                                                {...rest}
+                                            />
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={form.control}
                             name="name"
@@ -301,7 +347,7 @@ export default function ProfilePage() {
                 <div className="flex flex-col sm:flex-row gap-4 items-start">
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <Avatar className="h-32 w-28 rounded-lg border-4 border-muted shadow-md">
-                        <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
+                        <AvatarImage src={profile.avatarUrl || `https://avatar.vercel.sh/${user?.email}.png`} alt={profile.name || user?.email || ''} />
                         <AvatarFallback className="text-xl bg-primary/20 text-primary font-bold rounded-lg">
                             {getInitials(profile.name || user?.email || '')}
                         </AvatarFallback>
