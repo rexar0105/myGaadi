@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from "react";
 import { Bell, Calendar, ShieldCheck, Wrench } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 import { serviceRecords, insurancePolicies } from "@/lib/data";
@@ -12,8 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AlertsPage() {
+    const { toast } = useToast();
+
     const upcomingServices = serviceRecords
         .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
         .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
@@ -23,13 +27,55 @@ export default function AlertsPage() {
         .sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime());
 
     const allAlerts = [
-        ...upcomingServices.map(s => ({...s, type: 'service' as const})),
-        ...upcomingRenewals.map(p => ({...p, type: 'insurance' as const}))
+        ...upcomingServices.map(s => ({...s, type: 'service' as const, id: `service-${s.id}`})),
+        ...upcomingRenewals.map(p => ({...p, type: 'insurance' as const, id: `insurance-${p.id}`}))
     ].sort((a,b) => {
         const dateA = new Date(a.type === 'service' ? a.nextDueDate! : a.expiryDate);
         const dateB = new Date(b.type === 'service' ? b.nextDueDate! : b.expiryDate);
         return dateA.getTime() - dateB.getTime();
     });
+
+    useEffect(() => {
+      const notifiedAlertsKey = 'myGaadiNotifiedAlerts';
+      const notifiedAlerts = JSON.parse(sessionStorage.getItem(notifiedAlertsKey) || '[]');
+      
+      allAlerts.forEach(alert => {
+        if (notifiedAlerts.includes(alert.id)) return;
+
+        let isUrgent = false;
+        let title = '';
+        let description = '';
+
+        if (alert.type === 'service') {
+          const daysLeft = differenceInDays(new Date(alert.nextDueDate!), new Date());
+          if (daysLeft < 7) {
+            isUrgent = true;
+            title = `Service Due Soon: ${alert.vehicleName}`;
+            description = `${alert.service} is due in ${daysLeft} days.`;
+          }
+        } else { // Insurance
+          const daysLeft = differenceInDays(new Date(alert.expiryDate), new Date());
+           if (daysLeft < 15) {
+            isUrgent = true;
+            title = `Insurance Expiring: ${alert.vehicleName}`;
+            description = `Policy from ${alert.provider} expires in ${daysLeft} days.`;
+           }
+        }
+
+        if (isUrgent) {
+          toast({
+            title: title,
+            description: description,
+            variant: "destructive",
+          });
+          notifiedAlerts.push(alert.id);
+        }
+      });
+
+      sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [toast]);
+
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -59,7 +105,7 @@ export default function AlertsPage() {
 
                     return (
                       <li 
-                        key={`service-${alert.id}`}
+                        key={alert.id}
                         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 animate-fade-in-up"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
@@ -87,7 +133,7 @@ export default function AlertsPage() {
 
                     return (
                         <li 
-                          key={`insurance-${alert.id}`}
+                          key={alert.id}
                           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 animate-fade-in-up"
                           style={{ animationDelay: `${index * 50}ms` }}
                         >
