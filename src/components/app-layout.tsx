@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -34,7 +34,6 @@ const navItems = [
   { href: "/assessment", label: "AI Assess", icon: Sparkles },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
-  { href: "/documents", label: "Documents", icon: FileText },
 ];
 
 function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
@@ -136,7 +135,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" size="icon" className="relative ml-[-5px]">
+                    <Button asChild variant="ghost" size="icon" className="relative">
                         <Link href="/alerts">
                             <Bell />
                              {urgentAlertsCount > 0 && (
@@ -174,8 +173,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-28 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <div className="grid grid-cols-6 h-20 max-w-lg mx-auto items-center justify-around bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-2 gap-1">
-            {navItems.map((item) => (
+        <div className="grid grid-cols-5 h-20 max-w-lg mx-auto items-center justify-around bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-2 gap-1">
+            {navItems.slice(0, 2).map((item) => (
+                <NavLink key={item.href} {...item} />
+            ))}
+            {navItems.length > 2 && <NavLink {...navItems[2]}/>}
+            {navItems.slice(3).map((item) => (
                 <NavLink key={item.href} {...item} />
             ))}
         </div>
