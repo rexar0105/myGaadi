@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useMemo } from "react";
 import { Wrench, IndianRupee, History } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -17,15 +18,17 @@ export default function ActivityPage() {
   const { expenses, serviceRecords } = useData();
   const { settings } = useSettings();
 
-  const allActivity = [
-    ...expenses.map(e => ({ type: 'expense' as const, ...e})),
-    ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
-  ]
-  .sort((a, b) => {
-    const dateA = new Date(a.date).getTime();
-    const dateB = new Date(b.date).getTime();
-    return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-  });
+  const allActivity = useMemo(() => {
+    return [
+      ...expenses.map(e => ({ type: 'expense' as const, ...e})),
+      ...serviceRecords.map(s => ({ type: 'service' as const, ...s}))
+    ]
+    .sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+  }, [expenses, serviceRecords, settings.defaultSortOrder]);
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">

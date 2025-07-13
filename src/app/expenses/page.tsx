@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { IndianRupee, PlusCircle } from "lucide-react";
 import type { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,8 @@ export default function ExpensesPage() {
     },
   });
 
+  const descriptionValue = form.watch('description') || '';
+
   function onSubmit(values: z.infer<typeof expenseSchema>) {
     addExpense(values);
 
@@ -142,26 +144,31 @@ export default function ExpensesPage() {
     });
   }
 
-  const sortedExpenses = [...expenses].sort(
-      (a, b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+  const sortedExpenses = useMemo(() => {
+    return [...expenses].sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+  }, [expenses, settings.defaultSortOrder]);
+
+  const recentExpenses = useMemo(() => sortedExpenses.slice(0, 10), [sortedExpenses]);
+
+  const { chartData, totalExpenses } = useMemo(() => {
+    const expenseByCategory = expenses.reduce((acc, expense) => {
+      if (!acc[expense.category]) {
+        acc[expense.category] = { name: expense.category, value: 0 };
       }
-  );
+      acc[expense.category].value += expense.amount;
+      return acc;
+    }, {} as { [key: string]: { name: string; value: number } });
 
-  const recentExpenses = sortedExpenses.slice(0, 10);
+    const data = Object.values(expenseByCategory);
+    const total = data.reduce((sum, item) => sum + item.value, 0);
 
-  const expenseByCategory = expenses.reduce((acc, expense) => {
-    if (!acc[expense.category]) {
-      acc[expense.category] = { name: expense.category, value: 0 };
-    }
-    acc[expense.category].value += expense.amount;
-    return acc;
-  }, {} as { [key: string]: { name: string; value: number } });
+    return { chartData: data, totalExpenses: total };
+  }, [expenses]);
 
-  const chartData = Object.values(expenseByCategory);
-  const totalExpenses = chartData.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -272,6 +279,7 @@ export default function ExpensesPage() {
                           maxLength={100}
                         />
                       </FormControl>
+                       <div className="text-xs text-muted-foreground text-right">{`${descriptionValue.length} / 100`}</div>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy, Document } from '@/lib/types';
 import { useAuth } from './auth-context';
 
@@ -56,13 +56,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>([]);
     const [documents, setDocuments] = useState<Document[]>([]);
 
-    const DATA_KEYS = {
+    const DATA_KEYS = useMemo(() => ({
         VEHICLES: 'myGaadi_vehicles',
         SERVICES: 'myGaadi_serviceRecords',
         EXPENSES: 'myGaadi_expenses',
         INSURANCE: 'myGaadi_insurancePolicies',
         DOCUMENTS: 'myGaadi_documents',
-    };
+    }), []);
 
     // Load data from localStorage when the component mounts and user is authenticated
     useEffect(() => {
@@ -82,7 +82,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             setInsurancePolicies([]);
             setDocuments([]);
         }
-    }, [isAuthenticated, DATA_KEYS.DOCUMENTS, DATA_KEYS.EXPENSES, DATA_KEYS.INSURANCE, DATA_KEYS.SERVICES, DATA_KEYS.VEHICLES]);
+    }, [isAuthenticated, DATA_KEYS]);
 
     // Save data to localStorage whenever it changes
     useEffect(() => {
@@ -102,7 +102,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }, [documents, isAuthenticated, DATA_KEYS.DOCUMENTS]);
 
 
-    const addVehicle = (vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {
+    const addVehicle = useCallback((vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {
         const newId = `v${Date.now()}`;
         const newVehicle: Vehicle = {
             id: newId,
@@ -110,13 +110,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             ...vehicleData,
         }
         setVehicles(prev => [...prev, newVehicle].sort((a, b) => a.name.localeCompare(b.name)));
-    };
+    }, [user]);
 
-    const updateVehicle = (vehicleId: string, updatedData: Partial<Omit<Vehicle, 'id' | 'userId'>>) => {
+    const updateVehicle = useCallback((vehicleId: string, updatedData: Partial<Omit<Vehicle, 'id' | 'userId'>>) => {
         setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, ...updatedData } as Vehicle : v));
-    };
+    }, []);
 
-    const addServiceRecord = (recordData: Omit<ServiceRecord, 'id' | 'vehicleName' | 'userId'>) => {
+    const addServiceRecord = useCallback((recordData: Omit<ServiceRecord, 'id' | 'vehicleName' | 'userId'>) => {
         const newId = `s${Date.now()}`;
         const vehicleName = vehicles.find(v => v.id === recordData.vehicleId)?.name || 'Unknown';
         const newRecord: ServiceRecord = {
@@ -126,9 +126,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             ...recordData,
         }
         setServiceRecords(prev => [newRecord, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-    };
+    }, [user, vehicles]);
 
-    const addExpense = (expenseData: Omit<Expense, 'id' | 'vehicleName' | 'userId'>) => {
+    const addExpense = useCallback((expenseData: Omit<Expense, 'id' | 'vehicleName' | 'userId'>) => {
         const newId = `e${Date.now()}`;
         const vehicleName = vehicles.find(v => v.id === expenseData.vehicleId)?.name || 'Unknown';
         const newExpense: Expense = {
@@ -138,9 +138,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             ...expenseData
         };
         setExpenses(prev => [newExpense, ...prev].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-    };
+    }, [user, vehicles]);
 
-    const addInsurancePolicy = (policyData: Omit<InsurancePolicy, 'id' | 'vehicleName' | 'userId'>) => {
+    const addInsurancePolicy = useCallback((policyData: Omit<InsurancePolicy, 'id' | 'vehicleName' | 'userId'>) => {
          const newId = `i${Date.now()}`;
          const vehicleName = vehicles.find(v => v.id === policyData.vehicleId)?.name || 'Unknown';
          const newPolicy: InsurancePolicy = {
@@ -150,9 +150,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
              ...policyData
          };
         setInsurancePolicies(prev => [...prev, newPolicy].sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()));
-    };
+    }, [user, vehicles]);
 
-    const addDocument = (docData: Omit<Document, 'id' | 'vehicleName' | 'userId'>) => {
+    const addDocument = useCallback((docData: Omit<Document, 'id' | 'vehicleName' | 'userId'>) => {
         const newId = `d${Date.now()}`;
         const vehicleName = vehicles.find(v => v.id === docData.vehicleId)?.name || 'Unknown';
         const newDoc: Document = {
@@ -162,13 +162,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             ...docData
         };
         setDocuments(prev => [newDoc, ...prev].sort((a,b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()));
-    };
+    }, [user, vehicles]);
 
-    const deleteDocument = (docId: string) => {
+    const deleteDocument = useCallback((docId: string) => {
         setDocuments(prev => prev.filter(d => d.id !== docId));
-    };
+    }, []);
 
-    const clearAllData = () => {
+    const clearAllData = useCallback(() => {
         setIsLoading(true);
         setVehicles([]);
         setServiceRecords([]);
@@ -181,15 +181,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         setTimeout(() => setIsLoading(false), 200);
-    };
+    }, [DATA_KEYS]);
 
 
-    const value = {
+    const value = useMemo(() => ({
         vehicles, serviceRecords, expenses, insurancePolicies, documents,
         addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument,
         clearAllData,
         isLoading,
-    };
+    }), [vehicles, serviceRecords, expenses, insurancePolicies, documents, addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument, clearAllData, isLoading]);
 
     return (
         <DataContext.Provider value={value}>

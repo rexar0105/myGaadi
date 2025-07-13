@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Wrench, PlusCircle } from "lucide-react";
 import { format, isPast, differenceInDays } from "date-fns";
 import type { ServiceRecord } from "@/lib/types";
@@ -146,15 +146,19 @@ export default function ServicesPage() {
         });
     }
 
-    const upcomingServices = serviceRecords
-    .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
-    .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
+    const upcomingServices = useMemo(() => {
+        return serviceRecords
+            .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
+            .sort((a, b) => new Date(a.nextDueDate!).getTime() - new Date(b.nextDueDate!).getTime());
+    }, [serviceRecords]);
 
-    const serviceHistory = [...serviceRecords].sort((a,b) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-    });
+    const serviceHistory = useMemo(() => {
+        return [...serviceRecords].sort((a,b) => {
+            const dateA = new Date(a.date).getTime();
+            const dateB = new Date(b.date).getTime();
+            return settings.defaultSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+        });
+    }, [serviceRecords, settings.defaultSortOrder]);
 
 
     return (
@@ -329,7 +333,7 @@ export default function ServicesPage() {
                 </Card>
                 <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
                     <CardHeader>
-                        <CardTitle className="font-headline text-xl">Service History</CardTitle>
+                        <CardTitle className="font-headline flex items-center gap-2 text-xl">Service History</CardTitle>
                         <CardDescription>All recorded services for your vehicles, sorted by {settings.defaultSortOrder === 'newest' ? 'most recent' : 'oldest'}</CardDescription>
                     </CardHeader>
                     <CardContent>
