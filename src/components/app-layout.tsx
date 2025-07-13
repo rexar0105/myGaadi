@@ -43,12 +43,12 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
   if (isCentral) {
     return (
       <div className="group relative">
-        <Link
+        <LinkComponent
           href={href}
           className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
         >
           <Icon className="h-8 w-8 group-hover:animate-twinkle" />
-        </Link>
+        </LinkComponent>
       </div>
     );
   }
@@ -57,12 +57,12 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 rounded-md p-2 transition-colors text-muted-foreground w-16 h-16 relative"
+        "flex flex-col items-center justify-center gap-1.5 rounded-md p-2 transition-colors text-muted-foreground w-16 h-16 relative"
       )}
     >
       <div className={cn(
           "flex items-center justify-center h-8 w-12 rounded-full transition-colors relative",
-          isActive ? "bg-primary/10" : "bg-transparent group-hover:bg-accent"
+          isActive ? "bg-primary/10" : "bg-transparent group-hover:bg-accent/50"
       )}>
         <Icon className={cn("h-6 w-6", isActive && "text-primary")} />
       </div>
