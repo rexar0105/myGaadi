@@ -3,7 +3,7 @@
 
 import { useTheme } from "@/context/theme-context";
 import { useSettings } from "@/context/settings-context";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ import { useToast } from "@/hooks/use-toast";
 export function AppSettings() {
   const { theme, setTheme } = useTheme();
   const { settings, setSetting } = useSettings();
-  const { clearAllData } = useData();
+  const { clearAllData } = useAppContext();
   const { toast } = useToast();
   const isDark = theme === 'dark';
 

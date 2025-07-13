@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/context/settings-context";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 
 export default function AlertsPage() {
     const { toast } = useToast();
     const { settings } = useSettings();
-    const { serviceRecords, insurancePolicies } = useData();
+    const { serviceRecords, insurancePolicies } = useAppContext();
 
     const allAlerts = useMemo(() => {
         const upcomingServices = serviceRecords

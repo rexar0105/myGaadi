@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/auth-context";
+import { useAppContext, ProfileState } from "@/context/app-provider";
 import {
   Card,
   CardContent,
@@ -29,9 +29,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useData } from "@/context/data-context";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { ProfileState } from "@/context/auth-context";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -117,8 +115,7 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, profile, setProfile, logout, isAuthLoading } = useAuth();
-  const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading: isDataLoading } = useData();
+  const { user, profile, setProfile, logout, isLoading, vehicles, expenses, serviceRecords, documents, insurancePolicies } = useAppContext();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -214,7 +211,7 @@ export default function ProfilePage() {
     ];
   }, [vehicles, expenses, serviceRecords, insurancePolicies, documents]);
 
-  if (isAuthLoading || isDataLoading) {
+  if (isLoading) {
       return <ProfileSkeleton />;
   }
   

@@ -11,11 +11,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 
 export default function ActivityPage() {
-  const { expenses, serviceRecords } = useData();
+  const { expenses, serviceRecords } = useAppContext();
   const { settings } = useSettings();
 
   const allActivity = useMemo(() => {

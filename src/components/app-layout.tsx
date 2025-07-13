@@ -6,8 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText, Loader2 } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/auth-context";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { Button } from "./ui/button";
 import React from "react";
 import {
@@ -77,16 +76,15 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isAuthLoading, user, profile } = useAuth();
-  const { serviceRecords, insurancePolicies, isLoading } = useData();
+  const { isAuthenticated, isLoading, user, profile, serviceRecords, insurancePolicies } = useAppContext();
   const router = useRouter();
   const pathname = usePathname();
 
   React.useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated && !['/login', '/signup'].includes(pathname)) {
+    if (!isLoading && !isAuthenticated && !['/login', '/signup'].includes(pathname)) {
       router.push('/login');
     }
-  }, [isAuthLoading, isAuthenticated, pathname, router]);
+  }, [isLoading, isAuthenticated, pathname, router]);
 
 
   const getInitials = (nameOrEmail: string) => {
@@ -99,7 +97,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return nameOrEmail[0].toUpperCase();
   };
 
-  if (isAuthLoading) {
+  if (isLoading) {
     return (
         <div className="flex items-center justify-center min-h-screen bg-background">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

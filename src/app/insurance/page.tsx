@@ -51,7 +51,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 
 const insuranceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -64,7 +64,7 @@ const insuranceSchema = z.object({
 
 
 export default function InsurancePage() {
-    const { vehicles, insurancePolicies, addInsurancePolicy } = useData();
+    const { vehicles, insurancePolicies, addInsurancePolicy } = useAppContext();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
 

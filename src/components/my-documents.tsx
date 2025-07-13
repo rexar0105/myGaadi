@@ -39,7 +39,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 
 const documentSchema = z.object({
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
@@ -54,7 +54,7 @@ function AddDocumentForm({
   vehicleId: string;
 }) {
   const { toast } = useToast();
-  const { addDocument } = useData();
+  const { addDocument } = useAppContext();
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
@@ -148,7 +148,7 @@ function AddDocumentForm({
 }
 
 export function MyDocuments() {
-  const { vehicles, documents, deleteDocument } = useData();
+  const { vehicles, documents, deleteDocument } = useAppContext();
   const { toast } = useToast();
 
   const handleDelete = (docId: string) => {

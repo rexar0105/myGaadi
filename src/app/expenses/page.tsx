@@ -44,7 +44,7 @@ import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { ChartConfig } from "@/components/ui/chart";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTheme } from "@/context/theme-context";
@@ -105,7 +105,7 @@ function ExpenseSkeleton() {
 }
 
 export default function ExpensesPage() {
-  const { vehicles, expenses, addExpense, isLoading } = useData();
+  const { vehicles, expenses, addExpense, isLoading } = useAppContext();
   const { settings } = useSettings();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();

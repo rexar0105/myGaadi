@@ -1,12 +1,12 @@
+
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { AppLayout } from '@/components/app-layout';
-import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
 import { SettingsProvider } from '@/context/settings-context';
-import { DataProvider } from '@/context/data-context';
+import { AppProvider } from '@/context/app-provider';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -31,12 +31,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <SettingsProvider>
-            <AuthProvider>
-              <DataProvider>
+            <AppProvider>
                 <AppLayout>{children}</AppLayout>
                 <Toaster />
-              </DataProvider>
-            </AuthProvider>
+            </AppProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>

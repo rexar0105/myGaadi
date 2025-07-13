@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/card";
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -246,7 +246,7 @@ function EmptyGarage({ onAddVehicleClick }: { onAddVehicleClick: () => void }) {
 }
 
 export default function DashboardPage() {
-  const { vehicles, serviceRecords, insurancePolicies, addVehicle, updateVehicle, isLoading } = useData();
+  const { vehicles, serviceRecords, insurancePolicies, addVehicle, updateVehicle, isLoading } = useAppContext();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);

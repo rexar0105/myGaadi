@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/auth-context";
+import { useAppContext } from "@/context/app-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,7 +40,7 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup, loginWithGoogle } = useAppContext();
   const router = useRouter();
   const { toast } = useToast();
 

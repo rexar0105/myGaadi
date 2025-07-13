@@ -45,7 +45,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useData } from "@/context/data-context";
+import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -106,7 +106,7 @@ function ServicesPageSkeleton() {
 }
 
 export default function ServicesPage() {
-    const { vehicles, serviceRecords, addServiceRecord, isLoading } = useData();
+    const { vehicles, serviceRecords, addServiceRecord, isLoading } = useAppContext();
     const { settings } = useSettings();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
