@@ -47,10 +47,10 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
                 href={href}
                 className={cn(
                 "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-primary text-primary-foreground shadow-lg hover:bg-primary/90",
-                "h-14 w-14"
+                "h-16 w-16"
                 )}
             >
-                <Icon className="h-7 w-7 group-hover:animate-twinkle" />
+                <Icon className="h-8 w-8 group-hover:animate-twinkle" />
                 <span className="sr-only">{label}</span>
             </Link>
       </div>
@@ -61,14 +61,14 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent/50 h-14 w-14",
+        "flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent/50 h-16 w-16",
         isActive
           ? "text-primary bg-accent/80"
           : "hover:text-primary"
       )}
     >
-      <Icon className="h-5 w-5" />
-      <span className="text-xs font-medium text-center">{label}</span>
+      <Icon className="h-6 w-6" />
+      <span className="text-sm font-medium text-center">{label}</span>
     </Link>
   );
 }
