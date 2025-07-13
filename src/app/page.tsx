@@ -149,11 +149,18 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                             <FormItem>
                                 <FormLabel>Vehicle Image</FormLabel>
                                 <FormControl>
-                                    <Input 
-                                        type="file" 
-                                        accept="image/*"
-                                        onChange={(e) => field.onChange(e.target.files)}
-                                    />
+                                    <div className="relative">
+                                        <Input 
+                                            type="file" 
+                                            accept="image/*"
+                                            className="file:hidden"
+                                            onChange={(e) => field.onChange(e.target.files)}
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-start pl-3 pointer-events-none text-muted-foreground">
+                                           <Upload className="h-4 w-4 mr-2"/>
+                                           <span>{field.value?.[0]?.name ?? 'Upload a new image...'}</span>
+                                        </div>
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -276,11 +283,18 @@ export default function DashboardPage() {
                         <FormItem>
                         <FormLabel>Vehicle Image (Optional)</FormLabel>
                         <FormControl>
-                            <Input 
-                                type="file" 
-                                accept="image/*"
-                                onChange={(e) => field.onChange(e.target.files)}
-                            />
+                             <div className="relative">
+                                <Input 
+                                    type="file" 
+                                    accept="image/*"
+                                    className="file:hidden"
+                                    onChange={(e) => field.onChange(e.target.files)}
+                                />
+                                <div className="absolute inset-0 flex items-center justify-start pl-3 pointer-events-none text-muted-foreground">
+                                    <Upload className="h-4 w-4 mr-2"/>
+                                    <span>{field.value?.[0]?.name ?? 'Upload an image...'}</span>
+                                </div>
+                            </div>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
