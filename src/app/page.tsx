@@ -391,13 +391,13 @@ export default function DashboardPage() {
               return (
                   <div 
                     key={vehicle.id}
-                    className="perspective-container animate-fade-in-up h-[320px]"
+                    className="perspective-container animate-fade-in-up min-h-[350px]"
                     style={{ animationDelay: `${index * 100}ms` }}
                     onClick={() => handleCardClick(vehicle.id)}
                   >
                     <div className={cn("card-flipper w-full h-full relative", flippedCardId === vehicle.id && "is-flipped")}>
                       {/* Front of Card */}
-                      <div className="card-front absolute w-full h-full rounded-lg border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm">
+                      <div className="card-front absolute w-full h-full rounded-lg border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm flex flex-col">
                           <Button
                               variant="ghost"
                               size="icon"
@@ -419,10 +419,11 @@ export default function DashboardPage() {
                                   data-ai-hint={vehicle.dataAiHint}
                               />
                           </div>
-                          <div className="p-4">
+                          <div className="p-4 flex flex-col flex-grow">
                               <h3 className="font-bold text-xl font-headline">{vehicle.name}</h3>
                               <p className="text-sm text-muted-foreground">{vehicle.make} {vehicle.model} ({vehicle.year})</p>
-                              <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md">{vehicle.registrationNumber}</p>
+                              <div className="flex-grow" />
+                              <p className="text-sm font-mono mt-2 bg-secondary/70 text-secondary-foreground inline-block px-2 py-1 rounded-md self-start">{vehicle.registrationNumber}</p>
                           </div>
                           <div className="absolute bottom-2 right-3 text-muted-foreground/50 text-xs flex items-center gap-1">
                             <Info className="h-3 w-3" /> Click for details
