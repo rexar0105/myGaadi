@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -133,6 +133,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>Notifications</p>
+                </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button asChild variant="ghost" size="icon">
+                        <Link href="/activity">
+                            <History />
+                            <span className="sr-only">Recent Activity</span>
+                        </Link>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Recent Activity</p>
                 </TooltipContent>
             </Tooltip>
              <Tooltip>
