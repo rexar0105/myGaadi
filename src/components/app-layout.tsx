@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -36,15 +36,12 @@ const navItems = [
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
 
-function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
-
+function NavLink({ href, icon: Icon, label, isActive }: { href: string; icon: React.ElementType; label: string, isActive: boolean }) {
   if (href === '/assessment') {
     return (
         <Link
             href={href}
-            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105 animate-twinkle"
         >
             <Icon className="h-8 w-8" />
         </Link>
@@ -55,14 +52,22 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 rounded-lg transition-colors text-muted-foreground w-16 h-14",
-        isActive
-          ? "text-primary"
-          : "hover:text-primary"
+        "flex flex-col items-center justify-center gap-1.5 rounded-lg p-2 transition-colors text-muted-foreground w-16 h-16 hover:text-primary",
       )}
     >
-      <Icon className="h-6 w-6" />
-      <span className="text-xs font-medium text-center">{label}</span>
+      <div className={cn(
+          "flex items-center justify-center h-8 w-12 rounded-full transition-colors",
+          isActive ? "bg-primary/10" : "bg-transparent"
+      )}>
+        <Icon className={cn("h-6 w-6", isActive && "text-primary")} />
+      </div>
+      <span className={cn(
+          "text-xs font-medium",
+           isActive ? "text-primary" : "text-muted-foreground"
+        )}
+      >
+        {label}
+      </span>
     </Link>
   );
 }
@@ -169,7 +174,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t z-50">
         <div className="flex h-full items-center justify-around max-w-lg mx-auto px-2">
             {navItems.map((item) => (
-                <NavLink key={item.href} {...item} />
+                <NavLink key={item.href} {...item} isActive={pathname === item.href} />
             ))}
         </div>
       </nav>
