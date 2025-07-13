@@ -13,11 +13,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload, HeartPulse, Smartphone } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload, HeartPulse, Smartphone, File, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
-import { format } from "date-fns";
+import { format, differenceInDays, isPast } from "date-fns";
 import { MyDocuments } from "@/components/my-documents";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -90,7 +90,7 @@ const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
-  const { vehicles, expenses, serviceRecords } = useData();
+  const { vehicles, expenses, serviceRecords, documents, insurancePolicies } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -146,6 +146,19 @@ export default function ProfilePage() {
   const totalVehicles = vehicles.length;
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalServices = serviceRecords.length;
+  const totalDocuments = documents.length;
+
+  const upcomingRenewalsCount = insurancePolicies.filter(p => {
+    if (isPast(new Date(p.expiryDate))) return false;
+    const daysLeft = differenceInDays(new Date(p.expiryDate), new Date());
+    return daysLeft <= 30;
+  }).length;
+
+  const nextServiceDueDays = serviceRecords
+    .filter(s => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
+    .map(s => differenceInDays(new Date(s.nextDueDate!), new Date()))
+    .sort((a, b) => a - b)[0];
+
 
   const stats = [
     {
@@ -163,6 +176,21 @@ export default function ProfilePage() {
       label: "Services Logged",
       value: totalServices,
     },
+    {
+      icon: File,
+      label: "Documents Stored",
+      value: totalDocuments
+    },
+    {
+      icon: AlertTriangle,
+      label: "Upcoming Renewals",
+      value: upcomingRenewalsCount
+    },
+    {
+      icon: CalendarIcon,
+      label: "Next Service Due",
+      value: nextServiceDueDays !== undefined ? `${nextServiceDueDays} days` : "N/A"
+    }
   ];
 
   return (
@@ -533,3 +561,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
