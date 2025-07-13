@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText, Loader2 } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -77,24 +77,17 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user, profile } = useAuth();
+  const { isAuthenticated, isAuthLoading, user, profile } = useAuth();
   const { serviceRecords, insurancePolicies, isLoading } = useData();
   const router = useRouter();
   const pathname = usePathname();
 
   React.useEffect(() => {
-    if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
+    if (!isAuthLoading && !isAuthenticated && !['/login', '/signup'].includes(pathname)) {
       router.push('/login');
     }
-  }, [isAuthenticated, pathname, router]);
+  }, [isAuthLoading, isAuthenticated, pathname, router]);
 
-  if (!isAuthenticated && !['/login', '/signup'].includes(pathname)) {
-    return null; 
-  }
-
-  if (!isAuthenticated && (pathname === '/login' || pathname === '/signup')) {
-    return <>{children}</>;
-  }
 
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return "?";
@@ -105,6 +98,21 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     }
     return nameOrEmail[0].toUpperCase();
   };
+
+  if (isAuthLoading) {
+    return (
+        <div className="flex items-center justify-center min-h-screen bg-background">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    if (['/login', '/signup'].includes(pathname)) {
+        return <>{children}</>;
+    }
+    return null;
+  }
 
   const urgentAlertsCount = isLoading ? 0 : [
     ...serviceRecords.filter((s) => {

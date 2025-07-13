@@ -47,7 +47,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, isAuthLoading } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -66,7 +66,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
     // Load data from localStorage when the component mounts and user is authenticated
     useEffect(() => {
-        if (isAuthenticated) {
+        if (!isAuthLoading && isAuthenticated) {
             setIsLoading(true);
             setVehicles(loadFromLocalStorage(DATA_KEYS.VEHICLES, []));
             setServiceRecords(loadFromLocalStorage(DATA_KEYS.SERVICES, []));
@@ -74,32 +74,33 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             setInsurancePolicies(loadFromLocalStorage(DATA_KEYS.INSURANCE, []));
             setDocuments(loadFromLocalStorage(DATA_KEYS.DOCUMENTS, []));
             setIsLoading(false);
-        } else {
+        } else if (!isAuthenticated) {
             // Clear data if user logs out
             setVehicles([]);
             setServiceRecords([]);
             setExpenses([]);
             setInsurancePolicies([]);
             setDocuments([]);
+            setIsLoading(false);
         }
-    }, [isAuthenticated, DATA_KEYS]);
+    }, [isAuthenticated, isAuthLoading, DATA_KEYS]);
 
     // Save data to localStorage whenever it changes
     useEffect(() => {
-        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.VEHICLES, vehicles);
-    }, [vehicles, isAuthenticated, DATA_KEYS.VEHICLES]);
+        if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.VEHICLES, vehicles);
+    }, [vehicles, isAuthenticated, isAuthLoading, DATA_KEYS.VEHICLES]);
     useEffect(() => {
-        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.SERVICES, serviceRecords);
-    }, [serviceRecords, isAuthenticated, DATA_KEYS.SERVICES]);
+        if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.SERVICES, serviceRecords);
+    }, [serviceRecords, isAuthenticated, isAuthLoading, DATA_KEYS.SERVICES]);
     useEffect(() => {
-        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.EXPENSES, expenses);
-    }, [expenses, isAuthenticated, DATA_KEYS.EXPENSES]);
+        if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.EXPENSES, expenses);
+    }, [expenses, isAuthenticated, isAuthLoading, DATA_KEYS.EXPENSES]);
     useEffect(() => {
-        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.INSURANCE, insurancePolicies);
-    }, [insurancePolicies, isAuthenticated, DATA_KEYS.INSURANCE]);
+        if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.INSURANCE, insurancePolicies);
+    }, [insurancePolicies, isAuthenticated, isAuthLoading, DATA_KEYS.INSURANCE]);
      useEffect(() => {
-        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.DOCUMENTS, documents);
-    }, [documents, isAuthenticated, DATA_KEYS.DOCUMENTS]);
+        if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.DOCUMENTS, documents);
+    }, [documents, isAuthenticated, isAuthLoading, DATA_KEYS.DOCUMENTS]);
 
 
     const addVehicle = useCallback((vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {

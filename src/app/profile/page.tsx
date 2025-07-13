@@ -92,7 +92,7 @@ const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 function ProfileSkeleton() {
     return (
-        <div className="p-4 md:p-8 space-y-8">
+        <div className="p-4 md:p-8 space-y-8 animate-fade-in">
             <Card>
                 <CardHeader>
                     <Skeleton className="h-6 w-1/2" />
@@ -121,7 +121,7 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, profile, setProfile } = useAuth();
+  const { user, profile, setProfile, logout } = useAuth();
   const { vehicles, expenses, serviceRecords, documents, insurancePolicies } = useData();
   const router = useRouter();
   const { toast } = useToast();
@@ -342,6 +342,7 @@ export default function ProfilePage() {
                                         <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
+                                            type="button"
                                             variant={"outline"}
                                             className={cn(
                                                 "w-full pl-3 text-left font-normal",
@@ -433,6 +434,7 @@ export default function ProfilePage() {
                                         <PopoverTrigger asChild>
                                         <FormControl>
                                             <Button
+                                            type="button"
                                             variant={"outline"}
                                             className={cn(
                                                 "w-full pl-3 text-left font-normal",
