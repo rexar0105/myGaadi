@@ -52,36 +52,6 @@
     --input: 217 33% 17%;
     --ring: 217 91% 60%;
   }
-
-  .theme-forest {
-    --background: 220 18% 95%;
-    --foreground: 224 15% 20%;
-    --card: 220 18% 100%;
-    --card-foreground: 224 15% 20%;
-    --primary: 158 41% 30%;
-    --primary-foreground: 160 100% 98%;
-    --secondary: 215 15% 90%;
-    --muted: 215 15% 90%;
-    --accent: 158 41% 92%;
-    --accent-foreground: 158 41% 30%;
-    --border: 215 15% 85%;
-    --input: 215 15% 85%;
-  }
-
-  .theme-sunset {
-    --background: 35 100% 97%;
-    --foreground: 20 20% 25%;
-    --card: 35 100% 100%;
-    --card-foreground: 20 20% 25%;
-    --primary: 15 82% 55%;
-    --primary-foreground: 35 100% 98%;
-    --secondary: 30 80% 92%;
-    --muted: 30 80% 92%;
-    --accent: 15 82% 94%;
-    --accent-foreground: 15 82% 55%;
-    --border: 30 80% 88%;
-    --input: 30 80% 88%;
-  }
 }
 
 @layer base {

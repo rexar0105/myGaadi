@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Palette, History } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Palette, History, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
@@ -100,7 +100,7 @@ export default function ProfilePage() {
 
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <CardHeader>
-                <CardTitle className="font-headline text-xl flex items-center gap-2"><Palette/> App Settings</CardTitle>
+                <CardTitle className="font-headline text-xl flex items-center gap-2"><Settings/> App Settings</CardTitle>
                 <CardDescription>Customize the look and feel of the application.</CardDescription>
             </CardHeader>
             <CardContent>

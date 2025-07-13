@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
-type Theme = "default" | "forest" | "sunset" | "dark";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
   theme: Theme;
@@ -13,19 +13,26 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>('default');
+  const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('myGaadiTheme') as Theme | null;
-    if (storedTheme && ['default', 'forest', 'sunset', 'dark'].includes(storedTheme)) {
+    if (storedTheme && ['light', 'dark'].includes(storedTheme)) {
       setTheme(storedTheme);
+    } else {
+        // Check for system preference if no theme is stored
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
     }
   }, []);
 
   useEffect(() => {
-    document.body.classList.remove('theme-forest', 'theme-sunset', 'dark');
-    if (theme !== 'default') {
-      document.body.classList.add(`theme-${theme}`);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
     }
     localStorage.setItem('myGaadiTheme', theme);
   }, [theme]);
