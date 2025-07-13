@@ -147,7 +147,7 @@ export default function ProfilePage() {
         avatar: undefined,
       });
     }
-  }, [profile, form.reset]);
+  }, [profile, form]);
 
 
   const handleLogout = () => {
@@ -202,10 +202,10 @@ export default function ProfilePage() {
     return daysLeft <= 30;
   }).length;
 
-  const nextServiceDueDays = serviceRecords
+  const nextServiceDueDays = useMemo(() => serviceRecords
     .filter(s => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
     .map(s => differenceInDays(new Date(s.nextDueDate!), new Date()))
-    .sort((a, b) => a - b)[0];
+    .sort((a, b) => a - b)[0], [serviceRecords]);
 
 
   const stats = useMemo(() => [
@@ -509,7 +509,7 @@ export default function ProfilePage() {
                     </form>
                 </Form>
             ) : (
-              <div className="rounded-xl border bg-card p-4 font-sans text-sm max-w-2xl mx-auto shadow-lg overflow-hidden dark:bg-card/50">
+              <div className="rounded-xl border bg-card dark:bg-card/50 p-4 font-sans text-sm max-w-2xl mx-auto shadow-lg overflow-hidden">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b-2 border-primary/20 pb-2 mb-4">
                     <div className="text-left">

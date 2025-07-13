@@ -16,15 +16,13 @@ interface AuthContextType {
   user: User | null;
   profile: ProfileState | null;
   setProfile: (profile: ProfileState) => void;
-  login: (email: string, pass: string) => Promise<boolean>;
+  loginWithEmail: (email: string, pass: string) => Promise<boolean>;
   signup: (email: string, pass: string) => Promise<void>;
   logout: () => void;
   loginWithGoogle: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const initialUser = { id: 'local-user', email: 'user@example.com' };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,31 +31,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { settings } = useSettings();
 
   useEffect(() => {
-    // Simulate checking auth state on initial load
-    setIsAuthLoading(true);
-    const localUser = initialUser;
-    
-    // In a real app, this would be an async check for a session
-    setTimeout(() => {
+    const initializeAuth = () => {
+      setIsAuthLoading(true);
+      // Simulate checking for an existing session. In a real app, this would be an API call.
+      const localUser: User = { id: 'local-user', email: 'user@example.com' };
       setUser(localUser);
 
-      // Load profile from localStorage when user is loaded
+      // Load profile from localStorage after confirming user
       try {
         const storedProfile = localStorage.getItem('myGaadiProfile');
         if (storedProfile) {
           setProfileState(JSON.parse(storedProfile));
         } else {
-          // If no profile, create a default one
+          // If no profile, create and store a default one.
           const defaultProfile: ProfileState = {
             name: localUser.email.split('@')[0] || "New User",
-            avatarUrl: null
+            avatarUrl: null,
           };
           setProfileState(defaultProfile);
           localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
         }
       } catch (e) {
         console.error("Failed to load or create profile", e);
-        // Fallback to a default profile in case of error
+        // Fallback to a default profile in case of storage error
         const defaultProfile: ProfileState = {
             name: localUser.email.split('@')[0] || "New User",
             avatarUrl: null
@@ -66,11 +62,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } finally {
          setIsAuthLoading(false);
       }
-    }, 100);
+    };
+    initializeAuth();
   }, []);
 
-  const login = async (email: string, pass: string): Promise<boolean> => {
-    // This is a mock implementation
+  const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
     const localUser = { id: 'local-user', email };
     setUser(localUser);
     
@@ -99,14 +95,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signup = async (email: string, pass: string) => {
-     // Mock implementation
-     const localUser = { id: 'local-user', email };
-     setUser(localUser);
+     // Mock implementation for demo purposes
      const defaultProfile: ProfileState = {
         name: email.split('@')[0] || "New User",
         avatarUrl: null
      };
-     setProfileState(defaultProfile);
      localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
   };
 
@@ -133,7 +126,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAuthLoading, user, profile, setProfile, login, signup, logout, loginWithGoogle }}>
+    <AuthContext.Provider value={{ isAuthenticated, isAuthLoading, user, profile, setProfile, loginWithEmail, signup, logout, loginWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

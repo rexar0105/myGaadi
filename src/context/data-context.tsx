@@ -48,8 +48,7 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
     const { isAuthenticated, user, isAuthLoading } = useAuth();
-    const [isLoading, setIsLoading] = useState(true);
-
+    
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -67,13 +66,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     // Load data from localStorage when the component mounts and user is authenticated
     useEffect(() => {
         if (!isAuthLoading && isAuthenticated) {
-            setIsLoading(true);
             setVehicles(loadFromLocalStorage(DATA_KEYS.VEHICLES, []));
             setServiceRecords(loadFromLocalStorage(DATA_KEYS.SERVICES, []));
             setExpenses(loadFromLocalStorage(DATA_KEYS.EXPENSES, []));
             setInsurancePolicies(loadFromLocalStorage(DATA_KEYS.INSURANCE, []));
             setDocuments(loadFromLocalStorage(DATA_KEYS.DOCUMENTS, []));
-            setIsLoading(false);
         } else if (!isAuthenticated && !isAuthLoading) {
             // Clear data if user logs out or is not authenticated
             setVehicles([]);
@@ -81,7 +78,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             setExpenses([]);
             setInsurancePolicies([]);
             setDocuments([]);
-            setIsLoading(false);
         }
     }, [isAuthenticated, isAuthLoading, DATA_KEYS]);
 
@@ -89,15 +85,19 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.VEHICLES, vehicles);
     }, [vehicles, isAuthenticated, isAuthLoading, DATA_KEYS.VEHICLES]);
+
     useEffect(() => {
         if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.SERVICES, serviceRecords);
     }, [serviceRecords, isAuthenticated, isAuthLoading, DATA_KEYS.SERVICES]);
+
     useEffect(() => {
         if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.EXPENSES, expenses);
     }, [expenses, isAuthenticated, isAuthLoading, DATA_KEYS.EXPENSES]);
+
     useEffect(() => {
         if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.INSURANCE, insurancePolicies);
     }, [insurancePolicies, isAuthenticated, isAuthLoading, DATA_KEYS.INSURANCE]);
+
      useEffect(() => {
         if(isAuthenticated && !isAuthLoading) saveToLocalStorage(DATA_KEYS.DOCUMENTS, documents);
     }, [documents, isAuthenticated, isAuthLoading, DATA_KEYS.DOCUMENTS]);
@@ -126,7 +126,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             vehicleName,
             ...recordData,
         }
-        setServiceRecords(prev => [newRecord, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        setServiceRecords(prev => [newRecord, ...prev]);
     }, [user, vehicles]);
 
     const addExpense = useCallback((expenseData: Omit<Expense, 'id' | 'vehicleName' | 'userId'>) => {
@@ -138,7 +138,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             vehicleName,
             ...expenseData
         };
-        setExpenses(prev => [newExpense, ...prev].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+        setExpenses(prev => [newExpense, ...prev]);
     }, [user, vehicles]);
 
     const addInsurancePolicy = useCallback((policyData: Omit<InsurancePolicy, 'id' | 'vehicleName' | 'userId'>) => {
@@ -150,7 +150,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
              vehicleName,
              ...policyData
          };
-        setInsurancePolicies(prev => [...prev, newPolicy].sort((a, b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()));
+        setInsurancePolicies(prev => [...prev, newPolicy]);
     }, [user, vehicles]);
 
     const addDocument = useCallback((docData: Omit<Document, 'id' | 'vehicleName' | 'userId'>) => {
@@ -162,7 +162,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             vehicleName,
             ...docData
         };
-        setDocuments(prev => [newDoc, ...prev].sort((a,b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()));
+        setDocuments(prev => [newDoc, ...prev]);
     }, [user, vehicles]);
 
     const deleteDocument = useCallback((docId: string) => {
@@ -170,7 +170,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const clearAllData = useCallback(() => {
-        setIsLoading(true);
         setVehicles([]);
         setServiceRecords([]);
         setExpenses([]);
@@ -181,15 +180,24 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
                 window.localStorage.removeItem(key);
             }
         });
-        setTimeout(() => setIsLoading(false), 200);
     }, [DATA_KEYS]);
 
 
     const value = {
-        vehicles, serviceRecords, expenses, insurancePolicies, documents,
-        addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument,
+        vehicles,
+        serviceRecords,
+        expenses,
+        insurancePolicies,
+        documents,
+        addVehicle,
+        updateVehicle,
+        addServiceRecord,
+        addExpense,
+        addInsurancePolicy,
+        addDocument,
+        deleteDocument,
         clearAllData,
-        isLoading: isAuthLoading || isLoading,
+        isLoading: isAuthLoading,
     };
 
     return (
