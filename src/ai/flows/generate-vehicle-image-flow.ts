@@ -53,7 +53,7 @@ const generateVehicleImageFlow = ai.defineFlow(
 
       The image should look like a professional automotive photograph. Do not include any text or people in the image.`,
       config: {
-        responseModalities: ['IMAGE'],
+        responseModalities: ['IMAGE', 'TEXT'],
       },
     });
 

@@ -50,12 +50,12 @@ const documentSchema = z.object({
 
 function AddDocumentForm({
   vehicleId,
-  onDocumentAdded,
 }: {
   vehicleId: string;
-  onDocumentAdded: (newDoc: Document) => void;
 }) {
   const { toast } = useToast();
+  const { addDocument } = useData();
+
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
@@ -67,23 +67,17 @@ function AddDocumentForm({
 
   function onSubmit(values: z.infer<typeof documentSchema>) {
     const fileName = values.file[0].name;
-    const { addDocument, vehicles } = useData();
-    const vehicleName =
-      vehicles.find((v) => v.id === vehicleId)?.name || "Unknown Vehicle";
-    
-    // In a real app, you'd call addDocument from the context here
-    // But since this component is separate, we'll use the callback.
-    const newDocument: Document = {
-      id: `d${Date.now()}`,
-      documentType: values.documentType,
-      fileName,
-      vehicleId,
-      vehicleName,
-      uploadDate: new Date().toISOString(),
-      fileUrl: "#", // In a real app, this would be a URL to the uploaded file
-    };
 
-    onDocumentAdded(newDocument);
+    const newDocumentData = {
+        vehicleId,
+        documentType: values.documentType,
+        fileName,
+        uploadDate: new Date().toISOString(),
+        fileUrl: "#" // Placeholder URL
+    };
+    
+    addDocument(newDocumentData);
+
     toast({
       title: "Document Uploaded!",
       description: `${fileName} has been added.`,
@@ -153,12 +147,8 @@ function AddDocumentForm({
 }
 
 export function MyDocuments() {
-  const { vehicles, documents, addDocument, deleteDocument } = useData();
+  const { vehicles, documents, deleteDocument } = useData();
   const { toast } = useToast();
-
-  const handleDocumentAdded = (newDocData: Omit<Document, 'id' | 'vehicleName'>) => {
-     addDocument(newDocData);
-  }
 
   const handleDelete = (docId: string) => {
     deleteDocument(docId);
@@ -191,7 +181,7 @@ export function MyDocuments() {
         {vehicles.length > 0 ? (
           <Accordion type="multiple" className="w-full">
             {vehicles.map((vehicle) => {
-              const docs = documentsByVehicle[vehicle.name] || [];
+              const docs = documents.filter(d => d.vehicleId === vehicle.id) || [];
               return (
                 <AccordionItem value={vehicle.id} key={vehicle.id}>
                   <AccordionTrigger>
@@ -234,7 +224,7 @@ export function MyDocuments() {
                     ) : (
                         <p className="text-sm text-muted-foreground text-center py-4">No documents for this vehicle yet.</p>
                     )}
-                    <AddDocumentForm vehicleId={vehicle.id} onDocumentAdded={(newDoc) => handleDocumentAdded(newDoc)} />
+                    <AddDocumentForm vehicleId={vehicle.id} />
                   </AccordionContent>
                 </AccordionItem>
               );
