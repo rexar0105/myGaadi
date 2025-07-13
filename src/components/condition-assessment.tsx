@@ -168,9 +168,9 @@ export function ConditionAssessment() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 items-start">
-            <div className="min-h-[300px] bg-muted/40 p-4 rounded-xl relative overflow-y-auto">
+            <div className="bg-muted/40 p-4 rounded-xl relative overflow-y-auto aspect-square flex flex-col">
                 {isAssessing && (
-                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground flex-1">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         <p className="text-sm font-medium">Analyzing image...</p>
                         <p className="text-xs">This may take a moment.</p>
@@ -200,7 +200,7 @@ export function ConditionAssessment() {
                     </div>
                 )}
                 {!isAssessing && !assessmentResult && !error && (
-                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground flex-1">
                         <Wand2 className="h-10 w-10 text-muted-foreground/50" />
                         <p className="font-medium">Your assessment will appear here</p>
                         <p className="text-sm text-center">Upload a vehicle photo to begin.</p>
@@ -208,7 +208,7 @@ export function ConditionAssessment() {
                 )}
             </div>
 
-            <div className="min-h-[300px] bg-muted/40 rounded-xl relative overflow-hidden flex items-center justify-center p-2 aspect-square">
+            <div className="bg-muted/40 rounded-xl relative overflow-hidden flex items-center justify-center p-2 aspect-square">
                  {isGenerating && (
                     <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
