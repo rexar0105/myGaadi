@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Inter"', 'var(--font-inter)', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
         headline: ['"Google Sans"', 'var(--font-inter)', 'sans-serif'],
         code: ['monospace'],
       },
