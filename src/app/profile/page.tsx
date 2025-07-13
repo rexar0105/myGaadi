@@ -120,6 +120,7 @@ export default function ProfilePage() {
   const totalVehicles = vehicles.length;
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalServices = serviceRecords.length;
+  const primaryVehicleRegNo = vehicles.length > 0 ? vehicles[0].registrationNumber : 'N/A';
 
   const stats = [
     {
@@ -297,20 +298,24 @@ export default function ProfilePage() {
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">NAME</p>
                         <p className="font-bold text-xl text-foreground -mt-1">{profile.name}</p>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                      <div className="col-span-2">
+                    <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                      <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">ADDRESS</p>
                         <p className="font-medium text-foreground text-base">{profile.address || 'Not set'}</p>
                       </div>
-                      <div>
+                      <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DOB</p>
                         <p className="font-mono font-semibold text-foreground text-base">{profile.dob ? format(profile.dob, "dd-MM-yyyy") : 'Not set'}</p>
                       </div>
-                      <div>
+                      <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">BLOOD</p>
                         <p className="font-mono font-semibold text-foreground text-base">{profile.bloodGroup || 'Not set'}</p>
                       </div>
-                      <div className="col-span-2">
+                       <div className="col-span-1">
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">REGD. NO.</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{primaryVehicleRegNo}</p>
+                      </div>
+                      <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMAIL</p>
                         <p className="font-medium text-foreground truncate">{user?.email}</p>
                       </div>
