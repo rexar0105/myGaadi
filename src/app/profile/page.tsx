@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
@@ -37,6 +37,7 @@ const profileSchema = z.object({
     bloodGroup: z.string().optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
+    licenseNumber: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -46,7 +47,8 @@ const initialProfileData: ProfileFormValues = {
     dob: new Date("1990-01-01"),
     bloodGroup: "O+",
     phone: "+91 98765 43210",
-    address: "123, Main Street, New Delhi, India"
+    address: "123, Main Street, New Delhi, India",
+    licenseNumber: "DL14 20110012345"
 };
 
 const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -120,7 +122,6 @@ export default function ProfilePage() {
   const totalVehicles = vehicles.length;
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   const totalServices = serviceRecords.length;
-  const primaryVehicleRegNo = vehicles.length > 0 ? vehicles[0].registrationNumber : 'N/A';
 
   const stats = [
     {
@@ -259,6 +260,19 @@ export default function ProfilePage() {
                         />
                         <FormField
                             control={form.control}
+                            name="licenseNumber"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Driving License Number</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="DL14 20110012345" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
                             name="address"
                             render={({ field }) => (
                                 <FormItem>
@@ -312,8 +326,8 @@ export default function ProfilePage() {
                         <p className="font-mono font-semibold text-foreground text-base">{profile.bloodGroup || 'Not set'}</p>
                       </div>
                        <div className="col-span-1">
-                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">REGD. NO.</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{primaryVehicleRegNo}</p>
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">DL NO.</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseNumber || 'Not set'}</p>
                       </div>
                       <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMAIL</p>
