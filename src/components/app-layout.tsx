@@ -136,7 +136,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Tooltip>
             <Tooltip>
                 <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" size="icon" className="relative ml-[-3px]">
+                    <Button asChild variant="ghost" size="icon" className="relative ml-[-4px]">
                         <Link href="/alerts">
                             <Bell />
                              {urgentAlertsCount > 0 && (
