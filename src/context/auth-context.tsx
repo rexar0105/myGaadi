@@ -2,6 +2,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useSettings } from "./settings-context";
 
 interface User {
   id: string;
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { settings } = useSettings();
 
   useEffect(() => {
     // Mock checking for a session token in localStorage
@@ -82,6 +84,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("myGaadiUser");
+    if (settings.clearDataOnLogout) {
+      sessionStorage.clear();
+    }
   };
 
   if (isLoading) {

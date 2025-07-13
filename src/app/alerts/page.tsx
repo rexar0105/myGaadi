@@ -14,9 +14,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/context/settings-context";
 
 export default function AlertsPage() {
     const { toast } = useToast();
+    const { settings } = useSettings();
 
     const upcomingServices = serviceRecords
         .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
@@ -36,6 +38,8 @@ export default function AlertsPage() {
     });
 
     useEffect(() => {
+      if (!settings.notificationsEnabled) return;
+
       const notifiedAlertsKey = 'myGaadiNotifiedAlerts';
       const notifiedAlerts = JSON.parse(sessionStorage.getItem(notifiedAlertsKey) || '[]');
       
@@ -74,7 +78,7 @@ export default function AlertsPage() {
 
       sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [toast]);
+    }, [toast, settings.notificationsEnabled]);
 
 
   return (

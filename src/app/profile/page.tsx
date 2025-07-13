@@ -17,7 +17,7 @@ import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { vehicles, expenses, serviceRecords } from "@/lib/data";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { AppSettings } from "@/components/app-settings";
 import { format } from "date-fns";
 import { MyDocuments } from "@/components/my-documents";
 import { useForm } from "react-hook-form";
@@ -311,7 +311,7 @@ export default function ProfilePage() {
                 <CardDescription>Customize the look and feel of the application.</CardDescription>
             </CardHeader>
             <CardContent>
-              <ThemeSwitcher />
+              <AppSettings />
             </CardContent>
         </Card>
 
