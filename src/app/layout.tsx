@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Poppins } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { AppLayout } from '@/components/app-layout';
@@ -6,6 +7,12 @@ import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
 import { SettingsProvider } from '@/context/settings-context';
 import { DataProvider } from '@/context/data-context';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+});
 
 export const metadata: Metadata = {
   title: 'myGaadi - Your Vehicle Companion',
@@ -18,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={poppins.variable}>
       <head>
       </head>
       <body>
