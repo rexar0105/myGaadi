@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload, HeartPulse, Smartphone, File, AlertTriangle } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, PenLine, AlertTriangle, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
@@ -126,7 +126,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (profile) {
+    if (isEditing && profile) {
       form.reset({
         name: profile.name || '',
         dob: profile.dob ? new Date(profile.dob) : undefined,
@@ -140,7 +140,7 @@ export default function ProfilePage() {
         avatar: undefined,
       });
     }
-  }, [profile, form, isEditing]);
+  }, [profile, isEditing, form]);
 
 
   const handleLogout = () => {
@@ -216,7 +216,6 @@ export default function ProfilePage() {
   }
   
   if (!user || !profile) {
-    // This case should ideally not be hit if routing and context are correct, but it's a good fallback.
     return <ProfileSkeleton />;
   }
 
@@ -597,5 +596,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    

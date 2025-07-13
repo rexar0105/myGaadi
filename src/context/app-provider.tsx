@@ -145,7 +145,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     // --- AUTH METHODS ---
     
-    const performLogin = (loggedInUser: User) => {
+    const performLogin = useCallback((loggedInUser: User) => {
         const defaultProfile: ProfileState = {
             name: loggedInUser.email.split('@')[0] || "New User",
             avatarUrl: null
@@ -154,31 +154,45 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         saveToLocalStorage(DATA_KEYS.PROFILE, defaultProfile);
         setUser(loggedInUser);
         setProfileState(defaultProfile);
-    };
+        // On new login, clear any existing data to start fresh for the new user
+        setVehicles([]);
+        setServiceRecords([]);
+        setExpenses([]);
+        setInsurancePolicies([]);
+        setDocuments([]);
+        localStorage.removeItem(DATA_KEYS.VEHICLES);
+        localStorage.removeItem(DATA_KEYS.SERVICES);
+        localStorage.removeItem(DATA_KEYS.EXPENSES);
+        localStorage.removeItem(DATA_KEYS.INSURANCE);
+        localStorage.removeItem(DATA_KEYS.DOCUMENTS);
+    }, []);
 
-    const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
-        const localUser = { id: 'local-user', email };
+    const loginWithEmail = useCallback(async (email: string, pass: string): Promise<boolean> => {
+        // In a real app, you'd verify credentials here.
+        const localUser = { id: `local-user-${email}`, email };
         performLogin(localUser);
         return true;
-    };
+    }, [performLogin]);
 
-    const loginWithGoogle = async (): Promise<boolean> => {
-        const localUser = { id: 'local-user', email: 'user@example.com' };
-        performLogin(localUser);
+    const loginWithGoogle = useCallback(async (): Promise<boolean> => {
+        // In a real app, you'd use a Google Sign-In SDK here.
+        const googleUser = { id: `google-user-12345`, email: 'user@gmail.com' };
+        performLogin(googleUser);
         return true;
-    };
+    }, [performLogin]);
     
-    const signup = async (email: string, pass: string) => {
-        // In a real app, you'd create the user here. For this demo, it's just a success.
-        // A new profile will be created on first login.
-    };
+    const signup = useCallback(async (email: string, pass: string) => {
+        // In a real app, you'd create the user in your backend/auth provider.
+        // For this demo, it's just a success. A new profile will be created on first login.
+        return Promise.resolve();
+    }, []);
 
     const setProfile = useCallback((newProfile: ProfileState) => {
         setProfileState(newProfile);
         saveToLocalStorage(DATA_KEYS.PROFILE, newProfile);
     }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setUser(null);
         setProfileState(null);
 
@@ -195,7 +209,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setExpenses([]);
         setInsurancePolicies([]);
         setDocuments([]);
-    };
+    }, [settings.clearDataOnLogout]);
     
     // --- DATA METHODS ---
     const addVehicle = useCallback((vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {

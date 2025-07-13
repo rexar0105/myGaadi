@@ -4,7 +4,6 @@
 import { useState, useMemo } from "react";
 import { Wrench, PlusCircle } from "lucide-react";
 import { format, isPast, differenceInDays } from "date-fns";
-import type { ServiceRecord } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { ShieldCheck, Calendar, PlusCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { InsurancePolicy } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

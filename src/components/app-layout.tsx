@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText, Loader2 } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, Loader2 } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-provider";
@@ -170,7 +170,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                             <Avatar className="h-8 w-8">
                                 <AvatarImage src={profile?.avatarUrl ?? `https://avatar.vercel.sh/${user?.email}.png`} alt={profile?.name || user?.email || ''} />
                                 <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
-                                    {user ? getInitials(profile?.name || user.email) : <User />}
+                                    {user ? getInitials(profile?.name || user.email || '') : <User />}
                                 </AvatarFallback>
                             </Avatar>
                             <span className="sr-only">Profile</span>

@@ -1,9 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
 import { FileText, PlusCircle, Car, Trash2 } from "lucide-react";
-import type { Document } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -160,12 +158,6 @@ export function MyDocuments() {
     });
   };
 
-  const documentsByVehicle = documents.reduce((acc, doc) => {
-    (acc[doc.vehicleName] = acc[doc.vehicleName] || []).push(doc);
-    return acc;
-  }, {} as Record<string, Document[]>);
-
-
   return (
     <Card className="animate-fade-in-up" style={{ animationDelay: "250ms" }}>
       <CardHeader>
@@ -182,19 +174,19 @@ export function MyDocuments() {
         {vehicles.length > 0 ? (
           <Accordion type="multiple" className="w-full">
             {vehicles.map((vehicle) => {
-              const docs = documents.filter(d => d.vehicleId === vehicle.id) || [];
+              const vehicleDocs = documents.filter(d => d.vehicleId === vehicle.id);
               return (
                 <AccordionItem value={vehicle.id} key={vehicle.id}>
                   <AccordionTrigger>
                     <div className="flex items-center gap-2 font-semibold">
                       <Car className="text-primary" />{" "}
-                      {vehicle.name} ({docs.length})
+                      {vehicle.name} ({vehicleDocs.length})
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    {docs.length > 0 ? (
+                    {vehicleDocs.length > 0 ? (
                          <ul className="space-y-3 pt-2">
-                         {docs.map((doc) => (
+                         {vehicleDocs.map((doc) => (
                            <li
                              key={doc.id}
                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50"

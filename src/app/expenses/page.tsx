@@ -3,7 +3,6 @@
 
 import { useState, useMemo } from "react";
 import { IndianRupee, PlusCircle } from "lucide-react";
-import type { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
