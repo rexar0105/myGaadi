@@ -21,30 +21,30 @@ import { Badge } from "./ui/badge";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <path d="M24 20C24 14.4772 19.5228 10 14 10C8.47715 10 4 14.4772 4 20" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
-        <circle cx="14" cy="20" r="2.5" fill="hsl(var(--primary-foreground))"/>
-        <line x1="14" y1="20" x2="21" y2="13" stroke="hsl(var(--primary-foreground))" strokeWidth="2.5" strokeLinecap="round"/>
+      <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
+      <path d="M16 25C20.9706 25 25 20.9706 25 16C25 11.0294 20.9706 7 16 7C11.0294 7 7 11.0294 7 16V25H16Z" fill="hsl(var(--primary-foreground))"/>
     </svg>
 )
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles, isCentral: true },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
 
-function NavLink({ href, icon: Icon, label, isActive }: { href: string; icon: React.ElementType; label: string, isActive: boolean }) {
-  if (href === '/assessment') {
+function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: string; icon: React.ElementType; label: string, isActive: boolean, isCentral?: boolean }) {
+  const LinkComponent = isCentral ? 'div' : Link;
+
+  if (isCentral) {
     return (
-      <div className="group">
+      <div className="group relative">
         <Link
-            href={href}
-            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
+          href={href}
+          className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
         >
-            <Icon className="h-8 w-8 group-hover:animate-twinkle" />
+          <Icon className="h-8 w-8 group-hover:animate-twinkle" />
         </Link>
       </div>
     );
@@ -54,12 +54,12 @@ function NavLink({ href, icon: Icon, label, isActive }: { href: string; icon: Re
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 transition-colors text-muted-foreground w-16 h-16 hover:text-primary",
+        "flex flex-col items-center justify-center gap-1 rounded-md p-2 transition-colors text-muted-foreground w-16 h-16",
       )}
     >
       <div className={cn(
-          "flex items-center justify-center h-8 w-12 rounded-full transition-colors",
-          isActive ? "bg-primary/10" : "bg-transparent"
+          "flex items-center justify-center h-8 w-12 rounded-full transition-colors relative",
+          isActive ? "bg-primary/10" : "bg-transparent group-hover:bg-accent"
       )}>
         <Icon className={cn("h-6 w-6", isActive && "text-primary")} />
       </div>
