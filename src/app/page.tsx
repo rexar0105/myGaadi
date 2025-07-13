@@ -276,7 +276,7 @@ export default function DashboardPage() {
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
       <div className="flex items-center justify-between mb-8">
         <div>
-            <h1 className="text-3xl font-bold text-foreground mb-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                 Your Garage
             </h1>
             <p className="text-muted-foreground">Manage all your registered vehicles.</p>
@@ -434,13 +434,13 @@ export default function DashboardPage() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2 z-10 h-8 w-8 bg-black/30 hover:bg-black/50 text-white hover:text-white opacity-50 group-hover:opacity-100 transition-opacity"
+                                className="absolute top-2 right-2 z-10 h-10 w-10 bg-black/30 hover:bg-black/50 text-white hover:text-white opacity-50 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setEditingVehicle(vehicle);
                                 }}
                             >
-                                <Pencil className="h-4 w-4" />
+                                <Pencil className="h-5 w-5" />
                             </Button>
                             <div className="overflow-hidden rounded-t-lg">
                                 <Image

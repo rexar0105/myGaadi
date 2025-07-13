@@ -88,7 +88,7 @@ export default function AlertsPage() {
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-1">Alerts & Reminders</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Alerts & Reminders</h1>
         <p className="text-muted-foreground">
           Stay on top of upcoming service due dates and insurance renewals.
         </p>

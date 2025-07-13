@@ -99,7 +99,7 @@ export default function InsurancePage() {
         <div className="p-4 md:p-8 animate-fade-in">
             <div className="flex items-center justify-between mb-8">
                  <div>
-                    <h1 className="text-3xl font-bold text-foreground mb-1">
+                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                         Insurance Manager
                     </h1>
                     <p className="text-muted-foreground">Keep track of your vehicle insurance policies.</p>

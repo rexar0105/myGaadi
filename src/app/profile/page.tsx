@@ -516,32 +516,32 @@ export default function ProfilePage() {
                   <div className="flex-1 w-full">
                     <div className="mb-2">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">NAME</p>
-                        <p className="font-bold text-xl text-foreground -mt-1">{profile.name}</p>
+                        <p className="font-bold text-lg md:text-xl text-foreground -mt-1">{profile.name}</p>
                     </div>
-                    <div className="grid grid-cols-3 gap-x-4 gap-y-2">
-                      <div className="col-span-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2">
+                      <div className="col-span-2 sm:col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">ADDRESS</p>
-                        <p className="font-medium text-foreground text-base">{profile.address || 'Not set'}</p>
+                        <p className="font-medium text-foreground text-sm md:text-base">{profile.address || 'Not set'}</p>
                       </div>
                       <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DOB</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.dob ? format(new Date(profile.dob), "dd-MM-yyyy") : 'Not set'}</p>
+                        <p className="font-mono font-semibold text-foreground text-sm md:text-base">{profile.dob ? format(new Date(profile.dob), "dd-MM-yyyy") : 'Not set'}</p>
                       </div>
                       <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">BLOOD</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.bloodGroup || 'Not set'}</p>
+                        <p className="font-mono font-semibold text-foreground text-sm md:text-base">{profile.bloodGroup || 'Not set'}</p>
                       </div>
                        <div className="col-span-1">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">VALID THRU</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseExpiryDate ? format(new Date(profile.licenseExpiryDate), "MM/yy") : 'N/A'}</p>
+                        <p className="font-mono font-semibold text-foreground text-sm md:text-base">{profile.licenseExpiryDate ? format(new Date(profile.licenseExpiryDate), "MM/yy") : 'N/A'}</p>
                       </div>
-                      <div className="col-span-3">
+                      <div className="col-span-2 sm:col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DL NO.</p>
-                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseNumber || 'Not set'}</p>
+                        <p className="font-mono font-semibold text-foreground text-sm md:text-base">{profile.licenseNumber || 'Not set'}</p>
                       </div>
-                       <div className="col-span-3">
+                       <div className="col-span-2 sm:col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMERGENCY CONTACT</p>
-                        <p className="font-medium text-foreground">{profile.emergencyContactName && profile.emergencyContactPhone ? `${profile.emergencyContactName} (${profile.emergencyContactPhone})` : 'Not set'}</p>
+                        <p className="font-medium text-foreground text-sm md:text-base">{profile.emergencyContactName && profile.emergencyContactPhone ? `${profile.emergencyContactName} (${profile.emergencyContactPhone})` : 'Not set'}</p>
                       </div>
                     </div>
                   </div>
@@ -554,7 +554,7 @@ export default function ProfilePage() {
                         <p className="font-mono text-xs text-muted-foreground">Email: {user?.email}</p>
                     </div>
                     <div className="w-2/5">
-                        <p className="font-serif text-2xl text-foreground/80 border-b border-muted-foreground pb-1 text-center italic">{profile.name}</p>
+                        <p className="font-serif text-lg md:text-2xl text-foreground/80 border-b border-muted-foreground pb-1 text-center italic">{profile.name}</p>
                         <p className="text-xs text-muted-foreground text-center font-semibold tracking-wide">SIGNATURE</p>
                     </div>
                 </div>
@@ -575,7 +575,7 @@ export default function ProfilePage() {
                             <stat.icon className="h-8 w-8 text-primary"/>
                             <div>
                                 <p className="text-sm text-muted-foreground">{stat.label}</p>
-                                <p className="text-2xl font-bold">{stat.value}</p>
+                                <p className="text-xl md:text-2xl font-bold">{stat.value}</p>
                             </div>
                         </div>
                     ))}
