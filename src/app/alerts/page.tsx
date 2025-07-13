@@ -2,9 +2,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { Bell, Calendar, ShieldCheck, Wrench } from "lucide-react";
+import { Bell, ShieldCheck, Wrench } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
-import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -15,10 +14,12 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/context/settings-context";
+import { useData } from "@/context/data-context";
 
 export default function AlertsPage() {
     const { toast } = useToast();
     const { settings } = useSettings();
+    const { serviceRecords, insurancePolicies } = useData();
 
     const upcomingServices = serviceRecords
         .filter((s) => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
@@ -78,7 +79,7 @@ export default function AlertsPage() {
 
       sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [toast, settings.notificationsEnabled]);
+    }, [toast, settings.notificationsEnabled, allAlerts]);
 
 
   return (

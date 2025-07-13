@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { FileText, PlusCircle, Car, Trash2 } from "lucide-react";
-import { documents as initialDocuments, vehicles } from "@/lib/data";
 import type { Document } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +39,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useData } from "@/context/data-context";
 
 const documentSchema = z.object({
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
@@ -67,8 +67,12 @@ function AddDocumentForm({
 
   function onSubmit(values: z.infer<typeof documentSchema>) {
     const fileName = values.file[0].name;
+    const { addDocument, vehicles } = useData();
     const vehicleName =
       vehicles.find((v) => v.id === vehicleId)?.name || "Unknown Vehicle";
+    
+    // In a real app, you'd call addDocument from the context here
+    // But since this component is separate, we'll use the callback.
     const newDocument: Document = {
       id: `d${Date.now()}`,
       documentType: values.documentType,
@@ -78,6 +82,7 @@ function AddDocumentForm({
       uploadDate: new Date().toISOString(),
       fileUrl: "#", // In a real app, this would be a URL to the uploaded file
     };
+
     onDocumentAdded(newDocument);
     toast({
       title: "Document Uploaded!",
@@ -148,20 +153,15 @@ function AddDocumentForm({
 }
 
 export function MyDocuments() {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  const { vehicles, documents, addDocument, deleteDocument } = useData();
   const { toast } = useToast();
 
-  const handleDocumentAdded = (newDoc: Document) => {
-     setDocuments((prev) =>
-      [newDoc, ...prev].sort(
-        (a, b) =>
-          new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-      )
-    );
+  const handleDocumentAdded = (newDocData: Omit<Document, 'id' | 'vehicleName'>) => {
+     addDocument(newDocData);
   }
 
   const handleDelete = (docId: string) => {
-    setDocuments((prev) => prev.filter((d) => d.id !== docId));
+    deleteDocument(docId);
     toast({
       title: "Document Deleted",
       description: "The document has been removed.",
@@ -234,7 +234,7 @@ export function MyDocuments() {
                     ) : (
                         <p className="text-sm text-muted-foreground text-center py-4">No documents for this vehicle yet.</p>
                     )}
-                    <AddDocumentForm vehicleId={vehicle.id} onDocumentAdded={handleDocumentAdded} />
+                    <AddDocumentForm vehicleId={vehicle.id} onDocumentAdded={(newDoc) => handleDocumentAdded(newDoc)} />
                   </AccordionContent>
                 </AccordionItem>
               );

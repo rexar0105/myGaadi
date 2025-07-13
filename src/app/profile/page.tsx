@@ -16,7 +16,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { vehicles, expenses, serviceRecords } from "@/lib/data";
 import { AppSettings } from "@/components/app-settings";
 import { format } from "date-fns";
 import { MyDocuments } from "@/components/my-documents";
@@ -30,6 +29,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { useData } from "@/context/data-context";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -52,6 +52,7 @@ const initialProfileData: ProfileFormValues = {
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const { vehicles, expenses, serviceRecords } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);

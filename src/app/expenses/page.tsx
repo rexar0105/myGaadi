@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { IndianRupee, PlusCircle } from "lucide-react";
-import { expenses as initialExpenses, vehicles } from "@/lib/data";
 import type { Expense } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +44,7 @@ import { format } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { ChartConfig } from "@/components/ui/chart";
+import { useData } from "@/context/data-context";
 
 const expenseSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -79,11 +79,7 @@ const chartConfig: ChartConfig = {
 };
 
 export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState<Expense[]>(
-    initialExpenses.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    )
-  );
+  const { vehicles, expenses, addExpense } = useData();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -99,19 +95,8 @@ export default function ExpensesPage() {
   });
 
   function onSubmit(values: z.infer<typeof expenseSchema>) {
-    const vehicleName =
-      vehicles.find((v) => v.id === values.vehicleId)?.name ||
-      "Unknown Vehicle";
-    const newExpense: Expense = {
-      id: `e${expenses.length + 1}`,
-      ...values,
-      vehicleName: vehicleName,
-    };
-    setExpenses((prev) =>
-      [newExpense, ...prev].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      )
-    );
+    addExpense(values);
+
     toast({
       title: "Expense Added!",
       description: `${values.description} has been logged.`,
@@ -121,7 +106,11 @@ export default function ExpensesPage() {
     form.setValue("date", new Date().toISOString());
   }
 
-  const recentExpenses = expenses.slice(0, 10);
+  const sortedExpenses = [...expenses].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const recentExpenses = sortedExpenses.slice(0, 10);
 
   const expenseByCategory = expenses.reduce((acc, expense) => {
     if (!acc[expense.category]) {

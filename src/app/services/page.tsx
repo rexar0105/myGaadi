@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { Wrench, PlusCircle } from "lucide-react";
 import { format, isPast, differenceInDays } from "date-fns";
-import { serviceRecords as initialRecords, vehicles } from "@/lib/data";
 import type { ServiceRecord } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +45,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useData } from "@/context/data-context";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -58,7 +58,7 @@ const serviceSchema = z.object({
 
 
 export default function ServicesPage() {
-    const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>(initialRecords);
+    const { vehicles, serviceRecords, addServiceRecord } = useData();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
 
@@ -75,13 +75,10 @@ export default function ServicesPage() {
     });
 
     function onSubmit(values: z.infer<typeof serviceSchema>) {
+        const { vehicleId, service, date, cost, notes, nextDueDate } = values;
+        addServiceRecord({ vehicleId, service, date, cost, notes, nextDueDate });
+        
         const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name || 'Unknown Vehicle';
-        const newRecord: ServiceRecord = {
-            id: `s${serviceRecords.length + 1}`,
-            ...values,
-            vehicleName: vehicleName,
-        };
-        setServiceRecords(prev => [newRecord, ...prev].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         toast({
             title: "Service Logged!",
             description: `${values.service} for ${vehicleName} has been recorded.`,

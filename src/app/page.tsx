@@ -4,7 +4,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Car, PlusCircle, Wrench, ShieldCheck, Calendar, Info, Pencil, Upload } from "lucide-react";
-import { vehicles as initialVehicles, serviceRecords, insurancePolicies } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +36,7 @@ import {
 } from "@/components/ui/card";
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useData } from "@/context/data-context";
 
 const vehicleSchema = z.object({
   name: z.string().min(1, "Vehicle name is required"),
@@ -150,7 +150,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                      <FormField
                         control={form.control}
                         name="image"
-                        render={({ field }) => (
+                        render={({ field: { onChange, value, ...rest } }) => (
                             <FormItem>
                                 <FormLabel>Vehicle Image</FormLabel>
                                 <FormControl>
@@ -160,7 +160,8 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                                             type="file" 
                                             accept="image/*"
                                             className="sr-only"
-                                            onChange={(e) => field.onChange(e.target.files)}
+                                            onChange={(e) => onChange(e.target.files)}
+                                            {...rest}
                                         />
                                         <label htmlFor="edit-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
                                            <Upload className="h-4 w-4 mr-2"/>
@@ -181,7 +182,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
 
 
 export default function DashboardPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
+  const { vehicles, serviceRecords, insurancePolicies, addVehicle, updateVehicle } = useData();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
@@ -203,8 +204,7 @@ export default function DashboardPage() {
 
 
   function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
-    const newVehicle: Vehicle = {
-      id: `v${vehicles.length + 1}`,
+    const newVehicleData = {
       name: values.name,
       make: values.make,
       model: values.model,
@@ -214,7 +214,7 @@ export default function DashboardPage() {
       customImageUrl: values.image?.[0] ? URL.createObjectURL(values.image[0]) : undefined,
       dataAiHint: `${values.make.toLowerCase()} ${values.model.toLowerCase()}`,
     };
-    setVehicles((prev) => [...prev, newVehicle]);
+    addVehicle(newVehicleData);
     toast({
       title: "Vehicle Added!",
       description: `${values.name} has been added to your garage.`,
@@ -224,17 +224,13 @@ export default function DashboardPage() {
   }
 
   const handleEditVehicleSave = (data: VehicleFormValues, vehicleId: string) => {
-    setVehicles(prev => prev.map(v => {
-        if (v.id === vehicleId) {
-            const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : v.customImageUrl;
-            return {
-                ...v,
-                ...data,
-                customImageUrl: newImageUrl,
-            }
-        }
-        return v;
-    }));
+    const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : (vehicles.find(v => v.id === vehicleId)?.customImageUrl);
+    const updatedData = {
+        ...data,
+        customImageUrl: newImageUrl,
+    }
+    updateVehicle(vehicleId, updatedData);
+    
     toast({
         title: "Vehicle Updated!",
         description: "Your vehicle details have been saved."
@@ -289,17 +285,18 @@ export default function DashboardPage() {
                  <FormField
                     control={addVehicleForm.control}
                     name="image"
-                    render={({ field }) => (
+                    render={({ field: { onChange, value, ...rest } }) => (
                         <FormItem>
                         <FormLabel>Vehicle Image (Optional)</FormLabel>
                         <FormControl>
-                             <div>
+                            <div>
                                 <Input 
                                     id="new-image-upload"
                                     type="file" 
                                     accept="image/*"
                                     className="sr-only"
-                                    onChange={(e) => field.onChange(e.target.files)}
+                                    onChange={(e) => onChange(e.target.files)}
+                                    {...rest}
                                 />
                                 <label htmlFor="new-image-upload" className="flex items-center justify-start h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted-foreground ring-offset-background cursor-pointer hover:bg-accent">
                                     <Upload className="h-4 w-4 mr-2"/>

@@ -3,6 +3,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useSettings } from "./settings-context";
+import { useData } from "./data-context";
 
 interface User {
   id: string;
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { settings } = useSettings();
+  const data = useData();
 
   useEffect(() => {
     // Mock checking for a session token in localStorage
@@ -86,6 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("myGaadiUser");
     if (settings.clearDataOnLogout) {
       sessionStorage.clear();
+      data?.clearAllData();
     }
   };
 

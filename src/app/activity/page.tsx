@@ -3,7 +3,6 @@
 
 import { Wrench, IndianRupee, History } from "lucide-react";
 import { format } from "date-fns";
-import { serviceRecords, expenses } from "@/lib/data";
 import {
   Card,
   CardContent,
@@ -11,8 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useData } from "@/context/data-context";
 
 export default function ActivityPage() {
+  const { expenses, serviceRecords } = useData();
 
   const allActivity = [
     ...expenses.map(e => ({ type: 'expense' as const, ...e})),

@@ -6,6 +6,7 @@ import { AppLayout } from '@/components/app-layout';
 import { AuthProvider } from '@/context/auth-context';
 import { ThemeProvider } from '@/context/theme-context';
 import { SettingsProvider } from '@/context/settings-context';
+import { DataProvider } from '@/context/data-context';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <SettingsProvider>
-            <AuthProvider>
+            <DataProvider>
+              <AuthProvider>
                 <AppLayout>{children}</AppLayout>
                 <Toaster />
-            </AuthProvider>
+              </AuthProvider>
+            </DataProvider>
           </SettingsProvider>
         </ThemeProvider>
       </body>

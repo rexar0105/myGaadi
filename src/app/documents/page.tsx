@@ -3,7 +3,6 @@
 
 import { useState } from "react";
 import { FileText, PlusCircle, Upload, Car, Trash2 } from "lucide-react";
-import { documents as initialDocuments, vehicles } from "@/lib/data";
 import type { Document } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +41,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { format } from "date-fns";
+import { useData } from "@/context/data-context";
 
 const documentSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -50,7 +50,7 @@ const documentSchema = z.object({
 });
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  const { vehicles, documents, addDocument, deleteDocument } = useData();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -64,22 +64,13 @@ export default function DocumentsPage() {
   });
 
   function onSubmit(values: z.infer<typeof documentSchema>) {
-    const vehicleName =
-      vehicles.find((v) => v.id === values.vehicleId)?.name ||
-      "Unknown Vehicle";
-    const newDocument: Document = {
-      id: `d${documents.length + 1}`,
+    const newDocumentData = {
       ...values,
-      vehicleName,
       uploadDate: new Date().toISOString(),
       fileUrl: "#", // In a real app, this would be a URL to the uploaded file
     };
-    setDocuments((prev) =>
-      [newDocument, ...prev].sort(
-        (a, b) =>
-          new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-      )
-    );
+    addDocument(newDocumentData);
+
     toast({
       title: "Document Uploaded!",
       description: `${values.fileName} has been added.`,
@@ -89,7 +80,7 @@ export default function DocumentsPage() {
   }
 
   const handleDelete = (docId: string) => {
-    setDocuments(prev => prev.filter(d => d.id !== docId));
+    deleteDocument(docId);
     toast({
         title: "Document Deleted",
         description: "The document has been removed.",

@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
-import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
+import { useData } from "@/context/data-context";
 import { Button } from "./ui/button";
 import React from "react";
 import {
@@ -75,6 +75,7 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
+  const { serviceRecords, insurancePolicies, isLoading } = useData();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -97,7 +98,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return email[0].toUpperCase();
   };
 
-  const urgentAlertsCount = [
+  const urgentAlertsCount = isLoading ? 0 : [
     ...serviceRecords.filter((s) => {
         if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) return false;
         const daysLeft = differenceInDays(new Date(s.nextDueDate), new Date());
@@ -121,6 +122,19 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-2">
             <Tooltip>
                 <TooltipTrigger asChild>
+                    <Button asChild variant="ghost" size="icon">
+                        <Link href="/activity">
+                            <History />
+                            <span className="sr-only">Recent Activity</span>
+                        </Link>
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Recent Activity</p>
+                </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+                <TooltipTrigger asChild>
                     <Button asChild variant="ghost" size="icon" className="relative">
                         <Link href="/alerts">
                             <Bell />
@@ -133,19 +147,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>Notifications</p>
-                </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button asChild variant="ghost" size="icon">
-                        <Link href="/activity">
-                            <History />
-                            <span className="sr-only">Recent Activity</span>
-                        </Link>
-                    </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                    <p>Recent Activity</p>
                 </TooltipContent>
             </Tooltip>
              <Tooltip>

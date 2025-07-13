@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { ShieldCheck, Calendar, PlusCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
-import { insurancePolicies as initialPolicies, vehicles } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import type { InsurancePolicy } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -52,6 +51,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useData } from "@/context/data-context";
 
 const insuranceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -64,7 +64,7 @@ const insuranceSchema = z.object({
 
 
 export default function InsurancePage() {
-    const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>(initialPolicies);
+    const { vehicles, insurancePolicies, addInsurancePolicy } = useData();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
 
@@ -78,14 +78,13 @@ export default function InsurancePage() {
     });
 
     function onSubmit(values: z.infer<typeof insuranceSchema>) {
-        const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name || 'Unknown Vehicle';
-        const newPolicy: InsurancePolicy = {
-            id: `i${insurancePolicies.length + 1}`,
+        const policyData = {
             ...values,
             expiryDate: values.expiryDate.toISOString(),
-            vehicleName: vehicleName,
-        };
-        setInsurancePolicies(prev => [...prev, newPolicy].sort((a,b) => new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime()));
+        }
+        addInsurancePolicy(policyData);
+        
+        const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name || 'Unknown Vehicle';
         toast({
             title: "Insurance Added!",
             description: `Policy for ${vehicleName} has been added.`,
