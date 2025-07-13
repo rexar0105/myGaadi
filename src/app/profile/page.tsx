@@ -91,7 +91,7 @@ export default function ProfilePage() {
              <Separator />
           </CardContent>
           <CardFooter>
-               <Button variant="outline" onClick={handleLogout} className="w-full sm:w-auto">
+               <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
