@@ -16,8 +16,8 @@
     --secondary-foreground: 215 28% 17%;
     --muted: 216 34% 91%;
     --muted-foreground: 215 20% 65%;
-    --accent: 258 90% 66%; /* Vivid Violet */
-    --accent-foreground: 210 40% 98%;
+    --accent: 217 91% 94%; /* Lighter Blue for hover */
+    --accent-foreground: 217 91% 60%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 214 20% 85%;
@@ -44,7 +44,7 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    --accent: 258 90% 66%;
+    --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;

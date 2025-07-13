@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
-import { serviceRecords } from "@/lib/data";
+import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "./ui/button";
@@ -31,21 +31,21 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
-  { href: "/assessment", label: "AI Assess", icon: Sparkles, highlighted: true },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
+  { href: "/assessment", label: "AI Assess", icon: Sparkles },
 ];
 
-function NavLink({ href, icon: Icon, label, highlighted = false }: { href: string; icon: React.ElementType; label: string, highlighted?: boolean }) {
+function NavLink({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string }) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
-  if (highlighted) {
+  if (href === '/assessment') {
     return (
       <Link
         href={href}
         className={cn(
-          "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-accent text-accent-foreground shadow-lg hover:bg-accent/90",
+          "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-primary text-primary-foreground shadow-lg hover:bg-primary/90",
           "h-14 w-14 -translate-y-2 md:h-16 md:w-16"
         )}
       >
@@ -59,9 +59,9 @@ function NavLink({ href, icon: Icon, label, highlighted = false }: { href: strin
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-all text-muted-foreground",
+        "flex flex-col items-center justify-center gap-1 p-2 rounded-md transition-all text-muted-foreground hover:bg-accent/50",
         isActive
-          ? "text-primary"
+          ? "text-primary bg-accent/80"
           : "hover:text-primary"
       )}
     >
@@ -95,14 +95,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return email[0].toUpperCase();
   };
 
-  const urgentServicesCount = serviceRecords
-    .filter((s) => {
-        if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) {
-            return false;
-        }
+  const urgentAlertsCount = [
+    ...serviceRecords.filter((s) => {
+        if (!s.nextDueDate || isPast(new Date(s.nextDueDate))) return false;
         const daysLeft = differenceInDays(new Date(s.nextDueDate), new Date());
         return daysLeft <= 14;
-    }).length;
+    }),
+    ...insurancePolicies.filter((p) => {
+        if (isPast(new Date(p.expiryDate))) return false;
+        const daysLeft = differenceInDays(new Date(p.expiryDate), new Date());
+        return daysLeft <= 30;
+    })
+  ].length;
 
   return (
     <TooltipProvider>
@@ -118,8 +122,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <Button asChild variant="ghost" size="icon" className="relative">
                         <Link href="/alerts">
                             <Bell />
-                             {urgentServicesCount > 0 && (
-                                <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{urgentServicesCount}</Badge>
+                             {urgentAlertsCount > 0 && (
+                                <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 justify-center p-0">{urgentAlertsCount}</Badge>
                             )}
                             <span className="sr-only">Alerts</span>
                         </Link>
