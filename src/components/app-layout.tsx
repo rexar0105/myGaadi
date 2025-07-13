@@ -61,13 +61,13 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent/50 h-16 w-16",
+        "flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent/50 h-14 w-14",
         isActive
           ? "text-primary bg-accent/80"
           : "hover:text-primary"
       )}
     >
-      <Icon className="h-6 w-6" />
+      <Icon className="h-5 w-5" />
       <span className="text-xs font-medium text-center">{label}</span>
     </Link>
   );
@@ -173,7 +173,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-28 bg-muted/40">{children}</main>
 
       <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex h-20 w-full max-w-sm items-center justify-around bg-background/95 backdrop-blur-sm rounded-full border shadow-lg p-2 gap-1">
+        <div className="flex h-20 w-auto items-center justify-center bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-4 gap-2">
             {navItems.map((item) => (
                 <NavLink key={item.href} {...item} />
             ))}
