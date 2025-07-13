@@ -74,7 +74,7 @@ function AddDocumentForm({
         documentType: values.documentType,
         fileName,
         uploadDate: new Date().toISOString(),
-        fileUrl: "#" // Placeholder URL
+        fileUrl: URL.createObjectURL(values.file[0])
     };
     
     addDocument(newDocumentData);

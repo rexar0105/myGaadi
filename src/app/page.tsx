@@ -38,6 +38,7 @@ import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useData } from "@/context/data-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const vehicleSchema = z.object({
   name: z.string().min(2, "Vehicle name must be at least 2 characters."),
@@ -65,7 +66,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
     });
 
     const currentImageFile = form.watch('image');
-    const currentImageName = currentImageFile?.[0]?.name;
+    const newImagePreview = currentImageFile?.[0] ? URL.createObjectURL(currentImageFile[0]) : null;
 
 
     const onSubmit = (data: VehicleFormValues) => {
@@ -80,6 +81,40 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
             </DialogHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field: { onChange, value, ...rest } }) => (
+                            <FormItem>
+                                <FormLabel>Vehicle Image</FormLabel>
+                                <FormControl>
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-16 w-16 rounded-md">
+                                            <AvatarImage src={newImagePreview || vehicle.customImageUrl || vehicle.imageUrl} className="rounded-md object-cover"/>
+                                            <AvatarFallback className="rounded-md bg-muted"><Car/></AvatarFallback>
+                                        </Avatar>
+                                        <Input 
+                                            id="edit-image-upload"
+                                            type="file" 
+                                            accept="image/*"
+                                            className="sr-only"
+                                            onChange={(e) => onChange(e.target.files)}
+                                            {...rest}
+                                        />
+                                        <Button asChild variant="outline" className="w-full font-normal">
+                                            <label htmlFor="edit-image-upload" className="w-full cursor-pointer flex items-center">
+                                                <Upload className="mr-2"/>
+                                                <span className="truncate max-w-[calc(100%-2rem)]">
+                                                    {currentImageFile?.[0]?.name ?? 'Upload a new image...'}
+                                                </span>
+                                            </label>
+                                        </Button>
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                      <FormField
                         control={form.control}
                         name="name"
@@ -149,39 +184,9 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                             )}
                         />
                     </div>
-                     <FormField
-                        control={form.control}
-                        name="image"
-                        render={({ field: { onChange, value, ...rest } }) => (
-                            <FormItem>
-                                <FormLabel>Vehicle Image</FormLabel>
-                                <FormControl>
-                                    <div>
-                                        <Input 
-                                            id="edit-image-upload"
-                                            type="file" 
-                                            accept="image/*"
-                                            className="sr-only"
-                                            onChange={(e) => onChange(e.target.files)}
-                                            {...rest}
-                                        />
-                                        <Button asChild variant="outline" className="w-full font-normal">
-                                            <label htmlFor="edit-image-upload" className="w-full cursor-pointer">
-                                                <Upload className="mr-2"/>
-                                                <span className="truncate max-w-[calc(100%-2rem)]">
-                                                    {currentImageName ?? 'Upload a new image...'}
-                                                </span>
-                                            </label>
-                                        </Button>
-                                    </div>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        />
                     <div className="flex gap-2 justify-end">
                         <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-                        <Button type="submit" disabled={!form.formState.isValid}>Save Changes</Button>
+                        <Button type="submit" disabled={!form.formState.isDirty || !form.formState.isValid}>Save Changes</Button>
                     </div>
                 </form>
             </Form>
@@ -310,7 +315,7 @@ export default function DashboardPage() {
     <main className="p-4 md:p-8 flex-1 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+            <h1 className="text-xl md:text-3xl font-bold text-foreground mb-1">
                 Your Garage
             </h1>
             <p className="text-muted-foreground">Manage all your registered vehicles.</p>

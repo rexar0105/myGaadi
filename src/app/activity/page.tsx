@@ -30,7 +30,7 @@ export default function ActivityPage() {
   return (
     <div className="p-4 md:p-8 animate-fade-in">
         <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Full Activity Log</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground mb-1">Full Activity Log</h1>
             <p className="text-muted-foreground">
             A complete history of all your expenses and services.
             </p>

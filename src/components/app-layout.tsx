@@ -77,7 +77,7 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, profile } = useAuth();
   const { serviceRecords, insurancePolicies, isLoading } = useData();
   const router = useRouter();
   const pathname = usePathname();
@@ -96,9 +96,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  const getInitials = (email: string) => {
-    if (!email) return "?";
-    return email[0].toUpperCase();
+  const getInitials = (nameOrEmail: string) => {
+    if (!nameOrEmail) return "?";
+    
+    const parts = nameOrEmail.split(' ').filter(Boolean);
+    if(parts.length > 1 && parts[0] && parts[1]) {
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return nameOrEmail[0].toUpperCase();
   };
 
   const urgentAlertsCount = isLoading ? 0 : [
@@ -157,9 +162,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     <Button asChild variant="ghost" size="icon">
                         <Link href="/profile">
                             <Avatar className="h-8 w-8">
-                                <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} alt={user?.email || ''} />
+                                <AvatarImage src={profile?.avatarUrl ?? `https://avatar.vercel.sh/${user?.email}.png`} alt={profile?.name || user?.email || ''} />
                                 <AvatarFallback className="text-xs bg-primary/20 text-primary font-bold">
-                                    {user ? getInitials(user.email) : <User />}
+                                    {user ? getInitials(profile?.name || user.email) : <User />}
                                 </AvatarFallback>
                             </Avatar>
                             <span className="sr-only">Profile</span>

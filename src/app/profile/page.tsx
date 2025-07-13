@@ -46,7 +46,7 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-type ProfileState = Omit<ProfileFormValues, 'avatar' | 'dob' | 'licenseExpiryDate'> & {
+export type ProfileState = Omit<ProfileFormValues, 'avatar' | 'dob' | 'licenseExpiryDate'> & {
     dob?: string, // Stored as ISO string
     licenseExpiryDate?: string, // Stored as ISO string
     avatarUrl: string | null
@@ -79,44 +79,32 @@ const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
   );
 
+  const getInitials = (nameOrEmail: string) => {
+    if (!nameOrEmail) return "?";
+    
+    const parts = nameOrEmail.split(' ').filter(Boolean);
+    if(parts.length > 1 && parts[0] && parts[1]) {
+        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return nameOrEmail[0].toUpperCase();
+  };
+
+
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, profile, setProfile } = useAuth();
   const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading: isDataLoading } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [profile, setProfile] = useState<ProfileState | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
+    mode: 'onBlur',
     // Default values will be set once profile is loaded
   });
 
-   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
-      setIsLoadingProfile(true);
-
-      const storedProfile = localStorage.getItem('myGaadiProfile');
-      if (storedProfile) {
-        setProfile(JSON.parse(storedProfile));
-      } else {
-        const defaultProfile: ProfileState = {
-            name: user.email?.split('@')[0] || "New User",
-            avatarUrl: null
-        }
-        setProfile(defaultProfile);
-        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-      }
-      setIsLoadingProfile(false);
-    };
-
-    fetchProfile();
-  }, [user]);
-
   useEffect(() => {
-    // Once profile is loaded, reset the form with the fetched data
     if (profile) {
       form.reset({
         ...profile,
@@ -124,19 +112,10 @@ export default function ProfilePage() {
         licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
         avatar: undefined,
       });
+      setIsLoadingProfile(false);
     }
   }, [profile, form]);
 
-
-  const getInitials = (nameOrEmail: string) => {
-    if (!nameOrEmail) return "?";
-    
-    const parts = nameOrEmail.split(' ');
-    if(parts.length > 1 && parts[0] && parts[1]) {
-        return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return nameOrEmail[0].toUpperCase();
-  };
 
   const handleLogout = () => {
     logout();
@@ -170,7 +149,6 @@ export default function ProfilePage() {
         avatarUrl: newAvatarUrl
     };
     
-    localStorage.setItem('myGaadiProfile', JSON.stringify(updatedProfileData));
     setProfile(updatedProfileData);
 
     setIsEditing(false);
@@ -245,22 +223,32 @@ export default function ProfilePage() {
                 <CardDescription>Your personal information and app settings</CardDescription>
              </div>
 
-            <Button variant={isEditing ? "default" : "outline"} size="sm" className="gap-2" onClick={() => {
-                if (isEditing) {
-                    form.handleSubmit(onProfileSubmit)();
-                } else {
-                    setIsEditing(true);
-                    form.reset({
-                        ...profile,
-                        dob: profile.dob ? new Date(profile.dob) : undefined,
-                        licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
-                        avatar: undefined,
-                    }); 
-                }
-            }}>
-                {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
-                <span>{isEditing ? 'Save' : 'Edit'}</span>
-            </Button>
+             <div className="flex gap-2">
+                {isEditing && (
+                     <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
+                        Cancel
+                    </Button>
+                )}
+                <Button variant={isEditing ? "default" : "outline"} size="sm" className="gap-2" onClick={() => {
+                    if (isEditing) {
+                        form.handleSubmit(onProfileSubmit)();
+                    } else {
+                        setIsEditing(true);
+                        form.reset({
+                            ...profile,
+                            dob: profile.dob ? new Date(profile.dob) : undefined,
+                            licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
+                            avatar: undefined,
+                        }); 
+                    }
+                }}
+                 disabled={isEditing && (!form.formState.isDirty || !form.formState.isValid)}
+                >
+                    {isEditing ? <Save className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+                    <span>{isEditing ? 'Save' : 'Edit'}</span>
+                </Button>
+             </div>
+
           </CardHeader>
           <CardContent>
             {isEditing ? (

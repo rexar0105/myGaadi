@@ -45,8 +45,16 @@ export default function AlertsPage() {
       if (!settings.notificationsEnabled) return;
 
       const notifiedAlertsKey = 'myGaadiNotifiedAlerts';
-      const notifiedAlerts = JSON.parse(sessionStorage.getItem(notifiedAlertsKey) || '[]');
+      let notifiedAlerts: string[] = [];
+      try {
+        notifiedAlerts = JSON.parse(sessionStorage.getItem(notifiedAlertsKey) || '[]');
+      } catch (e) {
+        console.error("Failed to parse notified alerts from session storage", e);
+        notifiedAlerts = [];
+      }
       
+      const newNotifications: string[] = [];
+
       allAlerts.forEach(alert => {
         if (notifiedAlerts.includes(alert.id)) return;
 
@@ -57,14 +65,14 @@ export default function AlertsPage() {
 
         if (alert.type === 'service') {
           const daysLeft = differenceInDays(new Date(alert.nextDueDate!), new Date());
-          if (daysLeft < reminderLeadTime) {
+          if (daysLeft >= 0 && daysLeft <= reminderLeadTime) {
             isUrgent = true;
             title = `Service Due Soon: ${alert.vehicleName}`;
             description = `${alert.service} is due in ${daysLeft} days.`;
           }
         } else { // Insurance
           const daysLeft = differenceInDays(new Date(alert.expiryDate), new Date());
-           if (daysLeft < reminderLeadTime) {
+           if (daysLeft >= 0 && daysLeft <= reminderLeadTime) {
             isUrgent = true;
             title = `Insurance Expiring: ${alert.vehicleName}`;
             description = `Policy from ${alert.provider} expires in ${daysLeft} days.`;
@@ -77,18 +85,20 @@ export default function AlertsPage() {
             description: description,
             variant: "destructive",
           });
-          notifiedAlerts.push(alert.id);
+          newNotifications.push(alert.id);
         }
       });
 
-      sessionStorage.setItem(notifiedAlertsKey, JSON.stringify(notifiedAlerts));
+      if (newNotifications.length > 0) {
+        sessionStorage.setItem(notifiedAlertsKey, JSON.stringify([...notifiedAlerts, ...newNotifications]));
+      }
     }, [toast, settings.notificationsEnabled, allAlerts, settings.reminderLeadTime]);
 
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Alerts & Reminders</h1>
+        <h1 className="text-xl md:text-3xl font-bold text-foreground mb-1">Alerts & Reminders</h1>
         <p className="text-muted-foreground">
           Stay on top of upcoming service due dates and insurance renewals.
         </p>

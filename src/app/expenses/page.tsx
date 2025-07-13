@@ -121,7 +121,7 @@ export default function ExpensesPage() {
 
   const form = useForm<z.infer<typeof expenseSchema>>({
     resolver: zodResolver(expenseSchema),
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: {
       vehicleId: "",
       category: "Fuel",
@@ -173,7 +173,7 @@ export default function ExpensesPage() {
     <div className="p-4 md:p-8 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+          <h1 className="text-xl md:text-3xl font-bold text-foreground mb-1">
             Expense Tracker
           </h1>
           <p className="text-muted-foreground">

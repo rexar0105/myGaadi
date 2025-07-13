@@ -113,7 +113,7 @@ export default function ServicesPage() {
 
     const form = useForm<z.infer<typeof serviceSchema>>({
         resolver: zodResolver(serviceSchema),
-        mode: "onChange",
+        mode: "onBlur",
         defaultValues: {
             vehicleId: "",
             service: "",
@@ -161,7 +161,7 @@ export default function ServicesPage() {
         <div className="p-4 md:p-8 animate-fade-in">
              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
                  <div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
+                    <h1 className="text-xl md:text-3xl font-bold text-foreground mb-1">
                         Service Center
                     </h1>
                     <p className="text-muted-foreground">Log service history and track upcoming maintenance.</p>

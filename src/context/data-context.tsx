@@ -3,14 +3,29 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy, Document } from '@/lib/types';
-import {
-    vehicles as initialVehicles,
-    serviceRecords as initialServiceRecords,
-    expenses as initialExpenses,
-    insurancePolicies as initialInsurancePolicies,
-    documents as initialDocuments
-} from '@/lib/data';
 import { useAuth } from './auth-context';
+
+// This function loads data from localStorage
+const loadFromLocalStorage = <T,>(key: string, defaultValue: T): T => {
+  if (typeof window === 'undefined') return defaultValue;
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    console.warn(`Error reading localStorage key "${key}":`, error);
+    return defaultValue;
+  }
+};
+
+// This function saves data to localStorage
+const saveToLocalStorage = <T,>(key: string, value: T): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`Error writing to localStorage key "${key}":`, error);
+  }
+};
 
 interface DataContextType {
   vehicles: Vehicle[];
@@ -32,31 +47,66 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
+    const { isAuthenticated, user } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
+
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>([]);
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [insurancePolicies, setInsurancePolicies] = useState<InsurancePolicy[]>([]);
     const [documents, setDocuments] = useState<Document[]>([]);
 
+    const DATA_KEYS = {
+        VEHICLES: 'myGaadi_vehicles',
+        SERVICES: 'myGaadi_serviceRecords',
+        EXPENSES: 'myGaadi_expenses',
+        INSURANCE: 'myGaadi_insurancePolicies',
+        DOCUMENTS: 'myGaadi_documents',
+    };
+
+    // Load data from localStorage when the component mounts and user is authenticated
     useEffect(() => {
-        // Simulate loading data
-        setIsLoading(true);
-        setTimeout(() => {
-            setVehicles(initialVehicles);
-            setServiceRecords(initialServiceRecords);
-            setExpenses(initialExpenses);
-            setInsurancePolicies(initialInsurancePolicies);
-            setDocuments(initialDocuments);
+        if (isAuthenticated) {
+            setIsLoading(true);
+            setVehicles(loadFromLocalStorage(DATA_KEYS.VEHICLES, []));
+            setServiceRecords(loadFromLocalStorage(DATA_KEYS.SERVICES, []));
+            setExpenses(loadFromLocalStorage(DATA_KEYS.EXPENSES, []));
+            setInsurancePolicies(loadFromLocalStorage(DATA_KEYS.INSURANCE, []));
+            setDocuments(loadFromLocalStorage(DATA_KEYS.DOCUMENTS, []));
             setIsLoading(false);
-        }, 500); // 0.5 second delay to show skeleton loaders
-    }, []);
+        } else {
+            // Clear data if user logs out
+            setVehicles([]);
+            setServiceRecords([]);
+            setExpenses([]);
+            setInsurancePolicies([]);
+            setDocuments([]);
+        }
+    }, [isAuthenticated, DATA_KEYS.DOCUMENTS, DATA_KEYS.EXPENSES, DATA_KEYS.INSURANCE, DATA_KEYS.SERVICES, DATA_KEYS.VEHICLES]);
+
+    // Save data to localStorage whenever it changes
+    useEffect(() => {
+        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.VEHICLES, vehicles);
+    }, [vehicles, isAuthenticated, DATA_KEYS.VEHICLES]);
+    useEffect(() => {
+        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.SERVICES, serviceRecords);
+    }, [serviceRecords, isAuthenticated, DATA_KEYS.SERVICES]);
+    useEffect(() => {
+        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.EXPENSES, expenses);
+    }, [expenses, isAuthenticated, DATA_KEYS.EXPENSES]);
+    useEffect(() => {
+        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.INSURANCE, insurancePolicies);
+    }, [insurancePolicies, isAuthenticated, DATA_KEYS.INSURANCE]);
+     useEffect(() => {
+        if(isAuthenticated) saveToLocalStorage(DATA_KEYS.DOCUMENTS, documents);
+    }, [documents, isAuthenticated, DATA_KEYS.DOCUMENTS]);
+
 
     const addVehicle = (vehicleData: Omit<Vehicle, 'id' | 'userId'>) => {
         const newId = `v${Date.now()}`;
         const newVehicle: Vehicle = {
             id: newId,
-            userId: 'local-user',
+            userId: user?.id || 'local-user',
             ...vehicleData,
         }
         setVehicles(prev => [...prev, newVehicle].sort((a, b) => a.name.localeCompare(b.name)));
@@ -71,7 +121,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         const vehicleName = vehicles.find(v => v.id === recordData.vehicleId)?.name || 'Unknown';
         const newRecord: ServiceRecord = {
             id: newId,
-            userId: 'local-user',
+            userId: user?.id || 'local-user',
             vehicleName,
             ...recordData,
         }
@@ -83,7 +133,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         const vehicleName = vehicles.find(v => v.id === expenseData.vehicleId)?.name || 'Unknown';
         const newExpense: Expense = {
             id: newId,
-            userId: 'local-user',
+            userId: user?.id || 'local-user',
             vehicleName,
             ...expenseData
         };
@@ -95,7 +145,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
          const vehicleName = vehicles.find(v => v.id === policyData.vehicleId)?.name || 'Unknown';
          const newPolicy: InsurancePolicy = {
              id: newId,
-             userId: 'local-user',
+             userId: user?.id || 'local-user',
              vehicleName,
              ...policyData
          };
@@ -107,7 +157,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         const vehicleName = vehicles.find(v => v.id === docData.vehicleId)?.name || 'Unknown';
         const newDoc: Document = {
             id: newId,
-            userId: 'local-user',
+            userId: user?.id || 'local-user',
             vehicleName,
             ...docData
         };
@@ -125,6 +175,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setExpenses([]);
         setInsurancePolicies([]);
         setDocuments([]);
+        Object.values(DATA_KEYS).forEach(key => {
+            if (typeof window !== 'undefined') {
+                window.localStorage.removeItem(key);
+            }
+        });
         setTimeout(() => setIsLoading(false), 200);
     };
 
