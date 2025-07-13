@@ -35,68 +35,71 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Simulate checking auth state on initial load
     setIsAuthLoading(true);
-
-    // This simulates an async check for a user session
+    const localUser = initialUser;
+    
+    // In a real app, this would be an async check for a session
     setTimeout(() => {
-        setUser(initialUser);
+      setUser(localUser);
 
+      // Load profile from localStorage when user is loaded
+      try {
         const storedProfile = localStorage.getItem('myGaadiProfile');
         if (storedProfile) {
-            setProfileState(JSON.parse(storedProfile));
+          setProfileState(JSON.parse(storedProfile));
         } else {
-            // Create a default profile only if one doesn't exist in storage
-            const defaultProfile: ProfileState = {
-                name: initialUser.email.split('@')[0] || "New User",
-                avatarUrl: null
-            };
-            setProfileState(defaultProfile);
-            localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-        }
-        setIsAuthLoading(false);
-    }, 100); // Small delay to simulate async operation
-  }, []);
-
-  const login = async (email: string, pass: string): Promise<boolean> => {
-    setIsAuthLoading(true);
-    const localUser = { id: 'local-user', email };
-    setUser(localUser);
-    
-    // Set up default profile if none exists
-    const storedProfile = localStorage.getItem('myGaadiProfile');
-    if (!storedProfile) {
-        const defaultProfile: ProfileState = {
-            name: email.split('@')[0] || "New User",
+          // If no profile, create a default one
+          const defaultProfile: ProfileState = {
+            name: localUser.email.split('@')[0] || "New User",
             avatarUrl: null
-        };
-        setProfileState(defaultProfile);
-        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-    }
-    setIsAuthLoading(false);
-    return true;
-  };
-
-  const loginWithGoogle = async (): Promise<boolean> => {
-    setIsAuthLoading(true);
-    // In a real app, you'd get user info from Google
-    const localUser = { id: 'local-user', email: 'user@example.com' };
-    setUser(localUser);
-
-     // Set up default profile if none exists
-    const storedProfile = localStorage.getItem('myGaadiProfile');
-    if (!storedProfile) {
+          };
+          setProfileState(defaultProfile);
+          localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+        }
+      } catch (e) {
+        console.error("Failed to load or create profile", e);
+        // Fallback to a default profile in case of error
         const defaultProfile: ProfileState = {
             name: localUser.email.split('@')[0] || "New User",
             avatarUrl: null
         };
         setProfileState(defaultProfile);
-        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-    }
-    setIsAuthLoading(false);
+      } finally {
+         setIsAuthLoading(false);
+      }
+    }, 100);
+  }, []);
+
+  const login = async (email: string, pass: string): Promise<boolean> => {
+    // This is a mock implementation
+    const localUser = { id: 'local-user', email };
+    setUser(localUser);
+    
+    // Set up default profile if none exists
+    const defaultProfile: ProfileState = {
+        name: email.split('@')[0] || "New User",
+        avatarUrl: null
+    };
+    setProfileState(defaultProfile);
+    localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+    return true;
+  };
+
+  const loginWithGoogle = async (): Promise<boolean> => {
+    // Mock implementation
+    const localUser = { id: 'local-user', email: 'user@example.com' };
+    setUser(localUser);
+
+    const defaultProfile: ProfileState = {
+        name: localUser.email.split('@')[0] || "New User",
+        avatarUrl: null
+    };
+    setProfileState(defaultProfile);
+    localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
     return true;
   };
 
   const signup = async (email: string, pass: string) => {
-     setIsAuthLoading(true);
+     // Mock implementation
      const localUser = { id: 'local-user', email };
      setUser(localUser);
      const defaultProfile: ProfileState = {
@@ -105,21 +108,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
      };
      setProfileState(defaultProfile);
      localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
-     setIsAuthLoading(false);
   };
 
-  const setProfile = useCallback((newProfile: ProfileState | null) => {
+  const setProfile = useCallback((newProfile: ProfileState) => {
     setProfileState(newProfile);
-    if (newProfile) {
-        localStorage.setItem('myGaadiProfile', JSON.stringify(newProfile));
-    } else {
-        localStorage.removeItem('myGaadiProfile');
-    }
+    localStorage.setItem('myGaadiProfile', JSON.stringify(newProfile));
   }, []);
 
   const logout = () => {
     setUser(null);
-    setProfile(null);
+    setProfileState(null);
     if(settings.clearDataOnLogout) {
         sessionStorage.removeItem('myGaadiNotifiedAlerts');
     }

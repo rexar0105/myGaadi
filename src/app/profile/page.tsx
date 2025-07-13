@@ -121,7 +121,7 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, profile, setProfile, logout } = useAuth();
+  const { user, profile, setProfile, logout, isAuthLoading } = useAuth();
   const { vehicles, expenses, serviceRecords, documents, insurancePolicies } = useData();
   const router = useRouter();
   const { toast } = useToast();
@@ -130,7 +130,6 @@ export default function ProfilePage() {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     mode: 'onBlur',
-    // Default values will be set once profile is loaded
   });
 
   useEffect(() => {
@@ -242,7 +241,7 @@ export default function ProfilePage() {
     }
   ];
 
-  if (!profile) {
+  if (isAuthLoading || !profile) {
       return <ProfileSkeleton />;
   }
 

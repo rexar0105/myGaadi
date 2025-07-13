@@ -74,8 +74,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             setInsurancePolicies(loadFromLocalStorage(DATA_KEYS.INSURANCE, []));
             setDocuments(loadFromLocalStorage(DATA_KEYS.DOCUMENTS, []));
             setIsLoading(false);
-        } else if (!isAuthenticated) {
-            // Clear data if user logs out
+        } else if (!isAuthenticated && !isAuthLoading) {
+            // Clear data if user logs out or is not authenticated
             setVehicles([]);
             setServiceRecords([]);
             setExpenses([]);
@@ -189,8 +189,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         vehicles, serviceRecords, expenses, insurancePolicies, documents,
         addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument,
         clearAllData,
-        isLoading,
-    }), [vehicles, serviceRecords, expenses, insurancePolicies, documents, addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument, clearAllData, isLoading]);
+        isLoading: isAuthLoading || isLoading,
+    }), [vehicles, serviceRecords, expenses, insurancePolicies, documents, addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument, clearAllData, isLoading, isAuthLoading]);
 
     return (
         <DataContext.Provider value={value}>
