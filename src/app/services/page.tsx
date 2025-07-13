@@ -84,8 +84,14 @@ export default function ServicesPage() {
             description: `${values.service} for ${vehicleName} has been recorded.`,
         });
         setDialogOpen(false);
-        form.reset();
-        form.setValue("date", new Date().toISOString().split("T")[0]);
+        form.reset({
+             vehicleId: "",
+            service: "",
+            date: new Date().toISOString().split("T")[0],
+            cost: 0,
+            notes: "",
+            nextDueDate: "",
+        });
     }
 
     const upcomingServices = serviceRecords
@@ -149,7 +155,7 @@ export default function ServicesPage() {
                                         <FormItem>
                                             <FormLabel>Service Description</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="General Service" {...field} />
+                                                <Input placeholder="e.g., General Service, Tire Change" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -188,9 +194,9 @@ export default function ServicesPage() {
                                     name="notes"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Notes</FormLabel>
+                                            <FormLabel>Notes (Optional)</FormLabel>
                                             <FormControl>
-                                                <Textarea placeholder="Oil change, filter replacement..." {...field} />
+                                                <Textarea placeholder="e.g., Oil change, filter replacement..." {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -225,7 +231,7 @@ export default function ServicesPage() {
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-4">
-                      {upcomingServices.map((service, index) => {
+                      {upcomingServices.length > 0 ? upcomingServices.map((service, index) => {
                         const dueDate = new Date(service.nextDueDate!);
                         const daysLeft = differenceInDays(dueDate, new Date());
                         const urgency = daysLeft < 7 ? "destructive" : daysLeft < 30 ? "secondary" : "default";
@@ -249,8 +255,7 @@ export default function ServicesPage() {
                               {index < upcomingServices.length -1 && <Separator className="my-3"/>}
                             </li>
                         )
-                      })}
-                      {upcomingServices.length === 0 && (
+                      }) : (
                           <div className="text-center text-muted-foreground py-4 flex flex-col items-center gap-2">
                             <Wrench className="h-10 w-10 text-muted-foreground/50"/>
                             <p className="font-medium">No upcoming services.</p>
@@ -267,7 +272,7 @@ export default function ServicesPage() {
                     </CardHeader>
                     <CardContent>
                          <ul className="space-y-4">
-                            {serviceHistory.map((record, index) => (
+                            {serviceHistory.length > 0 ? serviceHistory.map((record, index) => (
                                 <li 
                                   key={record.id}
                                   className={cn(
@@ -286,8 +291,7 @@ export default function ServicesPage() {
                                     </div>
                                     {record.notes && <p className="text-sm text-muted-foreground mt-2 bg-secondary/30 p-2 rounded-md">{record.notes}</p>}
                                 </li>
-                            ))}
-                            {serviceHistory.length === 0 && (
+                            )) : (
                                 <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
                                     <Wrench className="h-10 w-10 text-muted-foreground/50"/>
                                     <p className="font-medium">No services logged yet.</p>

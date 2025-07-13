@@ -90,7 +90,7 @@ export default function ExpensesPage() {
       category: "Fuel",
       amount: 0,
       description: "",
-      date: new Date().toISOString(),
+      date: new Date().toISOString().split("T")[0],
     },
   });
 
@@ -102,8 +102,13 @@ export default function ExpensesPage() {
       description: `${values.description} has been logged.`,
     });
     setDialogOpen(false);
-    form.reset();
-    form.setValue("date", new Date().toISOString());
+    form.reset({
+      vehicleId: "",
+      category: "Fuel",
+      amount: 0,
+      description: "",
+      date: new Date().toISOString().split("T")[0],
+    });
   }
 
   const sortedExpenses = [...expenses].sort(
@@ -235,6 +240,19 @@ export default function ExpensesPage() {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expense Date</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" className="w-full">
                   Add Expense
                 </Button>
@@ -318,7 +336,7 @@ export default function ExpensesPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-4">
-              {recentExpenses.map((expense, index) => (
+              {recentExpenses.length > 0 ? recentExpenses.map((expense, index) => (
                 <li
                   key={expense.id}
                   className="flex justify-between items-center animate-fade-in-up"
@@ -337,8 +355,7 @@ export default function ExpensesPage() {
                     ₹{expense.amount.toLocaleString("en-IN")}
                   </p>
                 </li>
-              ))}
-              {recentExpenses.length === 0 && (
+              )) : (
                 <div className="col-span-full text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
                   <IndianRupee className="h-10 w-10 text-muted-foreground/50" />
                   <p className="font-medium">No expenses logged yet.</p>

@@ -401,7 +401,7 @@ export default function DashboardPage() {
                           <Button
                               variant="ghost"
                               size="icon"
-                              className="absolute top-2 right-2 z-10 h-8 w-8 bg-black/30 hover:bg-black/50 text-white hover:text-white"
+                              className="absolute top-2 right-2 z-10 h-8 w-8 bg-black/30 hover:bg-black/50 text-white hover:text-white opacity-50 group-hover:opacity-100 transition-opacity"
                               onClick={(e) => {
                                   e.stopPropagation();
                                   setEditingVehicle(vehicle);
