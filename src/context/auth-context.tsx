@@ -121,6 +121,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if(settings.clearDataOnLogout) {
         sessionStorage.removeItem('myGaadiNotifiedAlerts');
     }
+    // Also clear the user's data from localstorage
+    localStorage.removeItem('myGaadi_vehicles');
+    localStorage.removeItem('myGaadi_serviceRecords');
+    localStorage.removeItem('myGaadi_expenses');
+    localStorage.removeItem('myGaadi_insurancePolicies');
+    localStorage.removeItem('myGaadi_documents');
+    localStorage.removeItem('myGaadiProfile');
   };
 
   const isAuthenticated = !!user;

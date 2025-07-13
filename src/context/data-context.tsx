@@ -185,12 +185,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     }, [DATA_KEYS]);
 
 
-    const value = useMemo(() => ({
+    const value = {
         vehicles, serviceRecords, expenses, insurancePolicies, documents,
         addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument,
         clearAllData,
         isLoading: isAuthLoading || isLoading,
-    }), [vehicles, serviceRecords, expenses, insurancePolicies, documents, addVehicle, updateVehicle, addServiceRecord, addExpense, addInsurancePolicy, addDocument, deleteDocument, clearAllData, isLoading, isAuthLoading]);
+    };
 
     return (
         <DataContext.Provider value={value}>

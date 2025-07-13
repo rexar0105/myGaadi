@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import {
@@ -208,7 +208,7 @@ export default function ProfilePage() {
     .sort((a, b) => a - b)[0];
 
 
-  const stats = [
+  const stats = useMemo(() => [
     {
       icon: Car,
       label: "Total Vehicles",
@@ -239,7 +239,7 @@ export default function ProfilePage() {
       label: "Next Service Due",
       value: nextServiceDueDays !== undefined ? `${nextServiceDueDays} days` : "N/A"
     }
-  ];
+  ], [totalVehicles, totalExpenses, totalServices, totalDocuments, upcomingRenewalsCount, nextServiceDueDays]);
 
   if (isAuthLoading || !profile) {
       return <ProfileSkeleton />;
