@@ -21,10 +21,10 @@ import { Separator } from "@/components/ui/separator";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <rect width="32" height="32" rx="8" fill="hsl(var(--primary))"/>
-        <circle cx="16" cy="16" r="10" stroke="hsl(var(--primary-foreground))" strokeOpacity="0.8" strokeWidth="2"/>
-        <path d="M16 16L22 13" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="16" cy="16" r="2" fill="hsl(var(--primary-foreground))"/>
+        <rect width="32" height="32" rx="8" className="fill-primary"/>
+        <circle cx="16" cy="16" r="10" className="stroke-primary-foreground" strokeOpacity="0.8" strokeWidth="2"/>
+        <path d="M16 16L22 13" className="stroke-primary-foreground" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="16" cy="16" r="2" className="fill-primary-foreground"/>
     </svg>
 )
 
@@ -98,10 +98,10 @@ export default function SignupPage() {
                 <GoogleIcon className="mr-2" />
                 Sign up with Google
             </Button>
-            <div className="flex items-center space-x-2">
-              <Separator className="flex-1"/>
-              <span className="text-xs text-muted-foreground">OR</span>
-              <Separator className="flex-1"/>
+            <div className="relative flex items-center">
+              <Separator className="flex-1 shrink"/>
+              <span className="text-xs text-muted-foreground px-2">OR</span>
+              <Separator className="flex-1 shrink"/>
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

@@ -114,7 +114,7 @@ export default function ProfilePage() {
       });
       setIsLoadingProfile(false);
     }
-  }, [profile, form]);
+  }, [profile, form, isEditing]);
 
 
   const handleLogout = () => {
@@ -234,12 +234,6 @@ export default function ProfilePage() {
                         form.handleSubmit(onProfileSubmit)();
                     } else {
                         setIsEditing(true);
-                        form.reset({
-                            ...profile,
-                            dob: profile.dob ? new Date(profile.dob) : undefined,
-                            licenseExpiryDate: profile.licenseExpiryDate ? new Date(profile.licenseExpiryDate) : undefined,
-                            avatar: undefined,
-                        }); 
                     }
                 }}
                  disabled={isEditing && (!form.formState.isDirty || !form.formState.isValid)}
@@ -481,7 +475,7 @@ export default function ProfilePage() {
                     </form>
                 </Form>
             ) : (
-              <div className="rounded-xl border bg-card p-4 font-sans text-sm max-w-2xl mx-auto shadow-lg overflow-hidden">
+              <div className="rounded-xl border bg-card p-4 font-sans text-sm max-w-2xl mx-auto shadow-lg overflow-hidden dark:bg-card/50">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b-2 border-primary/20 pb-2 mb-4">
                     <div className="text-left">

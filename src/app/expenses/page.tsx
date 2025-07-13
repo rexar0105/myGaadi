@@ -47,6 +47,7 @@ import type { ChartConfig } from "@/components/ui/chart";
 import { useData } from "@/context/data-context";
 import { useSettings } from "@/context/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTheme } from "@/context/theme-context";
 
 const expenseSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -56,28 +57,18 @@ const expenseSchema = z.object({
   date: z.string().refine((date) => !isNaN(Date.parse(date)), "A valid date is required."),
 });
 
-const chartColors = ["#2563eb", "#f97316", "#16a34a", "#9333ea"];
-
-const chartConfig: ChartConfig = {
-  amount: {
-    label: "Amount",
-  },
-  Fuel: {
-    label: "Fuel",
-    color: "hsl(var(--chart-1))",
-  },
-  Repair: {
-    label: "Repair",
-    color: "hsl(var(--chart-2))",
-  },
-  Insurance: {
-    label: "Insurance",
-    color: "hsl(var(--chart-3))",
-  },
-  Other: {
-    label: "Other",
-    color: "hsl(var(--chart-4))",
-  },
+const lightChartConfig: ChartConfig = {
+    Fuel: { color: "hsl(var(--chart-1))" },
+    Repair: { color: "hsl(var(--chart-2))" },
+    Insurance: { color: "hsl(var(--chart-3))" },
+    Other: { color: "hsl(var(--chart-4))" },
+};
+  
+const darkChartConfig: ChartConfig = {
+    Fuel: { color: "hsl(var(--chart-1))" },
+    Repair: { color: "hsl(var(--chart-2))" },
+    Insurance: { color: "hsl(var(--chart-3))" },
+    Other: { color: "hsl(var(--chart-4))" },
 };
 
 function ExpenseSkeleton() {
@@ -118,6 +109,9 @@ export default function ExpensesPage() {
   const { settings } = useSettings();
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { theme } = useTheme();
+
+  const chartConfig = theme === 'dark' ? darkChartConfig : lightChartConfig;
 
   const form = useForm<z.infer<typeof expenseSchema>>({
     resolver: zodResolver(expenseSchema),
@@ -324,14 +318,11 @@ export default function ExpensesPage() {
                     <Tooltip
                       cursor={false}
                       contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
+                        backgroundColor: "hsl(var(--card))",
                         borderColor: "hsl(var(--border))",
                         borderRadius: "var(--radius)",
                       }}
-                      formatter={(value: number, name: string) => [
-                        `₹${value.toLocaleString("en-IN")}`,
-                        chartConfig[name as keyof typeof chartConfig]?.label,
-                      ]}
+                      formatter={(value: number) => `₹${value.toLocaleString("en-IN")}`}
                     />
                     <Pie
                       data={chartData}
@@ -343,13 +334,14 @@ export default function ExpensesPage() {
                       innerRadius={60}
                       labelLine={false}
                       paddingAngle={5}
+                      label
                     >
                       {chartData.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={
                             chartConfig[entry.name as keyof typeof chartConfig]
-                              ?.color || chartColors[index % chartColors.length]
+                              ?.color || "#000000"
                           }
                         />
                       ))}
