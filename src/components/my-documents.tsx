@@ -6,14 +6,6 @@ import { FileText, PlusCircle, Upload, Car, Trash2 } from "lucide-react";
 import { documents as initialDocuments, vehicles } from "@/lib/data";
 import type { Document } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -38,7 +30,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -49,22 +40,24 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Separator } from "./ui/separator";
 
 const documentSchema = z.object({
-  vehicleId: z.string().min(1, "Please select a vehicle"),
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
   fileName: z.string().min(1, "File name is required"),
 });
 
-export function MyDocuments() {
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+function AddDocumentForm({
+  vehicleId,
+  onDocumentAdded,
+}: {
+  vehicleId: string;
+  onDocumentAdded: (newDoc: Document) => void;
+}) {
   const { toast } = useToast();
-
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
     defaultValues: {
-      vehicleId: "",
       documentType: "Registration",
       fileName: "",
     },
@@ -72,27 +65,95 @@ export function MyDocuments() {
 
   function onSubmit(values: z.infer<typeof documentSchema>) {
     const vehicleName =
-      vehicles.find((v) => v.id === values.vehicleId)?.name ||
-      "Unknown Vehicle";
+      vehicles.find((v) => v.id === vehicleId)?.name || "Unknown Vehicle";
     const newDocument: Document = {
-      id: `d${documents.length + 1}`,
+      id: `d${Date.now()}`,
       ...values,
+      vehicleId,
       vehicleName,
       uploadDate: new Date().toISOString(),
       fileUrl: "#", // In a real app, this would be a URL to the uploaded file
     };
-    setDocuments((prev) =>
-      [newDocument, ...prev].sort(
-        (a, b) =>
-          new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-      )
-    );
+    onDocumentAdded(newDocument);
     toast({
       title: "Document Uploaded!",
       description: `${values.fileName} has been added.`,
     });
-    setDialogOpen(false);
     form.reset();
+  }
+
+  return (
+    <div className="bg-muted/50 p-4 rounded-lg mt-4 border">
+        <h4 className="font-semibold text-sm mb-3">Add New Document</h4>
+        <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid sm:grid-cols-2 gap-4">
+            <FormField
+                control={form.control}
+                name="documentType"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="text-xs">Document Type</FormLabel>
+                    <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    >
+                    <FormControl>
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        <SelectItem value="Registration">Registration</SelectItem>
+                        <SelectItem value="Insurance">Insurance</SelectItem>
+                        <SelectItem value="Service">Service Record</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="fileName"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="text-xs">File Name</FormLabel>
+                    <FormControl>
+                    <div className="relative">
+                        <Input placeholder="Registration_Cert.pdf" {...field} />
+                        <div className="absolute right-0 top-0 h-full flex items-center pr-3 pointer-events-none">
+                        <Upload className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                    </div>
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            </div>
+            <Button type="submit" size="sm" className="w-full sm:w-auto">
+            <PlusCircle />
+            Upload Document
+            </Button>
+        </form>
+        </Form>
+    </div>
+  );
+}
+
+export function MyDocuments() {
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  const { toast } = useToast();
+
+  const handleDocumentAdded = (newDoc: Document) => {
+     setDocuments((prev) =>
+      [newDoc, ...prev].sort(
+        (a, b) =>
+          new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
+      )
+    );
   }
 
   const handleDelete = (docId: string) => {
@@ -105,13 +166,19 @@ export function MyDocuments() {
   };
 
   const documentsByVehicle = documents.reduce((acc, doc) => {
-    (acc[doc.vehicleId] = acc[doc.vehicleId] || []).push(doc);
+    (acc[doc.vehicleName] = acc[doc.vehicleName] || []).push(doc);
     return acc;
   }, {} as Record<string, Document[]>);
 
+  const vehicleIdMap = vehicles.reduce((acc, v) => {
+    acc[v.name] = v.id;
+    return acc;
+  }, {} as Record<string, string>)
+
+
   return (
-    <Card className="animate-fade-in-up" style={{ animationDelay: '250ms' }}>
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="animate-fade-in-up" style={{ animationDelay: "250ms" }}>
+      <CardHeader>
         <div>
           <CardTitle className="font-headline text-xl flex items-center gap-2">
             <FileText /> My Documents
@@ -120,152 +187,55 @@ export function MyDocuments() {
             Store and manage your vehicle-related documents.
           </CardDescription>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle />
-              Add Document
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add a New Document</DialogTitle>
-              <DialogDescription>
-                Select a vehicle and upload your document. This is a
-                simulation; no file will be stored.
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="vehicleId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vehicle</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a vehicle" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {vehicles.map((vehicle) => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>
-                              {vehicle.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="documentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Document Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Registration">
-                            Registration
-                          </SelectItem>
-                          <SelectItem value="Insurance">Insurance</SelectItem>
-                          <SelectItem value="Service">
-                            Service Record
-                          </SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="fileName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>File Name</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            placeholder="Registration_Cert.pdf"
-                            {...field}
-                          />
-                          <div className="absolute right-0 top-0 h-full flex items-center pr-3 pointer-events-none">
-                            <Upload className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Upload Document
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
       </CardHeader>
       <CardContent>
-        {Object.keys(documentsByVehicle).length > 0 ? (
+        {vehicles.length > 0 ? (
           <Accordion type="multiple" className="w-full">
-            {Object.entries(documentsByVehicle).map(([vehicleId, docs]) => {
-              const vehicle = vehicles.find((v) => v.id === vehicleId);
+            {vehicles.map((vehicle) => {
+              const docs = documentsByVehicle[vehicle.name] || [];
               return (
-                <AccordionItem value={vehicleId} key={vehicleId}>
+                <AccordionItem value={vehicle.id} key={vehicle.id}>
                   <AccordionTrigger>
                     <div className="flex items-center gap-2 font-semibold">
                       <Car className="text-primary" />{" "}
-                      {vehicle?.name || "Unknown Vehicle"} ({docs.length})
+                      {vehicle.name} ({docs.length})
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
-                    <ul className="space-y-3 pt-2">
-                      {docs.map((doc) => (
-                        <li
-                          key={doc.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                        >
-                          <div className="flex items-center gap-3">
-                            <FileText className="h-5 w-5 text-primary" />
-                            <div>
-                              <p className="font-semibold">{doc.fileName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {doc.documentType} - Uploaded on{" "}
-                                {format(new Date(doc.uploadDate), "dd MMM, yyyy")}
-                              </p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(doc.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
+                    {docs.length > 0 ? (
+                         <ul className="space-y-3 pt-2">
+                         {docs.map((doc) => (
+                           <li
+                             key={doc.id}
+                             className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                           >
+                             <div className="flex items-center gap-3">
+                               <FileText className="h-5 w-5 text-primary" />
+                               <div>
+                                 <p className="font-semibold">{doc.fileName}</p>
+                                 <p className="text-sm text-muted-foreground">
+                                   {doc.documentType} - Uploaded on{" "}
+                                   {format(
+                                     new Date(doc.uploadDate),
+                                     "dd MMM, yyyy"
+                                   )}
+                                 </p>
+                               </div>
+                             </div>
+                             <Button
+                               variant="ghost"
+                               size="icon"
+                               onClick={() => handleDelete(doc.id)}
+                             >
+                               <Trash2 className="h-4 w-4 text-destructive" />
+                             </Button>
+                           </li>
+                         ))}
+                       </ul>
+                    ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">No documents for this vehicle yet.</p>
+                    )}
+                    <AddDocumentForm vehicleId={vehicle.id} onDocumentAdded={handleDocumentAdded} />
                   </AccordionContent>
                 </AccordionItem>
               );
@@ -275,10 +245,10 @@ export function MyDocuments() {
           <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-4">
             <FileText className="h-16 w-16 text-muted-foreground/30" />
             <p className="font-medium text-lg">
-              Your document locker is empty.
+              No vehicles found.
             </p>
             <p className="text-sm">
-              Click "Add Document" to upload your first file.
+              Add a vehicle from the dashboard to start uploading documents.
             </p>
           </div>
         )}
@@ -286,3 +256,5 @@ export function MyDocuments() {
     </Card>
   );
 }
+
+    
