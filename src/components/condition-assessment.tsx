@@ -7,7 +7,11 @@ import {
   assessVehicleCondition,
   AssessVehicleConditionOutput,
 } from "@/ai/flows/assess-vehicle-condition";
-import { Check, Info, Loader2, Sparkles, Upload, Wand2, X } from "lucide-react";
+import {
+    generateVehicleImage,
+    GenerateVehicleImageOutput,
+} from "@/ai/flows/generate-vehicle-image-flow";
+import { Check, Info, Loader2, Sparkles, Upload, Wand2, X, ImageIcon } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -15,28 +19,25 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 export function ConditionAssessment() {
   const { toast } = useToast();
-  const [isPending, startTransition] = useTransition();
+  const [isAssessing, startAssessmentTransition] = useTransition();
+  const [isGenerating, startGenerationTransition] = useTransition();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [result, setResult] = useState<AssessVehicleConditionOutput | null>(
-    null
-  );
+  const [assessmentResult, setAssessmentResult] = useState<AssessVehicleConditionOutput | null>(null);
+  const [generatedImage, setGeneratedImage] = useState<GenerateVehicleImageOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
-      setResult(null);
+      setAssessmentResult(null);
+      setGeneratedImage(null);
       setError(null);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -46,6 +47,16 @@ export function ConditionAssessment() {
     }
   };
 
+  const getVehicleDescription = (fileName: string) => {
+    // Simple heuristic to get a generic description, you could make this more robust
+    const name = fileName.toLowerCase().replace(/[^a-z\s]/gi, '');
+    if (name.includes('car')) return 'car';
+    if (name.includes('suv')) return 'suv';
+    if (name.includes('motorcycle') || name.includes('bike')) return 'motorcycle';
+    return 'vehicle';
+  }
+
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file) {
@@ -54,36 +65,60 @@ export function ConditionAssessment() {
     }
 
     setError(null);
-    setResult(null);
+    setAssessmentResult(null);
+    setGeneratedImage(null);
 
-    startTransition(async () => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = async () => {
-        try {
-          const base64data = reader.result as string;
-          const assessment = await assessVehicleCondition({
-            photoDataUri: base64data,
-          });
-          setResult(assessment);
-        } catch (e) {
-          console.error(e);
-          const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
-          setError(errorMessage);
-          toast({
-            variant: "destructive",
-            title: "Assessment Failed",
-            description: "Could not assess the vehicle's condition. Please try again.",
-          });
-        }
-      };
-    });
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+        const base64data = reader.result as string;
+        
+        startAssessmentTransition(async () => {
+            try {
+            const assessment = await assessVehicleCondition({
+                photoDataUri: base64data,
+            });
+            setAssessmentResult(assessment);
+
+            // Kick off image generation after assessment is done
+            startGenerationTransition(async () => {
+                try {
+                    const imageResult = await generateVehicleImage({
+                        assessment: assessment.assessment,
+                        vehicleDescription: getVehicleDescription(file.name),
+                    });
+                    setGeneratedImage(imageResult);
+                } catch (e) {
+                    console.error("Image generation failed:", e);
+                     toast({
+                        variant: "destructive",
+                        title: "Image Generation Failed",
+                        description: "Could not generate the creative image.",
+                    });
+                }
+            });
+
+            } catch (e) {
+            console.error(e);
+            const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
+            setError(errorMessage);
+            toast({
+                variant: "destructive",
+                title: "Assessment Failed",
+                description: "Could not assess the vehicle's condition. Please try again.",
+            });
+            }
+        });
+    };
   };
+
+  const isPending = isAssessing || isGenerating;
 
   return (
     <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
       <form onSubmit={handleSubmit}>
-        <CardContent className="grid md:grid-cols-2 gap-6 items-start pt-6">
+        <CardContent className="grid lg:grid-cols-2 gap-8 items-start pt-6">
+          
           <div className="flex flex-col gap-4">
              <div className="aspect-video w-full">
                 <Label
@@ -118,7 +153,7 @@ export function ConditionAssessment() {
                 />
             </div>
             <Button type="submit" disabled={isPending || !file} size="lg" className="w-full">
-              {isPending ? (
+              {isAssessing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Assessing...
@@ -132,51 +167,80 @@ export function ConditionAssessment() {
             </Button>
           </div>
 
-          <div className="min-h-[250px] bg-muted/40 p-4 rounded-xl relative overflow-hidden">
-            {isPending && (
-                <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm font-medium">Analyzing image...</p>
-                    <p className="text-xs">This may take a moment.</p>
-                </div>
-            )}
-            {error && (
-              <Alert variant="destructive">
-                 <X className="h-4 w-4"/>
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {result && (
-                <div className="space-y-4 animate-fade-in">
-                    <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Check className="text-green-500"/> AI Assessment</h4>
-                        <p className="text-sm text-muted-foreground">{result.assessment}</p>
+          <div className="grid md:grid-cols-2 gap-6 items-start">
+            <div className="min-h-[300px] bg-muted/40 p-4 rounded-xl relative overflow-y-auto">
+                {isAssessing && (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm font-medium">Analyzing image...</p>
+                        <p className="text-xs">This may take a moment.</p>
                     </div>
-                    <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Info className="text-amber-500"/> Risk Assessment</h4>
-                        <p className="text-sm text-muted-foreground">{result.riskAssessment}</p>
+                )}
+                {error && (
+                <Alert variant="destructive">
+                    <X className="h-4 w-4"/>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+                )}
+                {assessmentResult && (
+                    <div className="space-y-4 animate-fade-in">
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-foreground flex items-center gap-2"><Check className="text-green-500"/> AI Assessment</h4>
+                            <p className="text-sm text-muted-foreground">{assessmentResult.assessment}</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-foreground flex items-center gap-2"><Info className="text-amber-500"/> Risk Assessment</h4>
+                            <p className="text-sm text-muted-foreground">{assessmentResult.riskAssessment}</p>
+                        </div>
+                        <div className="space-y-2">
+                            <h4 className="font-semibold text-foreground flex items-center gap-2"><Sparkles className="text-blue-500"/> Maintenance Tips</h4>
+                            <p className="text-sm text-muted-foreground">{assessmentResult.maintenanceTips}</p>
+                        </div>
                     </div>
-                     <div className="space-y-2">
-                        <h4 className="font-semibold text-foreground flex items-center gap-2"><Sparkles className="text-blue-500"/> Maintenance Tips</h4>
-                        <p className="text-sm text-muted-foreground">{result.maintenanceTips}</p>
+                )}
+                {!isAssessing && !assessmentResult && !error && (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                        <Wand2 className="h-10 w-10 text-muted-foreground/50" />
+                        <p className="font-medium">Your assessment will appear here</p>
+                        <p className="text-sm text-center">Upload a vehicle photo to begin.</p>
                     </div>
-                </div>
-            )}
-            {!isPending && !result && !error && (
-                <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
-                    <Wand2 className="h-10 w-10 text-muted-foreground/50" />
-                    <p className="font-medium">Your assessment will appear here</p>
-                    <p className="text-sm text-center">Upload a vehicle photo to begin.</p>
-                </div>
-            )}
+                )}
+            </div>
+
+            <div className="min-h-[300px] bg-muted/40 rounded-xl relative overflow-hidden flex items-center justify-center p-2 aspect-square">
+                 {isGenerating && (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-sm font-medium">Generating image...</p>
+                        <p className="text-xs text-center">AI is creating a masterpiece.</p>
+                    </div>
+                )}
+                {generatedImage && (
+                    <div className="animate-fade-in w-full h-full">
+                         <Image
+                            src={generatedImage.imageUrl}
+                            alt="AI generated vehicle image"
+                            fill
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                )}
+                {!isGenerating && !generatedImage && (
+                    <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground text-center">
+                        <ImageIcon className="h-10 w-10 text-muted-foreground/50" />
+                        <p className="font-medium">AI-Generated Image</p>
+                        <p className="text-sm">A creative image based on your vehicle's assessment will appear here.</p>
+                    </div>
+                )}
+            </div>
           </div>
         </CardContent>
-        <CardFooter>
+         <div className="px-6 pb-6">
             <p className="text-xs text-muted-foreground">
-                Disclaimer: The AI assessment is for informational purposes only and is not a substitute for professional mechanical advice.
+                Disclaimer: The AI assessment and generated images are for informational and entertainment purposes only and are not a substitute for professional mechanical advice.
             </p>
-        </CardFooter>
+        </div>
       </form>
     </Card>
   );
