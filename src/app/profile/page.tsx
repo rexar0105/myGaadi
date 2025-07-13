@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload } from "lucide-react";
+import { LogOut, User, Car, IndianRupee, Wrench, Settings, History, Edit, Save, Calendar as CalendarIcon, Phone, MapPin, Droplets, UserCircle, PenLine, Shield, FileText, Upload, HeartPulse, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AppSettings } from "@/components/app-settings";
@@ -38,6 +38,9 @@ const profileSchema = z.object({
     phone: z.string().optional(),
     address: z.string().optional(),
     licenseNumber: z.string().optional(),
+    licenseExpiryDate: z.date().optional(),
+    emergencyContactName: z.string().optional(),
+    emergencyContactPhone: z.string().optional(),
     avatar: z.any().optional(),
 });
 
@@ -50,6 +53,9 @@ const initialProfileData = {
     phone: "+91 98765 43210",
     address: "123, Main Street, New Delhi, India",
     licenseNumber: "DL14 20110012345",
+    licenseExpiryDate: new Date("2030-12-31"),
+    emergencyContactName: "Jane Doe",
+    emergencyContactPhone: "+91 98765 01234",
     avatarUrl: null as string | null,
 };
 
@@ -316,19 +322,59 @@ export default function ProfilePage() {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="licenseNumber"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Driving License Number</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="DL14 20110012345" {...field} />
-                                    </FormControl>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <FormField
+                                control={form.control}
+                                name="licenseNumber"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Driving License Number</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="DL14 20110012345" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="licenseExpiryDate"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col">
+                                    <FormLabel>License Expiry</FormLabel>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full pl-3 text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                            >
+                                            {field.value ? (
+                                                format(field.value, "PPP")
+                                            ) : (
+                                                <span>Pick expiry date</span>
+                                            )}
+                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                        </PopoverContent>
+                                    </Popover>
                                     <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                                    </FormItem>
+                                )}
+                             />
+                        </div>
                         <FormField
                             control={form.control}
                             name="address"
@@ -342,6 +388,36 @@ export default function ProfilePage() {
                                 </FormItem>
                             )}
                         />
+                        <Separator />
+                        <h3 className="text-base font-semibold">Emergency Contact</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                             <FormField
+                                control={form.control}
+                                name="emergencyContactName"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Contact Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Jane Doe" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="emergencyContactPhone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Contact Phone</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="+91 98765 01234" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     </form>
                 </Form>
             ) : (
@@ -384,12 +460,16 @@ export default function ProfilePage() {
                         <p className="font-mono font-semibold text-foreground text-base">{profile.bloodGroup || 'Not set'}</p>
                       </div>
                        <div className="col-span-1">
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">VALID THRU</p>
+                        <p className="font-mono font-semibold text-foreground text-base">{profile.licenseExpiryDate ? format(profile.licenseExpiryDate, "MM/yy") : 'N/A'}</p>
+                      </div>
+                      <div className="col-span-3">
                         <p className="text-xs text-muted-foreground font-semibold tracking-wide">DL NO.</p>
                         <p className="font-mono font-semibold text-foreground text-base">{profile.licenseNumber || 'Not set'}</p>
                       </div>
-                      <div className="col-span-3">
-                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMAIL</p>
-                        <p className="font-medium text-foreground truncate">{user?.email}</p>
+                       <div className="col-span-3">
+                        <p className="text-xs text-muted-foreground font-semibold tracking-wide">EMERGENCY CONTACT</p>
+                        <p className="font-medium text-foreground">{profile.emergencyContactName} ({profile.emergencyContactPhone})</p>
                       </div>
                     </div>
                   </div>
@@ -399,7 +479,7 @@ export default function ProfilePage() {
                 <div className="flex justify-between items-end mt-2">
                     <div className="text-left">
                         <p className="font-mono text-xs text-muted-foreground">Class: ALL</p>
-                        <p className="font-mono text-xs text-muted-foreground">Expires: NEVER</p>
+                        <p className="font-mono text-xs text-muted-foreground">Email: {user?.email}</p>
                     </div>
                     <div className="w-2/5">
                         <p className="font-serif text-2xl text-foreground/80 border-b border-muted-foreground pb-1 text-center italic">{profile.name}</p>
