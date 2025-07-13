@@ -49,13 +49,32 @@ const initialProfileData: ProfileFormValues = {
     address: "123, Main Street, New Delhi, India"
 };
 
-const AppLogoMini = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg width="40" height="40" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm0 2c6.075 0 11 4.925 11 11s-4.925 11-11 11S5 22.075 5 16 9.925 5 16 5z" fill="hsl(var(--primary))" fillOpacity="0.2"/>
-      <path d="M16.064 10.339c-3.153 0-5.71 2.556-5.71 5.71s2.557 5.71 5.71 5.71c3.154 0 5.71-2.556 5.71-5.71s-2.556-5.71-5.71-5.71zm.001 2.057a3.655 3.655 0 110 7.31 3.655 3.655 0 010-7.31z" fill="hsl(var(--primary))" />
-      <path d="M19.982 11.082l2.96 2.457-4.48 5.418-2.96-2.457 4.48-5.418z" fill="hsl(var(--primary))"/>
+const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" {...props}>
+      <rect width="900" height="600" fill="#f93"/>
+      <rect y="200" width="900" height="200" fill="#fff"/>
+      <rect y="400" width="900" height="200" fill="#128807"/>
+      <g transform="translate(450 300)">
+        <circle r="90" fill="#000080"/>
+        <circle r="80" fill="#fff"/>
+        <circle r="3.5" fill="#000080"/>
+        <g id="d">
+          <g id="c">
+            <g id="b">
+              <g id="a">
+                <path d="M0-80V0h40" fill="none" stroke="#000080" strokeWidth="10"/>
+              </g>
+              <use href="#a" transform="rotate(15)"/>
+            </g>
+            <use href="#b" transform="rotate(30)"/>
+          </g>
+          <use href="#c" transform="rotate(60)"/>
+        </g>
+        <use href="#d" transform="rotate(120)"/>
+        <use href="#d" transform="rotate(240)"/>
+      </g>
     </svg>
-)
+  );
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
@@ -260,7 +279,7 @@ export default function ProfilePage() {
                         <p className="font-bold text-primary text-lg tracking-wider">myGaadi ID</p>
                         <p className="text-xs text-muted-foreground font-medium tracking-widest">VIRTUAL ID</p>
                     </div>
-                    <AppLogoMini />
+                    <IndianFlagIcon className="w-12 h-8" />
                 </div>
                 
                 {/* Body */}
