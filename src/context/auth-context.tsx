@@ -23,25 +23,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const initialUser = { id: 'local-user', email: 'user@example.com' };
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfileState] = useState<ProfileState | null>(null);
   const { settings } = useSettings();
 
   useEffect(() => {
-    // Simulate checking auth state
-    const localUser = { id: 'local-user', email: 'user@example.com' };
-    setUser(localUser);
+    // Simulate checking auth state on initial load
+    setUser(initialUser);
 
     const storedProfile = localStorage.getItem('myGaadiProfile');
     if (storedProfile) {
       setProfileState(JSON.parse(storedProfile));
     } else {
+      // Create a default profile only if one doesn't exist in storage
       const defaultProfile: ProfileState = {
-        name: localUser.email.split('@')[0] || "New User",
+        name: initialUser.email.split('@')[0] || "New User",
         avatarUrl: null
       };
       setProfileState(defaultProfile);
+      localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
     }
   }, []);
 

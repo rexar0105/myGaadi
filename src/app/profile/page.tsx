@@ -121,8 +121,8 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, logout, profile, setProfile } = useAuth();
-  const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading: isDataLoading } = useData();
+  const { user, profile, setProfile } = useAuth();
+  const { vehicles, expenses, serviceRecords, documents, insurancePolicies } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -242,7 +242,7 @@ export default function ProfilePage() {
     }
   ];
 
-  if (!profile || isDataLoading) {
+  if (!profile) {
       return <ProfileSkeleton />;
   }
 
