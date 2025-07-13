@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, FileText } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -55,7 +55,7 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 pt-2 pb-1 rounded-lg transition-colors text-muted-foreground w-16",
+        "flex flex-col items-center justify-center gap-1 rounded-lg transition-colors text-muted-foreground w-16 h-14",
         isActive
           ? "text-primary"
           : "hover:text-primary"
@@ -166,7 +166,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t z-50">
         <div className="flex h-full items-center justify-around max-w-lg mx-auto px-2">
             {navItems.map((item) => (
                 <NavLink key={item.href} {...item} />
