@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Car, PlusCircle, Wrench, ShieldCheck, Calendar, Info } from "lucide-react";
+import { Car, PlusCircle, Wrench, ShieldCheck, Calendar, Info, Pencil, Upload } from "lucide-react";
 import { vehicles as initialVehicles, serviceRecords, insurancePolicies } from "@/lib/data";
 import type { Vehicle } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -44,15 +44,81 @@ const vehicleSchema = z.object({
   model: z.string().min(1, "Model is required"),
   year: z.coerce.number().min(1900, "Invalid year").max(new Date().getFullYear() + 1),
   registrationNumber: z.string().min(1, "Registration number is required"),
+  image: z.any().optional(),
 });
+
+type VehicleFormValues = z.infer<typeof vehicleSchema>;
+
+function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSave: (data: VehicleFormValues, vehicleId: string) => void, onCancel: () => void }) {
+    const form = useForm<VehicleFormValues>({
+        resolver: zodResolver(vehicleSchema),
+        defaultValues: {
+            name: vehicle.name,
+            make: vehicle.make,
+            model: vehicle.model,
+            year: vehicle.year,
+            registrationNumber: vehicle.registrationNumber,
+        }
+    });
+
+    const onSubmit = (data: VehicleFormValues) => {
+        onSave(data, vehicle.id);
+    }
+    
+    return (
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Vehicle</DialogTitle>
+                <DialogDescription>Update the details of your vehicle.</DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Vehicle Name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Vehicle Image</FormLabel>
+                            <FormControl>
+                                <Input 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={(e) => field.onChange(e.target.files)}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    <Button type="submit" className="w-full">Save Changes</Button>
+                </form>
+            </Form>
+        </DialogContent>
+    );
+}
+
 
 export default function DashboardPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
-  const [isDialogOpen, setDialogOpen] = useState(false);
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof vehicleSchema>>({
+  const addVehicleForm = useForm<z.infer<typeof vehicleSchema>>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
       name: "",
@@ -63,11 +129,16 @@ export default function DashboardPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof vehicleSchema>) {
+  function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
     const newVehicle: Vehicle = {
       id: `v${vehicles.length + 1}`,
-      ...values,
+      name: values.name,
+      make: values.make,
+      model: values.model,
+      year: values.year,
+      registrationNumber: values.registrationNumber,
       imageUrl: "https://placehold.co/600x400.png",
+      customImageUrl: values.image?.[0] ? URL.createObjectURL(values.image[0]) : undefined,
       dataAiHint: `${values.make.toLowerCase()} ${values.model.toLowerCase()}`,
     };
     setVehicles((prev) => [...prev, newVehicle]);
@@ -75,12 +146,33 @@ export default function DashboardPage() {
       title: "Vehicle Added!",
       description: `${values.name} has been added to your garage.`,
     });
-    setDialogOpen(false);
-    form.reset();
+    setAddDialogOpen(false);
+    addVehicleForm.reset();
+  }
+
+  const handleEditVehicleSave = (data: VehicleFormValues, vehicleId: string) => {
+    setVehicles(prev => prev.map(v => {
+        if (v.id === vehicleId) {
+            const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : v.customImageUrl;
+            return {
+                ...v,
+                ...data,
+                customImageUrl: newImageUrl,
+            }
+        }
+        return v;
+    }));
+    toast({
+        title: "Vehicle Updated!",
+        description: "Your vehicle details have been saved."
+    })
+    setEditingVehicle(null);
   }
 
   const handleCardClick = (vehicleId: string) => {
-    setFlippedCardId(prevId => prevId === vehicleId ? null : vehicleId);
+    if (!editingVehicle) {
+        setFlippedCardId(prevId => prevId === vehicleId ? null : vehicleId);
+    }
   }
 
   return (
@@ -92,7 +184,7 @@ export default function DashboardPage() {
             </h1>
             <p className="text-muted-foreground">Manage all your registered vehicles.</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <PlusCircle />
@@ -106,10 +198,10 @@ export default function DashboardPage() {
                 Enter the details of your new vehicle.
               </DialogDescription>
             </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Form {...addVehicleForm}>
+              <form onSubmit={addVehicleForm.handleSubmit(onAddVehicleSubmit)} className="space-y-4">
                 <FormField
-                  control={form.control}
+                  control={addVehicleForm.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
@@ -121,9 +213,26 @@ export default function DashboardPage() {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                    control={addVehicleForm.control}
+                    name="image"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Vehicle Image (Optional)</FormLabel>
+                        <FormControl>
+                            <Input 
+                                type="file" 
+                                accept="image/*"
+                                onChange={(e) => field.onChange(e.target.files)}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={addVehicleForm.control}
                     name="make"
                     render={({ field }) => (
                       <FormItem>
@@ -136,7 +245,7 @@ export default function DashboardPage() {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={addVehicleForm.control}
                     name="model"
                     render={({ field }) => (
                       <FormItem>
@@ -151,7 +260,7 @@ export default function DashboardPage() {
                 </div>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
-                    control={form.control}
+                    control={addVehicleForm.control}
                     name="year"
                     render={({ field }) => (
                       <FormItem>
@@ -164,7 +273,7 @@ export default function DashboardPage() {
                     )}
                   />
                   <FormField
-                    control={form.control}
+                    control={addVehicleForm.control}
                     name="registrationNumber"
                     render={({ field }) => (
                       <FormItem>
@@ -183,6 +292,11 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
       </div>
+
+       <Dialog open={!!editingVehicle} onOpenChange={(isOpen) => !isOpen && setEditingVehicle(null)}>
+           {editingVehicle && <EditVehicleForm vehicle={editingVehicle} onSave={handleEditVehicleSave} onCancel={() => setEditingVehicle(null)} />}
+       </Dialog>
+
 
       <div className="grid gap-8">
         <Card className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
@@ -206,9 +320,20 @@ export default function DashboardPage() {
                     <div className={cn("card-flipper w-full h-full relative", flippedCardId === vehicle.id && "is-flipped")}>
                       {/* Front of Card */}
                       <div className="card-front absolute w-full h-full rounded-lg border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm">
+                          <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-2 right-2 z-10 h-8 w-8 bg-black/30 hover:bg-black/50 text-white hover:text-white"
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingVehicle(vehicle);
+                              }}
+                          >
+                              <Pencil className="h-4 w-4" />
+                          </Button>
                           <div className="overflow-hidden rounded-t-lg">
                               <Image
-                                  src={vehicle.imageUrl}
+                                  src={vehicle.customImageUrl || vehicle.imageUrl}
                                   alt={vehicle.name}
                                   width={400}
                                   height={200}

@@ -6,6 +6,7 @@ export type Vehicle = {
   year: number;
   registrationNumber: string;
   imageUrl: string;
+  customImageUrl?: string;
   dataAiHint: string;
 };
 
