@@ -39,12 +39,14 @@ const navItems = [
 function NavLink({ href, icon: Icon, label, isActive }: { href: string; icon: React.ElementType; label: string, isActive: boolean }) {
   if (href === '/assessment') {
     return (
+      <div className="group">
         <Link
             href={href}
-            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105 animate-twinkle"
+            className="relative -top-6 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
         >
-            <Icon className="h-8 w-8" />
+            <Icon className="h-8 w-8 group-hover:animate-twinkle" />
         </Link>
+      </div>
     );
   }
 
@@ -52,7 +54,7 @@ function NavLink({ href, icon: Icon, label, isActive }: { href: string; icon: Re
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1.5 rounded-lg p-2 transition-colors text-muted-foreground w-16 h-16 hover:text-primary",
+        "flex flex-col items-center justify-center gap-1 p-2 transition-colors text-muted-foreground w-16 h-16 hover:text-primary",
       )}
     >
       <div className={cn(
