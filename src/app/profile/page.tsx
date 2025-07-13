@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { useData } from "@/context/data-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { ProfileState } from "@/context/auth-context";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters."),
@@ -47,11 +48,6 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-export type ProfileState = Omit<ProfileFormValues, 'avatar' | 'dob' | 'licenseExpiryDate'> & {
-    dob?: string, // Stored as ISO string
-    licenseExpiryDate?: string, // Stored as ISO string
-    avatarUrl: string | null
-};
 
 const IndianFlagIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" {...props}>
@@ -121,8 +117,8 @@ function ProfileSkeleton() {
 }
 
 export default function ProfilePage() {
-  const { user, profile, setProfile, logout } = useAuth();
-  const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading } = useData();
+  const { user, profile, setProfile, logout, isAuthLoading } = useAuth();
+  const { vehicles, expenses, serviceRecords, documents, insurancePolicies, isLoading: isDataLoading } = useData();
   const router = useRouter();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -147,7 +143,7 @@ export default function ProfilePage() {
         avatar: undefined,
       });
     }
-  }, [profile, form]);
+  }, [profile, form, isEditing]);
 
 
   const handleLogout = () => {
@@ -190,60 +186,43 @@ export default function ProfilePage() {
         description: "Your information has been saved successfully."
     });
   }
+  
+  const stats = useMemo(() => {
+    const totalVehicles = vehicles.length;
+    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalServices = serviceRecords.length;
+    const totalDocuments = documents.length;
 
-  const totalVehicles = vehicles.length;
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const totalServices = serviceRecords.length;
-  const totalDocuments = documents.length;
+    const upcomingRenewalsCount = insurancePolicies.filter(p => {
+        if (!p.expiryDate || isPast(new Date(p.expiryDate))) return false;
+        const daysLeft = differenceInDays(new Date(p.expiryDate), new Date());
+        return daysLeft >= 0 && daysLeft <= 30;
+      }).length;
 
-  const upcomingRenewalsCount = insurancePolicies.filter(p => {
-    if (isPast(new Date(p.expiryDate))) return false;
-    const daysLeft = differenceInDays(new Date(p.expiryDate), new Date());
-    return daysLeft <= 30;
-  }).length;
+    const nextServiceDueDays = serviceRecords
+      .filter(s => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
+      .map(s => differenceInDays(new Date(s.nextDueDate!), new Date()))
+      .sort((a, b) => a - b)[0];
 
-  const nextServiceDueDays = useMemo(() => serviceRecords
-    .filter(s => s.nextDueDate && !isPast(new Date(s.nextDueDate)))
-    .map(s => differenceInDays(new Date(s.nextDueDate!), new Date()))
-    .sort((a, b) => a - b)[0], [serviceRecords]);
+    return [
+      { icon: Car, label: "Total Vehicles", value: totalVehicles },
+      { icon: IndianRupee, label: "Total Expenses", value: `₹${totalExpenses.toLocaleString('en-IN')}` },
+      { icon: Wrench, label: "Services Logged", value: totalServices },
+      { icon: File, label: "Documents Stored", value: totalDocuments },
+      { icon: AlertTriangle, label: "Upcoming Renewals", value: upcomingRenewalsCount },
+      { icon: CalendarIcon, label: "Next Service Due", value: nextServiceDueDays !== undefined ? `${nextServiceDueDays} days` : "N/A" }
+    ];
+  }, [vehicles, expenses, serviceRecords, insurancePolicies, documents]);
 
-
-  const stats = useMemo(() => [
-    {
-      icon: Car,
-      label: "Total Vehicles",
-      value: totalVehicles,
-    },
-    {
-      icon: IndianRupee,
-      label: "Total Expenses",
-      value: `₹${totalExpenses.toLocaleString('en-IN')}`,
-    },
-    {
-      icon: Wrench,
-      label: "Services Logged",
-      value: totalServices,
-    },
-    {
-      icon: File,
-      label: "Documents Stored",
-      value: totalDocuments
-    },
-    {
-      icon: AlertTriangle,
-      label: "Upcoming Renewals",
-      value: upcomingRenewalsCount
-    },
-    {
-      icon: CalendarIcon,
-      label: "Next Service Due",
-      value: nextServiceDueDays !== undefined ? `${nextServiceDueDays} days` : "N/A"
-    }
-  ], [totalVehicles, totalExpenses, totalServices, totalDocuments, upcomingRenewalsCount, nextServiceDueDays]);
-
-  if (isLoading || !profile) {
+  if (isAuthLoading || isDataLoading) {
       return <ProfileSkeleton />;
   }
+  
+  if (!user || !profile) {
+    // This case should ideally not be hit if routing and context are correct, but it's a good fallback.
+    return <ProfileSkeleton />;
+  }
+
 
   return (
     <div className="p-4 md:p-8 animate-fade-in">
@@ -621,3 +600,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

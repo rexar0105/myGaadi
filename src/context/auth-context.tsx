@@ -2,13 +2,25 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import type { ProfileState } from "@/app/profile/page";
 import { useSettings } from "./settings-context";
 
 interface User {
   id: string;
   email: string;
 }
+
+export type ProfileState = {
+  name: string;
+  dob?: string;
+  bloodGroup?: string;
+  phone?: string;
+  address?: string;
+  licenseNumber?: string;
+  licenseExpiryDate?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  avatarUrl: string | null;
+};
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -23,6 +35,11 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const defaultProfile: ProfileState = {
+    name: "User",
+    avatarUrl: null,
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -42,57 +59,61 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (storedProfile) {
         setProfileState(JSON.parse(storedProfile));
       } else {
-        const defaultProfile: ProfileState = {
+        const newDefaultProfile: ProfileState = {
           name: localUser.email.split('@')[0] || "New User",
           avatarUrl: null,
         };
-        setProfileState(defaultProfile);
-        localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+        setProfileState(newDefaultProfile);
+        localStorage.setItem('myGaadiProfile', JSON.stringify(newDefaultProfile));
       }
     } catch (e) {
       console.error("Failed to load or create profile", e);
-      const defaultProfile: ProfileState = {
+      const newDefaultProfile: ProfileState = {
           name: localUser.email.split('@')[0] || "New User",
           avatarUrl: null
       };
-      setProfileState(defaultProfile);
+      setProfileState(newDefaultProfile);
     } finally {
        setIsAuthLoading(false);
     }
   }, []);
 
   const loginWithEmail = async (email: string, pass: string): Promise<boolean> => {
+    setIsAuthLoading(true);
     const localUser = { id: 'local-user', email };
     setUser(localUser);
     
-    const defaultProfile: ProfileState = {
+    const newDefaultProfile: ProfileState = {
         name: email.split('@')[0] || "New User",
         avatarUrl: null
     };
-    setProfileState(defaultProfile);
-    localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+    setProfileState(newDefaultProfile);
+    localStorage.setItem('myGaadiProfile', JSON.stringify(newDefaultProfile));
+    setIsAuthLoading(false);
     return true;
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
+    setIsAuthLoading(true);
     const localUser = { id: 'local-user', email: 'user@example.com' };
     setUser(localUser);
 
-    const defaultProfile: ProfileState = {
+    const newDefaultProfile: ProfileState = {
         name: localUser.email.split('@')[0] || "New User",
         avatarUrl: null
     };
-    setProfileState(defaultProfile);
-    localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+    setProfileState(newDefaultProfile);
+    localStorage.setItem('myGaadiProfile', JSON.stringify(newDefaultProfile));
+    setIsAuthLoading(false);
     return true;
   };
 
   const signup = async (email: string, pass: string) => {
-     const defaultProfile: ProfileState = {
+     const newDefaultProfile: ProfileState = {
         name: email.split('@')[0] || "New User",
         avatarUrl: null
      };
-     localStorage.setItem('myGaadiProfile', JSON.stringify(defaultProfile));
+     localStorage.setItem('myGaadiProfile', JSON.stringify(newDefaultProfile));
   };
 
   const setProfile = useCallback((newProfile: ProfileState) => {
@@ -118,7 +139,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAuthLoading, user, profile, setProfile, loginWithEmail, signup, logout, loginWithGoogle }}>
+    <AuthContext.Provider value={{ 
+        isAuthenticated, 
+        isAuthLoading, 
+        user, 
+        profile, 
+        setProfile, 
+        loginWithEmail, 
+        signup, 
+        logout, 
+        loginWithGoogle 
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -131,3 +162,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+    
