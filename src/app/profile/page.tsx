@@ -303,6 +303,8 @@ export default function ProfilePage() {
             </CardContent>
         </Card>
 
+        <MyDocuments />
+
         <Card className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
             <CardHeader>
                 <CardTitle className="font-headline text-xl flex items-center gap-2"><Settings/> App Settings</CardTitle>
@@ -312,8 +314,6 @@ export default function ProfilePage() {
               <ThemeSwitcher />
             </CardContent>
         </Card>
-
-        <MyDocuments />
 
         <div className="flex justify-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
             <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">
