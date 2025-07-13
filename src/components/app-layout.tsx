@@ -42,18 +42,13 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
 
   if (href === '/assessment') {
     return (
-        <div className="flex items-center justify-center">
-            <Link
-                href={href}
-                className={cn(
-                "group flex items-center justify-center rounded-full transition-all text-sm font-medium bg-primary text-primary-foreground shadow-lg hover:bg-primary/90",
-                "h-16 w-16"
-                )}
-            >
-                <Icon className="h-8 w-8 group-hover:animate-twinkle" />
-                <span className="sr-only">{label}</span>
-            </Link>
-      </div>
+        <Link
+            href={href}
+            className="relative -top-6 flex flex-col items-center justify-center gap-1.5 h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+        >
+            <Icon className="h-7 w-7" />
+            <span className="text-xs font-medium">{label}</span>
+        </Link>
     );
   }
 
@@ -61,14 +56,14 @@ function NavLink({ href, icon: Icon, label }: { href: string; icon: React.Elemen
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 rounded-lg transition-colors text-muted-foreground hover:bg-accent/50 h-16 w-16",
+        "flex flex-col items-center justify-center gap-1 pt-2 pb-1 rounded-lg transition-colors text-muted-foreground w-16",
         isActive
-          ? "text-primary bg-accent/80"
+          ? "text-primary"
           : "hover:text-primary"
       )}
     >
       <Icon className="h-6 w-6" />
-      <span className="text-sm font-medium text-center">{label}</span>
+      <span className="text-xs font-medium text-center">{label}</span>
     </Link>
   );
 }
@@ -170,10 +165,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto pb-28 bg-muted/40">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
 
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-        <div className="flex h-24 w-auto items-center justify-center bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-6 gap-4">
+      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div className="flex h-full items-center justify-around max-w-lg mx-auto px-2">
             {navItems.map((item) => (
                 <NavLink key={item.href} {...item} />
             ))}
