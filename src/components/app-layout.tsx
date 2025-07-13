@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, FileText } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { serviceRecords, insurancePolicies } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -109,10 +109,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         return daysLeft <= 30;
     })
   ].length;
-  
-  const navGrid = {
-    gridTemplateColumns: `repeat(${navItems.length}, 1fr)`
-  }
 
   return (
     <TooltipProvider>
@@ -160,10 +156,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto pb-24 bg-muted/40">{children}</main>
+      <main className="flex-1 overflow-y-auto pb-28 bg-muted/40">{children}</main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:border-none md:bg-transparent md:backdrop-blur-none md:relative">
-        <div className="grid h-20 max-w-lg mx-auto items-center justify-around md:bg-background/95 md:backdrop-blur-sm md:rounded-full md:border md:bottom-4 md:fixed md:left-1/2 md:-translate-x-1/2 md:px-2 md:gap-2" style={navGrid}>
+      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+        <div className="grid grid-cols-5 h-20 max-w-lg mx-auto items-center justify-around bg-background/95 backdrop-blur-sm rounded-full border shadow-lg px-2 gap-2">
             {navItems.map((item) => (
                 <NavLink key={item.href} {...item} />
             ))}

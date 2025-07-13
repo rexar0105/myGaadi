@@ -121,7 +121,7 @@ export default function DashboardPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="make"
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                     )}
                   />
                 </div>
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="year"
@@ -205,8 +205,8 @@ export default function DashboardPage() {
                   >
                     <div className={cn("card-flipper w-full h-full relative", flippedCardId === vehicle.id && "is-flipped")}>
                       {/* Front of Card */}
-                      <div className="card-front absolute w-full h-full rounded-2xl border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm">
-                          <div className="overflow-hidden rounded-t-2xl">
+                      <div className="card-front absolute w-full h-full rounded-lg border bg-card hover:border-primary/50 transition-colors group cursor-pointer shadow-sm">
+                          <div className="overflow-hidden rounded-t-lg">
                               <Image
                                   src={vehicle.imageUrl}
                                   alt={vehicle.name}
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Back of Card */}
-                      <div className="card-back absolute w-full h-full rounded-2xl border bg-card p-4 flex flex-col gap-3 justify-center shadow-sm">
+                      <div className="card-back absolute w-full h-full rounded-lg border bg-card p-4 flex flex-col gap-3 justify-center shadow-sm">
                           <h3 className="font-bold text-xl font-headline text-center -mt-4">{vehicle.name}</h3>
                            <div className="space-y-3 text-sm">
                              {lastService && (

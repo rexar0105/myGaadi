@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, PlusCircle, Upload, Car, Trash2 } from "lucide-react";
+import { FileText, PlusCircle, Car, Trash2 } from "lucide-react";
 import { documents as initialDocuments, vehicles } from "@/lib/data";
 import type { Document } from "@/lib/types";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { cn } from "@/lib/utils";
 
 const documentSchema = z.object({
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
@@ -92,7 +91,7 @@ function AddDocumentForm({
         <h4 className="font-semibold text-sm mb-3">Add New Document</h4>
         <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4 items-end">
             <FormField
                 control={form.control}
                 name="documentType"

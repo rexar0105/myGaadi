@@ -123,7 +123,7 @@ export function ConditionAssessment() {
              <div className="aspect-video w-full">
                 <Label
                 htmlFor="photo-upload"
-                className="w-full h-full border-2 border-dashed rounded-xl flex flex-col justify-center items-center cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20"
+                className="w-full h-full border-2 border-dashed rounded-lg flex flex-col justify-center items-center cursor-pointer hover:bg-muted/50 transition-colors bg-muted/20"
                 >
                 {previewUrl ? (
                     <Image
@@ -167,8 +167,8 @@ export function ConditionAssessment() {
             </Button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 items-start">
-            <div className="bg-muted/40 p-4 rounded-xl relative overflow-y-auto aspect-square flex flex-col">
+          <div className="grid sm:grid-cols-2 gap-6 items-start">
+            <div className="bg-muted/40 p-4 rounded-lg relative overflow-y-auto aspect-square flex flex-col">
                 {isAssessing && (
                     <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground flex-1">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -208,7 +208,7 @@ export function ConditionAssessment() {
                 )}
             </div>
 
-            <div className="bg-muted/40 rounded-xl relative overflow-hidden flex items-center justify-center p-2 aspect-square">
+            <div className="bg-muted/40 rounded-lg relative overflow-hidden flex items-center justify-center p-2 aspect-square">
                  {isGenerating && (
                     <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
