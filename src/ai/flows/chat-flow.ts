@@ -8,9 +8,9 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z, generate} from 'genkit';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy } from '@/lib/types';
-import { generate } from 'genkit/generate';
+
 
 // Define tool schemas
 const VehicleInfoInputSchema = z.object({
