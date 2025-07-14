@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { IndianRupee, LayoutDashboard, ShieldCheck, Sparkles, User, Wrench, Bell, History, Loader2 } from "lucide-react";
+import { IndianRupee, LayoutDashboard, ShieldCheck, User, Wrench, Bell, History, Loader2, Bot } from "lucide-react";
 import { differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-provider";
@@ -30,7 +30,7 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/services", label: "Services", icon: Wrench },
-  { href: "/assessment", label: "AI Hub", icon: Sparkles, isCentral: true },
+  { href: "/assessment", label: "AI Hub", icon: Bot, isCentral: true },
   { href: "/expenses", label: "Expenses", icon: IndianRupee },
   { href: "/insurance", label: "Insurance", icon: ShieldCheck },
 ];
