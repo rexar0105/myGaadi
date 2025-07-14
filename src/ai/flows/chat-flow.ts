@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A conversational AI agent for querying vehicle data.
@@ -10,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z, generate} from 'genkit';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy } from '@/lib/types';
+import { VehicleSchema, ServiceRecordSchema, ExpenseSchema, InsurancePolicySchema } from '@/ai/schemas';
 
 
 // Define tool schemas
@@ -35,10 +37,10 @@ const InsuranceInfoInputSchema = z.object({
 // Define flow input schema, which includes the user's data
 const ChatWithGaadiInputSchema = z.object({
   query: z.string().describe("The user's question or message."),
-  vehicles: z.array(z.any()).describe("A list of the user's vehicles."),
-  serviceRecords: z.array(z.any()).describe("A list of the user's service records."),
-  expenses: z.array(z.any()).describe("A list of the user's expenses."),
-  insurancePolicies: z.array(z.any()).describe("A list of the user's insurance policies."),
+  vehicles: z.array(VehicleSchema).describe("A list of the user's vehicles."),
+  serviceRecords: z.array(ServiceRecordSchema).describe("A list of the user's service records."),
+  expenses: z.array(ExpenseSchema).describe("A list of the user's expenses."),
+  insurancePolicies: z.array(InsurancePolicySchema).describe("A list of the user's insurance policies."),
 });
 export type ChatWithGaadiInput = z.infer<typeof ChatWithGaadiInputSchema>;
 
@@ -70,7 +72,7 @@ const chatWithGaadiFlow = ai.defineFlow(
           name: 'getVehicleInfo',
           description: 'Get information about the user\'s vehicles, like make, model, year, and registration number.',
           inputSchema: VehicleInfoInputSchema,
-          outputSchema: z.array(z.any()),
+          outputSchema: z.array(VehicleSchema),
         },
         async ({ vehicleName }) => {
             if (vehicleName) {
@@ -85,7 +87,7 @@ const chatWithGaadiFlow = ai.defineFlow(
             name: 'getServiceHistory',
             description: 'Get the service history for vehicles, including dates, costs, and work performed.',
             inputSchema: ServiceInfoInputSchema,
-            outputSchema: z.array(z.any()),
+            outputSchema: z.array(ServiceRecordSchema),
         },
         async ({ vehicleName, query }) => {
             let results: ServiceRecord[] = serviceRecords;
@@ -106,7 +108,7 @@ const chatWithGaadiFlow = ai.defineFlow(
             name: 'getExpenseHistory',
             description: 'Get the expense history for vehicles, including amounts, categories, and dates.',
             inputSchema: ExpenseInfoInputSchema,
-            outputSchema: z.array(z.any()),
+            outputSchema: z.array(ExpenseSchema),
         },
         async ({ vehicleName, category }) => {
             let results: Expense[] = expenses;
@@ -127,7 +129,7 @@ const chatWithGaadiFlow = ai.defineFlow(
             name: 'getInsuranceInfo',
             description: 'Get insurance policy details for vehicles, like provider and expiry dates.',
             inputSchema: InsuranceInfoInputSchema,
-            outputSchema: z.array(z.any()),
+            outputSchema: z.array(InsurancePolicySchema),
         },
         async ({ vehicleName }) => {
             if (vehicleName) {

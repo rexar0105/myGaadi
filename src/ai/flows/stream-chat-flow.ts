@@ -11,6 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import type { Vehicle, ServiceRecord, Expense, InsurancePolicy } from '@/lib/types';
 import { generate } from 'genkit';
+import { VehicleSchema, ServiceRecordSchema, ExpenseSchema, InsurancePolicySchema } from '@/ai/schemas';
 
 // Tool schemas from the non-streaming version can be reused.
 const VehicleInfoInputSchema = z.object({
@@ -38,10 +39,10 @@ const StreamChatInputSchema = z.object({
     sender: z.enum(["user", "bot"]),
     text: z.string(),
   })).describe("The history of the conversation so far."),
-  vehicles: z.array(z.any()).describe("A list of the user's vehicles."),
-  serviceRecords: z.array(z.any()).describe("A list of the user's service records."),
-  expenses: z.array(z.any()).describe("A list of the user's expenses."),
-  insurancePolicies: z.array(z.any()).describe("A list of the user's insurance policies."),
+  vehicles: z.array(VehicleSchema).describe("A list of the user's vehicles."),
+  serviceRecords: z.array(ServiceRecordSchema).describe("A list of the user's service records."),
+  expenses: z.array(ExpenseSchema).describe("A list of the user's expenses."),
+  insurancePolicies: z.array(InsurancePolicySchema).describe("A list of the user's insurance policies."),
 });
 export type StreamChatInput = z.infer<typeof StreamChatInputSchema>;
 
@@ -57,7 +58,7 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
         name: 'getVehicleInfo',
         description: 'Get information about the user\'s vehicles, like make, model, year, and registration number.',
         inputSchema: VehicleInfoInputSchema,
-        outputSchema: z.array(z.any()),
+        outputSchema: z.array(VehicleSchema),
       },
       async ({ vehicleName }) => {
           if (vehicleName) {
@@ -72,7 +73,7 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
           name: 'getServiceHistory',
           description: 'Get the service history for vehicles, including dates, costs, and work performed.',
           inputSchema: ServiceInfoInputSchema,
-          outputSchema: z.array(z.any()),
+          outputSchema: z.array(ServiceRecordSchema),
       },
       async ({ vehicleName, query }) => {
           let results: ServiceRecord[] = serviceRecords;
@@ -93,7 +94,7 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
           name: 'getExpenseHistory',
           description: 'Get the expense history for vehicles, including amounts, categories, and dates.',
           inputSchema: ExpenseInfoInputSchema,
-          outputSchema: z.array(z.any()),
+          outputSchema: z.array(ExpenseSchema),
       },
       async ({ vehicleName, category }) => {
           let results: Expense[] = expenses;
@@ -114,7 +115,7 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
           name: 'getInsuranceInfo',
           description: 'Get insurance policy details for vehicles, like provider and expiry dates.',
           inputSchema: InsuranceInfoInputSchema,
-          outputSchema: z.array(z.any()),
+          outputSchema: z.array(InsurancePolicySchema),
       },
       async ({ vehicleName }) => {
           if (vehicleName) {
