@@ -587,7 +587,7 @@ export default function ProfilePage() {
         </Card>
 
         <div className="flex justify-center animate-fade-in-up" style={{ animationDelay: '500ms' }}>
-            <Button variant="destructive" onClick={handleLogout} className="w-full sm:w-auto">
+            <Button onClick={handleLogout} className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
             </Button>

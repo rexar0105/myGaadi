@@ -139,14 +139,14 @@ export function AppSettings() {
          <p className="text-xs text-muted-foreground mt-2 px-1">
             If enabled, temporary data (like which notification alerts have been shown) will be cleared when you log out.
         </p>
-         <div className="flex items-center justify-between rounded-lg border border-destructive/50 p-3">
+         <div className="flex items-center justify-between rounded-lg border border-red-500/50 dark:border-red-500/30 p-3 bg-red-500/5 dark:bg-red-500/10">
             <div>
-              <Label className="text-destructive">Reset App</Label>
-              <p className="text-xs text-destructive/80">Permanently delete all data.</p>
+              <Label className="text-red-600 dark:text-red-500">Reset App</Label>
+              <p className="text-xs text-red-600/80 dark:text-red-500/80">Permanently delete all data.</p>
             </div>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive">Clear All Data</Button>
+                <Button className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-500 dark:hover:bg-red-600 dark:text-white">Clear All Data</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -157,7 +157,7 @@ export function AppSettings() {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleClearData}>
+                  <AlertDialogAction className="bg-red-600 hover:bg-red-700" onClick={handleClearData}>
                     Yes, delete everything
                   </AlertDialogAction>
                 </AlertDialogFooter>
