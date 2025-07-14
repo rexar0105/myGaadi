@@ -45,7 +45,7 @@ const vehicleSchema = z.object({
   make: z.string().min(2, "Make is required."),
   model: z.string().min(1, "Model is required."),
   year: z.coerce.number().min(1900, "Invalid year").max(new Date().getFullYear() + 1, `Year can't be in the future.`),
-  registrationNumber: z.string().min(4, "Registration number seems too short.").regex(/^[A-Z]{2}[ -]?[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[ -]?[0-9]{4}$/i, "Invalid registration number format."),
+  registrationNumber: z.string().min(4, "Registration number seems too short.").regex(/^[A-Z]{2}[ -]?[0-9]{1,2}(?:[A-Z])?(?:[A-Z]*)?[ -]?[0-9]{4}$/i, "Invalid registration number format.").transform((val) => val.toUpperCase()),
   image: z.any().optional(),
 });
 
@@ -177,7 +177,7 @@ function EditVehicleForm({ vehicle, onSave, onCancel }: { vehicle: Vehicle, onSa
                                 <FormItem>
                                     <FormLabel>Registration No.</FormLabel>
                                     <FormControl>
-                                    <Input placeholder="MH 12 AB 3456" {...field} />
+                                    <Input placeholder="MH 12 AB 3456" {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -275,7 +275,7 @@ function DashboardPageComponent() {
       make: values.make,
       model: values.model,
       year: values.year,
-      registrationNumber: values.registrationNumber.toUpperCase(),
+      registrationNumber: values.registrationNumber,
       imageUrl: "https://placehold.co/600x400.png",
       customImageUrl: values.image?.[0] ? URL.createObjectURL(values.image[0]) : undefined,
       dataAiHint: `${values.make.toLowerCase()} ${values.model.toLowerCase()}`,
@@ -293,7 +293,6 @@ function DashboardPageComponent() {
     const newImageUrl = data.image?.[0] ? URL.createObjectURL(data.image[0]) : (vehicles.find(v => v.id === vehicleId)?.customImageUrl);
     const updatedData = {
         ...data,
-        registrationNumber: data.registrationNumber.toUpperCase(),
         customImageUrl: newImageUrl,
     }
     updateVehicle(vehicleId, updatedData);
@@ -432,7 +431,7 @@ function DashboardPageComponent() {
                       <FormItem>
                         <FormLabel>Registration No.</FormLabel>
                         <FormControl>
-                          <Input placeholder="MH 12 AB 3456" {...field} />
+                          <Input placeholder="MH 12 AB 3456" {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -560,3 +559,5 @@ function DashboardPageComponent() {
 
 const DashboardPage = React.memo(DashboardPageComponent);
 export default DashboardPage;
+
+    

@@ -51,6 +51,7 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAppContext } from "@/context/app-provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const insuranceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
@@ -61,9 +62,34 @@ const insuranceSchema = z.object({
   }),
 });
 
+function InsuranceSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between items-baseline mb-1">
+                        <div>
+                            <Skeleton className="h-5 w-40 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                        <Skeleton className="h-5 w-24" />
+                      </div>
+                      <Skeleton className="h-2 w-full" />
+                       <Skeleton className="h-4 w-1/4 mt-2" />
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
+    )
+}
 
 function InsurancePageComponent() {
-    const { vehicles, insurancePolicies, addInsurancePolicy } = useAppContext();
+    const { vehicles, insurancePolicies, addInsurancePolicy, isLoading } = useAppContext();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
 
@@ -215,6 +241,7 @@ function InsurancePageComponent() {
                     </DialogContent>
                 </Dialog>
             </div>
+            {isLoading ? <InsuranceSkeleton /> : (
             <Card className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
               <CardHeader>
                 <CardTitle className="font-headline flex items-center gap-2 text-xl">
@@ -263,9 +290,12 @@ function InsurancePageComponent() {
                 )}
               </CardContent>
             </Card>
+            )}
         </div>
     )
 }
 
 const InsurancePage = React.memo(InsurancePageComponent);
 export default InsurancePage;
+
+    

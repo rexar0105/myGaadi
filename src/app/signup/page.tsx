@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -40,19 +41,34 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup, loginWithGoogle } = useAppContext();
+  const [isLoading, setIsLoading] = useState(false);
+  const { signup, loginWithEmail, loginWithGoogle } = useAppContext();
   const router = useRouter();
   const { toast } = useToast();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await signup(email, password);
-      toast({
-        title: "Signup Successful",
-        description: "You can now log in with your new account.",
-      });
-      router.push("/login");
+      // Automatically log the user in after successful signup
+      const loginSuccess = await loginWithEmail(email, password);
+
+      if (loginSuccess) {
+        toast({
+            title: "Signup Successful",
+            description: "Welcome to myGaadi!",
+        });
+        router.push("/");
+      } else {
+        // This case is unlikely but handled for safety
+         toast({
+            title: "Signup Successful, Login Failed",
+            description: "Your account was created, but we couldn't log you in. Please go to the login page.",
+        });
+        router.push("/login");
+      }
+      
     } catch (error) {
         const message = error instanceof Error ? error.message : "An unexpected error occurred.";
         toast({
@@ -60,10 +76,13 @@ export default function SignupPage() {
             title: "Signup Failed",
             description: message,
         });
+    } finally {
+        setIsLoading(false);
     }
   };
 
   const handleGoogleSignup = async () => {
+    setIsLoading(true);
     const success = await loginWithGoogle();
     if (success) {
         toast({
@@ -78,6 +97,7 @@ export default function SignupPage() {
             description: "Could not sign up with Google.",
         });
     }
+    setIsLoading(false);
   }
 
 
@@ -94,7 +114,7 @@ export default function SignupPage() {
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
-            <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignup}>
+            <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignup} disabled={isLoading}>
                 <GoogleIcon className="mr-2" />
                 Sign up with Google
             </Button>
@@ -112,6 +132,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -123,9 +144,11 @@ export default function SignupPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="animate-spin" />}
               Sign Up
             </Button>
           </CardContent>
@@ -142,3 +165,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+    

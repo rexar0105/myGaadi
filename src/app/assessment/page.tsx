@@ -31,7 +31,7 @@ function ChatAssistant() {
 
   const { messages, setMessages, input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
     onFinish: (message) => {
-        setMessages((prev) => [...prev, {id: `bot-${Date.now()}`, text: message, sender: 'bot'}]);
+        // The final message is now handled directly within the hook
     },
     onError: () => {
         const errorMessage: ChatMessage = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
@@ -47,11 +47,14 @@ function ChatAssistant() {
   }, [messages, currentResponse]);
 
   useEffect(() => {
-    setMessages([
-        { id: 'welcome-1', text: "Hello! I'm Gaadi Mitra, your vehicle's best friend. How can I help you today?", sender: 'bot' },
-        { id: 'welcome-2', text: "You can ask me things like 'When is the next service for my car?' or 'How much did I spend on fuel last month?'.", sender: 'bot'}
-    ]);
-  }, [setMessages]);
+    // Only set welcome messages if there are no messages yet
+    if(messages.length === 0) {
+        setMessages([
+            { id: 'welcome-1', text: "Hello! I'm Gaadi Mitra, your vehicle's best friend. How can I help you today?", sender: 'bot' },
+            { id: 'welcome-2', text: "You can ask me things like 'When is the next service for my car?' or 'How much did I spend on fuel last month?'.", sender: 'bot'}
+        ]);
+    }
+  }, [setMessages, messages.length]);
 
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return "U";
@@ -61,15 +64,6 @@ function ChatAssistant() {
     }
     return nameOrEmail[0].toUpperCase();
   };
-
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: input, sender: 'user' };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    handleSubmit(e);
-  }
     
   return (
     <Card className="flex-1 flex flex-col h-[70vh] shadow-inner">
@@ -83,7 +77,7 @@ function ChatAssistant() {
                 )}
             >
                 {message.sender === "bot" && (
-                <Avatar className="h-8 w-8 bg-primary/20 text-primary">
+                <Avatar className="h-8 w-8 bg-primary/20 text-primary shrink-0">
                     <AvatarFallback><AppLogo /></AvatarFallback>
                 </Avatar>
                 )}
@@ -98,32 +92,28 @@ function ChatAssistant() {
                     <p className="text-sm">{message.text}</p>
                 </div>
                     {message.sender === "user" && (
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-8 w-8 shrink-0">
                             <AvatarImage src={profile?.avatarUrl ?? `https://avatar.vercel.sh/${user?.email}.png`} alt={profile?.name || user?.email || ''} />
                         <AvatarFallback>{getInitials(profile?.name || user?.email || 'U')}</AvatarFallback>
                     </Avatar>
                 )}
             </div>
             ))}
-            {isLoading && currentResponse && (
+            {isLoading && (
                 <div className="flex items-end gap-2 justify-start">
-                    <Avatar className="h-8 w-8 bg-primary/20 text-primary">
+                    <Avatar className="h-8 w-8 bg-primary/20 text-primary shrink-0">
                         <AvatarFallback><AppLogo /></AvatarFallback>
                     </Avatar>
                     <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-muted rounded-bl-none">
-                        <p className="text-sm">{currentResponse}<span className="animate-pulse">▍</span></p>
-                    </div>
-                </div>
-            )}
-             {isLoading && messages[messages.length-1]?.sender === 'user' && !currentResponse && (
-                <div className="flex items-end gap-2 justify-start">
-                    <Avatar className="h-8 w-8 bg-primary/20 text-primary">
-                        <AvatarFallback><AppLogo /></AvatarFallback>
-                    </Avatar>
-                    <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-muted rounded-bl-none flex items-center gap-2">
-                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></span>
-                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></span>
-                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></span>
+                        {currentResponse ? (
+                             <p className="text-sm">{currentResponse}<span className="animate-pulse">▍</span></p>
+                        ) : (
+                        <div className="flex items-center gap-2">
+                             <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></span>
+                             <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></span>
+                             <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></span>
+                        </div>
+                        )}
                     </div>
                 </div>
             )}
@@ -131,7 +121,7 @@ function ChatAssistant() {
         </CardContent>
         
         <div className="p-4 border-t bg-background">
-            <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <Input
                     value={input}
                     onChange={handleInputChange}
@@ -142,6 +132,7 @@ function ChatAssistant() {
                 <Button type="submit" disabled={isLoading || !input.trim()}>
                     <Send className="h-4 w-4" />
                     <span className="sr-only">Send</span>
+
                 </Button>
             </form>
         </div>
@@ -176,3 +167,5 @@ export default function AssessmentPage() {
         </div>
     )
 }
+
+    

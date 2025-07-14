@@ -32,23 +32,22 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!input.trim() || isLoading) return;
+        if (!input.trim()) return;
 
+        const userInput = input;
+        const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: userInput, sender: 'user' };
+        
+        // Add user message to state and start loading, then clear input
+        setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
         setCurrentResponse('');
-        const userInput = input;
-        
-        // Add user's message to history before clearing input
-        const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: userInput, sender: 'user' };
-        const updatedHistory = [...messages, userMessage];
-
         setInput('');
 
         try {
             const fullResponse = await streamChat(
                 {
                     query: userInput,
-                    history: updatedHistory,
+                    history: messages.map(m => ({ text: m.text, sender: m.sender})), // Pass clean history
                     vehicles,
                     serviceRecords,
                     expenses,
@@ -62,11 +61,16 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
             // Create the final bot message once streaming is complete
             const botMessage: ChatMessage = { id: `bot-${Date.now()}`, text: fullResponse, sender: 'bot' };
             setMessages(prev => [...prev, botMessage]);
+            if(onFinish) {
+                onFinish(fullResponse);
+            }
 
         } catch (error) {
             console.error("Chat streaming error:", error);
             const err = error instanceof Error ? error : new Error('An unknown error occurred.');
-            onError(err);
+            if (onError) {
+              onError(err);
+            }
             toast({
                 variant: "destructive",
                 title: "Oh no! Something went wrong.",
@@ -88,3 +92,5 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
         currentResponse,
     };
 }
+
+    

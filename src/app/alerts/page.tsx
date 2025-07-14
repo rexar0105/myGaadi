@@ -15,11 +15,37 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/context/settings-context";
 import { useAppContext } from "@/context/app-provider";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function AlertsSkeleton() {
+    return (
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                    <li key={i} className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-4">
+                          <Skeleton className="h-12 w-12 rounded-full" />
+                          <div>
+                            <Skeleton className="h-5 w-40 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-6 w-24 rounded-full" />
+                      </li>
+                ))}
+            </CardContent>
+        </Card>
+    )
+}
 
 function AlertsPageComponent() {
     const { toast } = useToast();
     const { settings } = useSettings();
-    const { serviceRecords, insurancePolicies } = useAppContext();
+    const { serviceRecords, insurancePolicies, isLoading } = useAppContext();
 
     const allAlerts = useMemo(() => {
         const upcomingServices = serviceRecords
@@ -103,6 +129,7 @@ function AlertsPageComponent() {
           Stay on top of upcoming service due dates and insurance renewals.
         </p>
       </div>
+      {isLoading ? <AlertsSkeleton /> : (
       <Card className="animate-fade-in-up">
         <CardHeader>
             <CardTitle className="font-headline flex items-center gap-2 text-xl">
@@ -184,9 +211,12 @@ function AlertsPageComponent() {
             )}
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }
 
 const AlertsPage = React.memo(AlertsPageComponent);
 export default AlertsPage;
+
+    
