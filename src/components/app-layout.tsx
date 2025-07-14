@@ -36,16 +36,15 @@ const navItems = [
 ];
 
 function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: string; icon: React.ElementType; label: string, isActive: boolean, isCentral?: boolean }) {
-  const LinkComponent = isCentral ? 'div' : Link;
 
   if (isCentral) {
     return (
       <div className="group relative">
         <Link
           href={href}
-          className="relative -top-8 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
+          className="relative -top-8 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform hover:scale-110"
         >
-          <Icon className="h-8 w-8 group-hover:animate-bot-pulse" />
+          <Icon className="h-8 w-8" />
         </Link>
       </div>
     );
@@ -55,18 +54,18 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
     <Link
       href={href}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 p-2 transition-colors text-muted-foreground w-16 h-16 relative rounded-lg",
-        isActive && "text-primary"
+        "flex flex-col items-center justify-center gap-1 p-2 transition-colors text-muted-foreground w-16 h-16 relative rounded-lg group"
       )}
     >
       <div className={cn(
-          "flex items-center justify-center h-8 w-12 rounded-full transition-colors relative",
-          isActive ? "bg-primary/10" : "bg-transparent group-hover:bg-accent/50"
+          "flex items-center justify-center h-8 w-12 rounded-full transition-all duration-200 relative",
+          isActive ? "bg-primary/10 text-primary" : "bg-transparent text-muted-foreground group-hover:bg-accent/50 group-hover:text-accent-foreground"
       )}>
-        <Icon className={cn("h-6 w-6")} />
+        <Icon className={cn("h-6 w-6 transition-transform duration-200", isActive ? "scale-110" : "group-hover:scale-110")} />
       </div>
       <span className={cn(
-          "text-xs font-medium"
+          "text-xs font-medium",
+           isActive && "text-primary"
         )}
       >
         {label}

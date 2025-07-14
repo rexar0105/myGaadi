@@ -1,7 +1,8 @@
 
 "use client";
 
-import { FileText, PlusCircle, Car, Trash2 } from "lucide-react";
+import React, { useRef, useEffect } from 'react';
+import { FileText, PlusCircle, Car, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -42,8 +43,8 @@ import { useAppContext } from "@/context/app-provider";
 const documentSchema = z.object({
   documentType: z.enum(["Registration", "Insurance", "Service", "Other"]),
   file: z
-    .instanceof(FileList)
-    .refine((files) => files?.length === 1, "A file is required."),
+    .any()
+    .refine((files) => files instanceof FileList && files?.length === 1, "A file is required."),
 });
 
 function AddDocumentForm({
@@ -53,26 +54,45 @@ function AddDocumentForm({
 }) {
   const { toast } = useToast();
   const { addDocument } = useAppContext();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
     mode: "onChange",
     defaultValues: {
       documentType: "Registration",
+      file: undefined
     },
   });
 
-  const fileRef = form.register("file");
+  const documentType = form.watch('documentType');
+  const fileValue = form.watch('file');
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+        form.setValue('file', files, { shouldValidate: true });
+    }
+  };
+
+  useEffect(() => {
+    if (fileValue && fileValue.length > 0 && form.formState.isValid) {
+        const values = form.getValues();
+        onSubmit(values);
+    }
+  }, [fileValue, form.formState.isValid]);
+
 
   function onSubmit(values: z.infer<typeof documentSchema>) {
-    const fileName = values.file[0].name;
+    const file = values.file[0];
+    const fileName = file.name;
 
     const newDocumentData = {
         vehicleId,
         documentType: values.documentType,
         fileName,
         uploadDate: new Date().toISOString(),
-        fileUrl: URL.createObjectURL(values.file[0])
+        fileUrl: URL.createObjectURL(file)
     };
     
     addDocument(newDocumentData);
@@ -82,13 +102,16 @@ function AddDocumentForm({
       description: `${fileName} has been added.`,
     });
     form.reset();
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
   }
 
   return (
     <div className="bg-muted/50 p-4 rounded-lg mt-4 border">
         <h4 className="font-semibold text-sm mb-3">Add New Document</h4>
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4 items-end">
             <FormField
                 control={form.control}
@@ -116,29 +139,29 @@ function AddDocumentForm({
                 </FormItem>
                 )}
             />
-            <FormField
-              control={form.control}
-              name="file"
-              render={() => (
-                <FormItem>
-                  <FormLabel className="text-xs">File</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/*,.pdf"
-                      {...fileRef}
-                      className="file:text-primary file:font-semibold"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormItem>
+                <FormLabel className="text-xs">File</FormLabel>
+                <FormControl>
+                     <Button asChild variant="outline" className="w-full font-normal">
+                        <label htmlFor={`file-upload-${vehicleId}`} className="w-full cursor-pointer flex items-center">
+                            <Upload className="mr-2"/>
+                            <span className="truncate max-w-[calc(100%-2rem)]">
+                                {fileValue?.[0]?.name ?? 'Select a file...'}
+                            </span>
+                             <Input
+                                id={`file-upload-${vehicleId}`}
+                                type="file"
+                                accept="image/*,.pdf"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                className="sr-only"
+                                />
+                        </label>
+                    </Button>
+                </FormControl>
+                <FormMessage />
+            </FormItem>
             </div>
-            <Button type="submit" size="sm" className="w-full sm:w-auto" disabled={!form.formState.isValid}>
-            <PlusCircle />
-            Upload Document
-            </Button>
         </form>
         </Form>
     </div>
@@ -191,10 +214,10 @@ export function MyDocuments() {
                              key={doc.id}
                              className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
                            >
-                             <div className="flex items-center gap-3">
-                               <FileText className="h-5 w-5 text-primary" />
-                               <div>
-                                 <p className="font-semibold">{doc.fileName}</p>
+                            <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 flex-1 overflow-hidden">
+                               <FileText className="h-5 w-5 text-primary shrink-0" />
+                               <div className="overflow-hidden">
+                                 <p className="font-semibold truncate">{doc.fileName}</p>
                                  <p className="text-sm text-muted-foreground">
                                    {doc.documentType} - Uploaded on{" "}
                                    {format(
@@ -203,11 +226,12 @@ export function MyDocuments() {
                                    )}
                                  </p>
                                </div>
-                             </div>
+                             </a>
                              <Button
                                variant="ghost"
                                size="icon"
                                onClick={() => handleDelete(doc.id)}
+                               className="ml-2"
                              >
                                <Trash2 className="h-4 w-4 text-destructive" />
                              </Button>

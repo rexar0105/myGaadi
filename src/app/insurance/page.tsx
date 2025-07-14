@@ -297,5 +297,3 @@ function InsurancePageComponent() {
 
 const InsurancePage = React.memo(InsurancePageComponent);
 export default InsurancePage;
-
-    
