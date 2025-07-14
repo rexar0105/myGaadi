@@ -11,14 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ConditionAssessment } from "@/components/condition-assessment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useStreamChat } from "@/hooks/use-stream-chat";
+import { useStreamChat, type ChatMessage } from "@/hooks/use-stream-chat";
 
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "bot";
-}
 
 const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
     <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
@@ -30,22 +24,20 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 function ChatAssistant() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
     user,
     profile,
   } = useAppContext();
 
+  const handleNewMessage = (message: ChatMessage) => {
+    setMessages(prev => [...prev, message]);
+  }
+
   const { input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
-    onFinish: (input, answer) => {
-        setMessages((prev) => [
-            ...prev,
-            { id: `user-${Date.now()}`, text: input, sender: 'user' },
-            { id: `bot-${Date.now()}`, text: answer, sender: 'bot' }
-        ]);
-    },
+    onNewMessage: handleNewMessage,
     onError: () => {
-        const errorMessage: Message = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
+        const errorMessage: ChatMessage = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
         setMessages((prev) => [...prev, errorMessage]);
     }
   });
@@ -107,7 +99,7 @@ function ChatAssistant() {
                 )}
             </div>
             ))}
-            {isLoading && (
+            {isLoading && currentResponse && (
                 <div className="flex items-start gap-3 justify-start">
                     <Avatar className="h-8 w-8 bg-primary/20 text-primary">
                         <AvatarFallback><AppLogo /></AvatarFallback>
@@ -117,11 +109,23 @@ function ChatAssistant() {
                     </div>
                 </div>
             )}
+             {isLoading && messages[messages.length-1]?.sender === 'user' && !currentResponse && (
+                <div className="flex items-start gap-3 justify-start">
+                    <Avatar className="h-8 w-8 bg-primary/20 text-primary">
+                        <AvatarFallback><AppLogo /></AvatarFallback>
+                    </Avatar>
+                    <div className="max-w-xs md:max-w-md p-3 rounded-xl bg-muted flex items-center gap-2">
+                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></span>
+                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></span>
+                         <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></span>
+                    </div>
+                </div>
+            )}
             <div ref={messagesEndRef} />
         </CardContent>
         
         <div className="p-4 border-t bg-background">
-            <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            <form onSubmit={(e) => handleSubmit(e, messages)} className="flex items-center gap-2">
                 <Input
                     value={input}
                     onChange={handleInputChange}

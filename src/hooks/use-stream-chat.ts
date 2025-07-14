@@ -6,12 +6,19 @@ import { streamChat } from '@/ai/flows/stream-chat-flow';
 import { useAppContext } from '@/context/app-provider';
 import { useToast } from './use-toast';
 
+
+export interface ChatMessage {
+    id: string;
+    text: string;
+    sender: "user" | "bot";
+}
+  
 interface UseStreamChatOptions {
-    onFinish: (userInput: string, response: string) => void;
+    onNewMessage: (message: ChatMessage) => void;
     onError: (error: Error) => void;
 }
 
-export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
+export function useStreamChat({ onNewMessage, onError }: UseStreamChatOptions) {
     const { toast } = useToast();
     const { vehicles, serviceRecords, expenses, insurancePolicies } = useAppContext();
     const [input, setInput] = useState('');
@@ -22,13 +29,16 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
         setInput(e.target.value);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, history: ChatMessage[]) => {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
 
         setIsLoading(true);
         setCurrentResponse('');
         const userInput = input;
+        
+        // Optimistically add user message to the UI
+        onNewMessage({ id: `user-${Date.now()}`, text: userInput, sender: 'user' });
         setInput('');
 
         try {
@@ -37,6 +47,7 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
             await streamChat(
                 {
                     query: userInput,
+                    history: history,
                     vehicles,
                     serviceRecords,
                     expenses,
@@ -48,7 +59,8 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
                 }
             );
 
-            onFinish(userInput, accumulatedResponse);
+            // Add the final bot response to the UI
+            onNewMessage({ id: `bot-${Date.now()}`, text: accumulatedResponse, sender: 'bot' });
 
         } catch (error) {
             console.error("Chat streaming error:", error);
@@ -61,6 +73,7 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
             });
         } finally {
             setIsLoading(false);
+            setCurrentResponse('');
         }
     };
     

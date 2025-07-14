@@ -34,6 +34,10 @@ const InsuranceInfoInputSchema = z.object({
 // Flow input schema remains the same
 const StreamChatInputSchema = z.object({
   query: z.string().describe("The user's question or message."),
+  history: z.array(z.object({
+    sender: z.enum(["user", "bot"]),
+    text: z.string(),
+  })).describe("The history of the conversation so far."),
   vehicles: z.array(z.any()).describe("A list of the user's vehicles."),
   serviceRecords: z.array(z.any()).describe("A list of the user's service records."),
   expenses: z.array(z.any()).describe("A list of the user's expenses."),
@@ -45,7 +49,7 @@ export type StreamChatInput = z.infer<typeof StreamChatInputSchema>;
 // The main exported function that the client will call.
 // This function itself does not need to be a Genkit flow, as it orchestrates the streaming.
 export async function streamChat(input: StreamChatInput, onChunk: (chunk: string) => void) {
-  const { query, vehicles, serviceRecords, expenses, insurancePolicies } = input;
+  const { query, history, vehicles, serviceRecords, expenses, insurancePolicies } = input;
   
   // Dynamically define tools with access to the request's data, same as before.
   const getVehicleInfo = ai.defineTool(
@@ -121,14 +125,21 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
       }
   );
 
+  const historyPrompt = history.map(message => ({
+    role: message.sender === 'user' ? 'user' : 'model',
+    parts: [{ text: message.text }],
+  }));
+
   // Use `generateStream` instead of `generate`
   const { stream, response } = generate({
     model: 'googleai/gemini-2.0-flash',
     tools: [getVehicleInfo, getServiceHistory, getExpenseHistory, getInsuranceInfo],
+    history: historyPrompt,
     prompt: `You are Gaadi Mitra, a helpful and friendly AI that helps users manage their vehicle information.
 
     - Be concise and conversational.
     - Use the provided tools to answer the user's questions about their vehicles, services, expenses, and insurance.
+    - Use the conversation history to understand context and answer follow-up questions.
     - If you don't have the information, say so. Don't make things up.
     - When providing dates, format them in a friendly way (e.g., "January 15, 2024").
     - When providing costs or amounts, always use the Indian Rupee symbol (₹).
