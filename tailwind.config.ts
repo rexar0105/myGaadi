@@ -11,8 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        headline: ['var(--font-sans)', 'sans-serif'],
+        sans: ['var(--font-figtree)', 'sans-serif'],
+        headline: ['var(--font-figtree)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -70,6 +70,7 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        '2xl': 'calc(var(--radius) + 4px)',
       },
       keyframes: {
         'accordion-down': {
