@@ -1,18 +1,17 @@
 
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Sparkles, User, Bot, Wand2, MessageSquare } from "lucide-react";
+import { useState, useRef, useEffect, useOptimistic } from "react";
+import { Send, Sparkles, User, Bot, Wand2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/context/app-provider";
-import { chatWithGaadi } from "@/ai/flows/chat-flow";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { ConditionAssessment } from "@/components/condition-assessment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useStreamChat } from "@/hooks/use-stream-chat";
 
 
 interface Message {
@@ -32,22 +31,31 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 
 function ChatAssistant() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const {
-    vehicles,
-    serviceRecords,
-    expenses,
-    insurancePolicies,
     user,
     profile,
   } = useAppContext();
+
+  const { input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
+    onFinish: (input, answer) => {
+        setMessages((prev) => [
+            ...prev,
+            { id: `user-${Date.now()}`, text: input, sender: 'user' },
+            { id: `bot-${Date.now()}`, text: answer, sender: 'bot' }
+        ]);
+    },
+    onError: () => {
+        const errorMessage: Message = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
+        setMessages((prev) => [...prev, errorMessage]);
+    }
+  });
+
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, currentResponse]);
 
   useEffect(() => {
     setMessages([
@@ -55,40 +63,6 @@ function ChatAssistant() {
         { id: 'welcome-2', text: "You can ask me things like 'When is the next service for my car?' or 'How much did I spend on fuel last month?'.", sender: 'bot'}
     ]);
   }, []);
-
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = { id: `user-${Date.now()}`, text: input, sender: "user" };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const result = await chatWithGaadi({
-        query: input,
-        vehicles,
-        serviceRecords,
-        expenses,
-        insurancePolicies,
-      });
-
-      const botMessage: Message = { id: `bot-${Date.now()}`, text: result.answer, sender: "bot" };
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Chat API error:", error);
-      toast({
-        variant: "destructive",
-        title: "Oh no! Something went wrong.",
-        description: "There was a problem communicating with the AI. Please try again.",
-      });
-      const errorMessage: Message = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return "U";
@@ -134,13 +108,12 @@ function ChatAssistant() {
             </div>
             ))}
             {isLoading && (
-                    <div className="flex items-start gap-3 justify-start">
+                <div className="flex items-start gap-3 justify-start">
                     <Avatar className="h-8 w-8 bg-primary/20 text-primary">
                         <AvatarFallback><AppLogo /></AvatarFallback>
                     </Avatar>
-                    <div className="max-w-xs md:max-w-md p-3 rounded-xl bg-muted flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            <p className="text-sm text-muted-foreground">Thinking...</p>
+                    <div className="max-w-xs md:max-w-md p-3 rounded-xl bg-muted">
+                        <p className="text-sm">{currentResponse}<span className="animate-pulse">▍</span></p>
                     </div>
                 </div>
             )}
@@ -148,20 +121,16 @@ function ChatAssistant() {
         </CardContent>
         
         <div className="p-4 border-t bg-background">
-            <form onSubmit={handleSend} className="flex items-center gap-2">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2">
                 <Input
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputChange}
                     placeholder="Ask about your vehicles..."
                     autoComplete="off"
                     disabled={isLoading}
                 />
                 <Button type="submit" disabled={isLoading || !input.trim()}>
-                    {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
                     <Send className="h-4 w-4" />
-                    )}
                     <span className="sr-only">Send</span>
                 </Button>
             </form>
