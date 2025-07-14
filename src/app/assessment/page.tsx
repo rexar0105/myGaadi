@@ -24,14 +24,12 @@ const AppLogo = (props: React.SVGProps<SVGSVGElement>) => (
 )
 
 function ChatAssistant() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const {
     user,
     profile,
   } = useAppContext();
 
-
-  const { input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
+  const { messages, setMessages, input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
     onFinish: (message) => {
         setMessages((prev) => [...prev, {id: `bot-${Date.now()}`, text: message, sender: 'bot'}]);
     },
@@ -53,7 +51,7 @@ function ChatAssistant() {
         { id: 'welcome-1', text: "Hello! I'm Gaadi Mitra, your vehicle's best friend. How can I help you today?", sender: 'bot' },
         { id: 'welcome-2', text: "You can ask me things like 'When is the next service for my car?' or 'How much did I spend on fuel last month?'.", sender: 'bot'}
     ]);
-  }, []);
+  }, [setMessages]);
 
   const getInitials = (nameOrEmail: string) => {
     if (!nameOrEmail) return "U";
@@ -69,10 +67,8 @@ function ChatAssistant() {
     if (!input.trim() || isLoading) return;
 
     const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: input, sender: 'user' };
-    const newMessages = [...messages, userMessage];
-
-    setMessages(newMessages);
-    handleSubmit(e, newMessages);
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    handleSubmit(e);
   }
     
   return (

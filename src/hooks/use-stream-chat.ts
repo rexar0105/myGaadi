@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { streamChat } from '@/ai/flows/stream-chat-flow';
 import { useAppContext } from '@/context/app-provider';
 import { useToast } from './use-toast';
@@ -21,6 +21,7 @@ interface UseStreamChatOptions {
 export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
     const { toast } = useToast();
     const { vehicles, serviceRecords, expenses, insurancePolicies } = useAppContext();
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState('');
     const [currentResponse, setCurrentResponse] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -29,20 +30,25 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
         setInput(e.target.value);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, history: ChatMessage[]) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
 
         setIsLoading(true);
         setCurrentResponse('');
         const userInput = input;
+        
+        // Add user's message to history before clearing input
+        const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: userInput, sender: 'user' };
+        const updatedHistory = [...messages, userMessage];
+
         setInput('');
 
         try {
             const fullResponse = await streamChat(
                 {
                     query: userInput,
-                    history: history,
+                    history: updatedHistory,
                     vehicles,
                     serviceRecords,
                     expenses,
@@ -53,7 +59,9 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
                 }
             );
 
-            onFinish(fullResponse);
+            // Create the final bot message once streaming is complete
+            const botMessage: ChatMessage = { id: `bot-${Date.now()}`, text: fullResponse, sender: 'bot' };
+            setMessages(prev => [...prev, botMessage]);
 
         } catch (error) {
             console.error("Chat streaming error:", error);
@@ -71,6 +79,8 @@ export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
     };
     
     return {
+        messages,
+        setMessages,
         input,
         handleInputChange,
         handleSubmit,
