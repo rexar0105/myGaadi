@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   title: 'myGaadi - Your Vehicle Companion',
   description: 'Track the health, services, and expenses of your vehicles with myGaadi.',
   manifest: '/manifest.json',
+  themeColor: '#2563eb',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'myGaadi',
+  },
 };
 
 export default function RootLayout({
@@ -28,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={figtree.variable}>
       <head>
+        <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body>
         <ThemeProvider>
