@@ -1,6 +1,6 @@
 
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Figtree } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster"
 import './globals.css';
 import { AppLayout } from '@/components/app-layout';
@@ -8,10 +8,10 @@ import { ThemeProvider } from '@/context/theme-context';
 import { SettingsProvider } from '@/context/settings-context';
 import { AppProvider } from '@/context/app-provider';
 
-const poppins = Poppins({
+const figtree = Figtree({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-poppins',
+  variable: '--font-sans',
 });
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={poppins.variable}>
+    <html lang="en" suppressHydrationWarning className={figtree.variable}>
       <head>
       </head>
       <body>
