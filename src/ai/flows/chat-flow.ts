@@ -88,12 +88,14 @@ const chatWithGaadiFlow = ai.defineFlow(
             outputSchema: z.array(z.any()),
         },
         async ({ vehicleName, query }) => {
-            let results = serviceRecords;
+            let results: ServiceRecord[] = serviceRecords;
             if (vehicleName) {
-                results = results.filter(s => s.vehicleName.toLowerCase().includes(vehicleName.toLowerCase()));
+                const lowerVehicleName = vehicleName.toLowerCase();
+                results = results.filter(s => s.vehicleName.toLowerCase().includes(lowerVehicleName));
             }
             if (query) {
-                results = results.filter(s => s.service.toLowerCase().includes(query.toLowerCase()));
+                const lowerQuery = query.toLowerCase();
+                results = results.filter(s => s.service.toLowerCase().includes(lowerQuery) || s.notes?.toLowerCase().includes(lowerQuery));
             }
             return results;
         }
@@ -107,12 +109,14 @@ const chatWithGaadiFlow = ai.defineFlow(
             outputSchema: z.array(z.any()),
         },
         async ({ vehicleName, category }) => {
-            let results = expenses;
+            let results: Expense[] = expenses;
             if (vehicleName) {
-                results = results.filter(e => e.vehicleName.toLowerCase().includes(vehicleName.toLowerCase()));
+                 const lowerVehicleName = vehicleName.toLowerCase();
+                results = results.filter(e => e.vehicleName.toLowerCase().includes(lowerVehicleName));
             }
             if (category) {
-                results = results.filter(e => e.category.toLowerCase() === category.toLowerCase());
+                const lowerCategory = category.toLowerCase();
+                results = results.filter(e => e.category.toLowerCase() === lowerCategory);
             }
             return results;
         }
@@ -127,7 +131,8 @@ const chatWithGaadiFlow = ai.defineFlow(
         },
         async ({ vehicleName }) => {
             if (vehicleName) {
-                return insurancePolicies.filter(p => p.vehicleName.toLowerCase().includes(vehicleName.toLowerCase()));
+                const lowerVehicleName = vehicleName.toLowerCase();
+                return insurancePolicies.filter(p => p.vehicleName.toLowerCase().includes(lowerVehicleName));
             }
             return insurancePolicies;
         }
