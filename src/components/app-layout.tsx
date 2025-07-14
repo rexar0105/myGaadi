@@ -45,7 +45,7 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
           href={href}
           className="relative -top-8 flex flex-col items-center justify-center h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-transform"
         >
-          <Icon className="h-8 w-8 group-hover:animate-bot-bob" />
+          <Icon className="h-8 w-8 group-hover:animate-bot-pulse" />
         </Link>
       </div>
     );
