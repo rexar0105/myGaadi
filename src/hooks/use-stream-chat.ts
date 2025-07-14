@@ -14,11 +14,11 @@ export interface ChatMessage {
 }
   
 interface UseStreamChatOptions {
-    onNewMessage: (message: ChatMessage) => void;
+    onFinish: (message: string) => void;
     onError: (error: Error) => void;
 }
 
-export function useStreamChat({ onNewMessage, onError }: UseStreamChatOptions) {
+export function useStreamChat({ onFinish, onError }: UseStreamChatOptions) {
     const { toast } = useToast();
     const { vehicles, serviceRecords, expenses, insurancePolicies } = useAppContext();
     const [input, setInput] = useState('');
@@ -36,15 +36,10 @@ export function useStreamChat({ onNewMessage, onError }: UseStreamChatOptions) {
         setIsLoading(true);
         setCurrentResponse('');
         const userInput = input;
-        
-        // Optimistically add user message to the UI
-        onNewMessage({ id: `user-${Date.now()}`, text: userInput, sender: 'user' });
         setInput('');
 
         try {
-            let accumulatedResponse = '';
-            
-            await streamChat(
+            const fullResponse = await streamChat(
                 {
                     query: userInput,
                     history: history,
@@ -54,13 +49,11 @@ export function useStreamChat({ onNewMessage, onError }: UseStreamChatOptions) {
                     insurancePolicies,
                 },
                 (chunk) => {
-                    accumulatedResponse += chunk;
-                    setCurrentResponse(accumulatedResponse);
+                    setCurrentResponse(prev => prev + chunk);
                 }
             );
 
-            // Add the final bot response to the UI
-            onNewMessage({ id: `bot-${Date.now()}`, text: accumulatedResponse, sender: 'bot' });
+            onFinish(fullResponse);
 
         } catch (error) {
             console.error("Chat streaming error:", error);

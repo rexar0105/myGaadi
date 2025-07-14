@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useRef, useEffect, useOptimistic } from "react";
-import { Send, Sparkles, User, Bot, Wand2, MessageSquare } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Send, Wand2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppContext } from "@/context/app-provider";
@@ -30,12 +30,11 @@ function ChatAssistant() {
     profile,
   } = useAppContext();
 
-  const handleNewMessage = (message: ChatMessage) => {
-    setMessages(prev => [...prev, message]);
-  }
 
   const { input, handleInputChange, handleSubmit, isLoading, currentResponse } = useStreamChat({
-    onNewMessage: handleNewMessage,
+    onFinish: (message) => {
+        setMessages((prev) => [...prev, {id: `bot-${Date.now()}`, text: message, sender: 'bot'}]);
+    },
     onError: () => {
         const errorMessage: ChatMessage = { id: `bot-error-${Date.now()}`, text: "I'm sorry, but I'm having trouble connecting right now. Please try again in a moment.", sender: 'bot'};
         setMessages((prev) => [...prev, errorMessage]);
@@ -64,15 +63,26 @@ function ChatAssistant() {
     }
     return nameOrEmail[0].toUpperCase();
   };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = { id: `user-${Date.now()}`, text: input, sender: 'user' };
+    const newMessages = [...messages, userMessage];
+
+    setMessages(newMessages);
+    handleSubmit(e, newMessages);
+  }
     
   return (
-    <Card className="flex-1 flex flex-col h-[70vh]">
+    <Card className="flex-1 flex flex-col h-[70vh] shadow-inner">
         <CardContent className="flex-1 p-4 space-y-4 overflow-y-auto">
             {messages.map((message) => (
             <div
                 key={message.id}
                 className={cn(
-                "flex items-start gap-3",
+                "flex items-end gap-2",
                 message.sender === "user" ? "justify-end" : "justify-start"
                 )}
             >
@@ -83,10 +93,10 @@ function ChatAssistant() {
                 )}
                 <div
                 className={cn(
-                    "max-w-xs md:max-w-md p-3 rounded-xl",
+                    "max-w-xs md:max-w-md p-3 rounded-2xl",
                     message.sender === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                    ? "bg-primary text-primary-foreground rounded-br-none"
+                    : "bg-muted rounded-bl-none"
                 )}
                 >
                     <p className="text-sm">{message.text}</p>
@@ -100,21 +110,21 @@ function ChatAssistant() {
             </div>
             ))}
             {isLoading && currentResponse && (
-                <div className="flex items-start gap-3 justify-start">
+                <div className="flex items-end gap-2 justify-start">
                     <Avatar className="h-8 w-8 bg-primary/20 text-primary">
                         <AvatarFallback><AppLogo /></AvatarFallback>
                     </Avatar>
-                    <div className="max-w-xs md:max-w-md p-3 rounded-xl bg-muted">
+                    <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-muted rounded-bl-none">
                         <p className="text-sm">{currentResponse}<span className="animate-pulse">▍</span></p>
                     </div>
                 </div>
             )}
              {isLoading && messages[messages.length-1]?.sender === 'user' && !currentResponse && (
-                <div className="flex items-start gap-3 justify-start">
+                <div className="flex items-end gap-2 justify-start">
                     <Avatar className="h-8 w-8 bg-primary/20 text-primary">
                         <AvatarFallback><AppLogo /></AvatarFallback>
                     </Avatar>
-                    <div className="max-w-xs md:max-w-md p-3 rounded-xl bg-muted flex items-center gap-2">
+                    <div className="max-w-xs md:max-w-md p-3 rounded-2xl bg-muted rounded-bl-none flex items-center gap-2">
                          <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></span>
                          <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></span>
                          <span className="h-2 w-2 bg-muted-foreground/50 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></span>
@@ -125,7 +135,7 @@ function ChatAssistant() {
         </CardContent>
         
         <div className="p-4 border-t bg-background">
-            <form onSubmit={(e) => handleSubmit(e, messages)} className="flex items-center gap-2">
+            <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
                 <Input
                     value={input}
                     onChange={handleInputChange}
