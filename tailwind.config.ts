@@ -95,10 +95,9 @@ export default {
           'from': { opacity: '0', transform: 'translateY(20px)' },
           'to': { opacity: '1', transform: 'translateY(0)' },
         },
-        'twinkle': {
-          '0%': { transform: 'scale(1) rotate(0deg)' },
-          '50%': { transform: 'scale(1.25) rotate(15deg)' },
-          '100%': { transform: 'scale(1) rotate(0deg)' },
+        'bot-bob': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' },
         }
       },
       animation: {
@@ -106,7 +105,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
-        'twinkle': 'twinkle 0.5s ease-in-out infinite',
+        'bot-bob': 'bot-bob 1s ease-in-out infinite',
       },
     },
   },
