@@ -8,6 +8,7 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: 'export', // Required for Capacitor to package the app
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -23,6 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    unoptimized: true, // Required for next export
   },
 };
 
