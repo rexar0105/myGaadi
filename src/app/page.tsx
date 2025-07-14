@@ -266,7 +266,7 @@ export default function DashboardPage() {
   });
 
   const newImageFile = addVehicleForm.watch('image');
-  const newImageName = newImageFile?.[0]?.name;
+  const newImagePreview = newImageFile?.[0] ? URL.createObjectURL(newImageFile[0]) : null;
 
 
   function onAddVehicleSubmit(values: z.infer<typeof vehicleSchema>) {
@@ -336,6 +336,40 @@ export default function DashboardPage() {
             </DialogHeader>
             <Form {...addVehicleForm}>
               <form onSubmit={addVehicleForm.handleSubmit(onAddVehicleSubmit)} className="space-y-4">
+                 <FormField
+                    control={addVehicleForm.control}
+                    name="image"
+                    render={({ field: { onChange, value, ...rest } }) => (
+                        <FormItem>
+                        <FormLabel>Vehicle Image (Optional)</FormLabel>
+                        <FormControl>
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-16 w-16 rounded-md">
+                                    <AvatarImage src={newImagePreview ?? undefined} className="rounded-md object-cover"/>
+                                    <AvatarFallback className="rounded-md bg-muted"><Car/></AvatarFallback>
+                                </Avatar>
+                                <Input 
+                                    id="new-image-upload"
+                                    type="file" 
+                                    accept="image/*"
+                                    className="sr-only"
+                                    onChange={(e) => onChange(e.target.files)}
+                                    {...rest}
+                                />
+                                <Button asChild variant="outline" className="w-full font-normal">
+                                    <label htmlFor="new-image-upload" className="w-full cursor-pointer flex items-center">
+                                    <Upload className="mr-2"/>
+                                    <span className="truncate max-w-[calc(100%-2rem)]">
+                                        {newImageFile?.[0]?.name ?? 'Upload an image...'}
+                                    </span>
+                                    </label>
+                                </Button>
+                            </div>
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                 />
                 <FormField
                   control={addVehicleForm.control}
                   name="name"
@@ -349,36 +383,6 @@ export default function DashboardPage() {
                     </FormItem>
                   )}
                 />
-                 <FormField
-                    control={addVehicleForm.control}
-                    name="image"
-                    render={({ field: { onChange, value, ...rest } }) => (
-                        <FormItem>
-                        <FormLabel>Vehicle Image (Optional)</FormLabel>
-                        <FormControl>
-                           <div>
-                             <Input 
-                                id="new-image-upload"
-                                type="file" 
-                                accept="image/*"
-                                className="sr-only"
-                                onChange={(e) => onChange(e.target.files)}
-                                {...rest}
-                             />
-                             <Button asChild variant="outline" className="w-full font-normal">
-                               <label htmlFor="new-image-upload" className="w-full cursor-pointer">
-                                 <Upload className="mr-2"/>
-                                 <span className="truncate max-w-[calc(100%-2rem)]">
-                                    {newImageName ?? 'Upload an image...'}
-                                 </span>
-                               </label>
-                             </Button>
-                           </div>
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField
                     control={addVehicleForm.control}

@@ -67,7 +67,11 @@ export default function ActivityPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-muted-foreground text-sm text-center py-4">No activity recorded.</p>
+                  <div className="text-center text-muted-foreground py-10 flex flex-col items-center gap-2">
+                    <History className="h-10 w-10 text-muted-foreground/50"/>
+                    <p className="font-medium">No activity recorded yet.</p>
+                    <p className="text-sm">Your vehicle services and expenses will appear here.</p>
+                  </div>
                 )}
             </CardContent>
         </Card>
