@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Wrench, PlusCircle } from "lucide-react";
+import { Wrench, PlusCircle, Calendar as CalendarIcon } from "lucide-react";
 import { format, isPast, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,14 +47,18 @@ import { cn } from "@/lib/utils";
 import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 const serviceSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
   service: z.string().min(3, "Service description must be at least 3 characters.").max(100, "Description is too long."),
-  date: z.string().refine((date) => !isNaN(Date.parse(date)), "A valid date is required."),
+  date: z.date({
+    required_error: "A valid date is required.",
+  }),
   cost: z.coerce.number().min(0, "Cost cannot be negative"),
   notes: z.string().max(250, "Notes can't exceed 250 characters.").optional(),
-  nextDueDate: z.string().optional(),
+  nextDueDate: z.date().optional(),
 });
 
 
@@ -116,10 +120,9 @@ function ServicesPageComponent() {
         defaultValues: {
             vehicleId: "",
             service: "",
-            date: new Date().toISOString().split("T")[0],
+            date: new Date(),
             cost: 0,
             notes: "",
-            nextDueDate: "",
         },
     });
 
@@ -127,7 +130,14 @@ function ServicesPageComponent() {
 
     function onSubmit(values: z.infer<typeof serviceSchema>) {
         const { vehicleId, service, date, cost, notes, nextDueDate } = values;
-        addServiceRecord({ vehicleId, service, date, cost, notes, nextDueDate });
+        addServiceRecord({ 
+            vehicleId, 
+            service, 
+            date: date.toISOString(), 
+            cost, 
+            notes, 
+            nextDueDate: nextDueDate?.toISOString() 
+        });
         
         const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name || 'Unknown Vehicle';
         toast({
@@ -136,12 +146,12 @@ function ServicesPageComponent() {
         });
         setDialogOpen(false);
         form.reset({
-             vehicleId: "",
+            vehicleId: "",
             service: "",
-            date: new Date().toISOString().split("T")[0],
+            date: new Date(),
             cost: 0,
             notes: "",
-            nextDueDate: "",
+            nextDueDate: undefined,
         });
     }
 
@@ -225,11 +235,39 @@ function ServicesPageComponent() {
                                         control={form.control}
                                         name="date"
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className="flex flex-col">
                                                 <FormLabel>Service Date</FormLabel>
-                                                <FormControl>
-                                                    <Input type="date" {...field} />
-                                                </FormControl>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <FormControl>
+                                                            <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-full pl-3 text-left font-normal",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                            >
+                                                            {field.value ? (
+                                                                format(field.value, "PPP")
+                                                            ) : (
+                                                                <span>Pick a date</span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                            </Button>
+                                                        </FormControl>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={field.value}
+                                                            onSelect={field.onChange}
+                                                            disabled={(date) =>
+                                                                date > new Date() || date < new Date("1900-01-01")
+                                                            }
+                                                            initialFocus
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
@@ -270,11 +308,39 @@ function ServicesPageComponent() {
                                     control={form.control}
                                     name="nextDueDate"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="flex flex-col">
                                             <FormLabel>Next Service Due Date (Optional)</FormLabel>
-                                            <FormControl>
-                                                <Input type="date" {...field} />
-                                            </FormControl>
+                                             <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full pl-3 text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                        >
+                                                        {field.value ? (
+                                                            format(field.value, "PPP")
+                                                        ) : (
+                                                            <span>Pick a date</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0" align="start">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={field.onChange}
+                                                        disabled={(date) =>
+                                                            date < new Date()
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
                                             <FormMessage />
                                         </FormItem>
                                     )}

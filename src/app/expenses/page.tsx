@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { IndianRupee, PlusCircle } from "lucide-react";
+import { IndianRupee, PlusCircle, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,13 +47,18 @@ import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTheme } from "@/context/theme-context";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 
 const expenseSchema = z.object({
   vehicleId: z.string().min(1, "Please select a vehicle"),
   category: z.enum(["Fuel", "Repair", "Insurance", "Other"]),
   amount: z.coerce.number().min(1, "Amount must be greater than 0"),
   description: z.string().min(3, "Description must be at least 3 characters.").max(100, "Description is too long."),
-  date: z.string().refine((date) => !isNaN(Date.parse(date)), "A valid date is required."),
+  date: z.date({
+    required_error: "A valid date is required.",
+  }),
 });
 
 const lightChartConfig: ChartConfig = {
@@ -120,14 +125,17 @@ function ExpensesPageComponent() {
       category: "Fuel",
       amount: 0,
       description: "",
-      date: new Date().toISOString().split("T")[0],
+      date: new Date(),
     },
   });
 
   const descriptionValue = form.watch('description') || '';
 
   function onSubmit(values: z.infer<typeof expenseSchema>) {
-    addExpense(values);
+    addExpense({
+      ...values,
+      date: values.date.toISOString(),
+    });
 
     toast({
       title: "Expense Added!",
@@ -139,7 +147,7 @@ function ExpensesPageComponent() {
       category: "Fuel",
       amount: 0,
       description: "",
-      date: new Date().toISOString().split("T")[0],
+      date: new Date(),
     });
   }
 
@@ -287,11 +295,39 @@ function ExpensesPageComponent() {
                   control={form.control}
                   name="date"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>Expense Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
+                      <Popover>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                                >
+                                {field.value ? (
+                                    format(field.value, "PPP")
+                                ) : (
+                                    <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                    date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                            />
+                            </PopoverContent>
+                        </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
