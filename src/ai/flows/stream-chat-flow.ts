@@ -125,7 +125,7 @@ export async function streamChat(input: StreamChatInput, onChunk: (chunk: string
   const { stream, response } = generate({
     model: 'googleai/gemini-2.0-flash',
     tools: [getVehicleInfo, getServiceHistory, getExpenseHistory, getInsuranceInfo],
-    prompt: `You are myGaadi Assistant, a helpful and friendly AI that helps users manage their vehicle information.
+    prompt: `You are Gaadi Mitra, a helpful and friendly AI that helps users manage their vehicle information.
 
     - Be concise and conversational.
     - Use the provided tools to answer the user's questions about their vehicles, services, expenses, and insurance.

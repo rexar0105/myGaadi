@@ -59,7 +59,7 @@ function ChatAssistant() {
 
   useEffect(() => {
     setMessages([
-        { id: 'welcome-1', text: "Hello! I'm your myGaadi Assistant. How can I help you today?", sender: 'bot' },
+        { id: 'welcome-1', text: "Hello! I'm Gaadi Mitra, your vehicle's best friend. How can I help you today?", sender: 'bot' },
         { id: 'welcome-2', text: "You can ask me things like 'When is the next service for my car?' or 'How much did I spend on fuel last month?'.", sender: 'bot'}
     ]);
   }, []);
@@ -154,7 +154,7 @@ export default function AssessmentPage() {
             <Tabs defaultValue="assessment" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="assessment"><Wand2/>Condition Assessment</TabsTrigger>
-                    <TabsTrigger value="chat"><MessageSquare/>Gaadi Assistant</TabsTrigger>
+                    <TabsTrigger value="chat"><MessageSquare/>Gaadi Mitra</TabsTrigger>
                 </TabsList>
                 <TabsContent value="assessment" className="mt-4">
                     <ConditionAssessment />
