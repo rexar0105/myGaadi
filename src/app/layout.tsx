@@ -17,6 +17,7 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   title: 'myGaadi - Your Vehicle Companion',
   description: 'Track the health, services, and expenses of your vehicles with myGaadi.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
