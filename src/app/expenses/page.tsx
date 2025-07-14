@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { IndianRupee, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,7 +103,7 @@ function ExpenseSkeleton() {
   )
 }
 
-export default function ExpensesPage() {
+function ExpensesPageComponent() {
   const { vehicles, expenses, addExpense, isLoading } = useAppContext();
   const { settings } = useSettings();
   const [isDialogOpen, setDialogOpen] = useState(false);
@@ -413,3 +413,6 @@ export default function ExpensesPage() {
     </div>
   );
 }
+
+const ExpensesPage = React.memo(ExpensesPageComponent);
+export default ExpensesPage;

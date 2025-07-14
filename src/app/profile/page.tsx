@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAppContext, ProfileState } from "@/context/app-provider";
 import {
@@ -114,7 +114,7 @@ function ProfileSkeleton() {
     )
 }
 
-export default function ProfilePage() {
+function ProfilePageComponent() {
   const { user, profile, setProfile, logout, isLoading, vehicles, expenses, serviceRecords, documents, insurancePolicies } = useAppContext();
   const router = useRouter();
   const { toast } = useToast();
@@ -596,3 +596,6 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+const ProfilePage = React.memo(ProfilePageComponent);
+export default ProfilePage;

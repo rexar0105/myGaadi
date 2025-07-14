@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Wrench, IndianRupee, History } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -14,7 +14,7 @@ import {
 import { useAppContext } from "@/context/app-provider";
 import { useSettings } from "@/context/settings-context";
 
-export default function ActivityPage() {
+function ActivityPageComponent() {
   const { expenses, serviceRecords } = useAppContext();
   const { settings } = useSettings();
 
@@ -78,3 +78,6 @@ export default function ActivityPage() {
     </div>
   );
 }
+
+const ActivityPage = React.memo(ActivityPageComponent);
+export default ActivityPage;

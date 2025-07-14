@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Wrench, PlusCircle } from "lucide-react";
 import { format, isPast, differenceInDays } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -104,7 +104,7 @@ function ServicesPageSkeleton() {
     )
 }
 
-export default function ServicesPage() {
+function ServicesPageComponent() {
     const { vehicles, serviceRecords, addServiceRecord, isLoading } = useAppContext();
     const { settings } = useSettings();
     const [isDialogOpen, setDialogOpen] = useState(false);
@@ -371,3 +371,6 @@ export default function ServicesPage() {
         </div>
     )
 }
+
+const ServicesPage = React.memo(ServicesPageComponent);
+export default ServicesPage;

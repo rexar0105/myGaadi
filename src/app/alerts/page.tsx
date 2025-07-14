@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Bell, ShieldCheck, Wrench } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useSettings } from "@/context/settings-context";
 import { useAppContext } from "@/context/app-provider";
 
-export default function AlertsPage() {
+function AlertsPageComponent() {
     const { toast } = useToast();
     const { settings } = useSettings();
     const { serviceRecords, insurancePolicies } = useAppContext();
@@ -187,3 +187,6 @@ export default function AlertsPage() {
     </div>
   );
 }
+
+const AlertsPage = React.memo(AlertsPageComponent);
+export default AlertsPage;

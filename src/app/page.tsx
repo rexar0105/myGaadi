@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Car, PlusCircle, Wrench, ShieldCheck, Calendar, Info, Pencil, Upload } from "lucide-react";
 import type { Vehicle } from "@/lib/types";
@@ -245,7 +245,7 @@ function EmptyGarage({ onAddVehicleClick }: { onAddVehicleClick: () => void }) {
     );
 }
 
-export default function DashboardPage() {
+function DashboardPageComponent() {
   const { vehicles, serviceRecords, insurancePolicies, addVehicle, updateVehicle, isLoading } = useAppContext();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
@@ -557,3 +557,6 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+const DashboardPage = React.memo(DashboardPageComponent);
+export default DashboardPage;

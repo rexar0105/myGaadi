@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { ShieldCheck, Calendar, PlusCircle } from "lucide-react";
 import { format, differenceInDays, isPast } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -62,7 +62,7 @@ const insuranceSchema = z.object({
 });
 
 
-export default function InsurancePage() {
+function InsurancePageComponent() {
     const { vehicles, insurancePolicies, addInsurancePolicy } = useAppContext();
     const [isDialogOpen, setDialogOpen] = useState(false);
     const { toast } = useToast();
@@ -266,3 +266,6 @@ export default function InsurancePage() {
         </div>
     )
 }
+
+const InsurancePage = React.memo(InsurancePageComponent);
+export default InsurancePage;

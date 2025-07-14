@@ -75,7 +75,7 @@ function NavLink({ href, icon: Icon, label, isActive, isCentral }: { href: strin
   );
 }
 
-export function AppLayout({ children }: { children: React.ReactNode }) {
+function AppLayoutComponent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user, profile, serviceRecords, insurancePolicies } = useAppContext();
   const router = useRouter();
   const pathname = usePathname();
@@ -197,3 +197,5 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </TooltipProvider>
   );
 }
+
+export const AppLayout = React.memo(AppLayoutComponent);
